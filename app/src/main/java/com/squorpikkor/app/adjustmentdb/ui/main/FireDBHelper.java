@@ -55,27 +55,6 @@ class FireDBHelper {
                 });
     }
 
-    void getElementFromDB_old(String table) {
-        db.collection("users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    QuerySnapshot querySnapshot = task.getResult();
-                    if (querySnapshot == null) return;
-                    //QuerySnapshot -- это список QueryDocumentSnapshot (список всех "user"-ов в таблице "users" Базы Данных )
-                    //QueryDocumentSnapshot -- это объект в БД, один "user", у которого можно будет прочитать свойства
-                    for (QueryDocumentSnapshot documentSnapshot : querySnapshot) {
-                        Map<String, Object> user = documentSnapshot.getData();
-                        Log.e(TAG, "onComplete: first - " + user.get("first").toString() + " middle - " + user.get("middle").toString());
-                    }
-                } else {
-                    Log.e(TAG, "Error - " + task.getException());
-                }
-            }
-        });
-    }
-
-
     void getElementFromDB(String table) {
         db.collection(table).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -96,17 +75,7 @@ class FireDBHelper {
         });
     }
 
-    /*void getElementFromDB(String table) {
-        db.collection(table).addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                if (queryDocumentSnapshots != null) {
-                    List<DUnit> users = queryDocumentSnapshots.toObjects(User.class);
-                    adapter.setUsers(users);
-                }
-            }
-        });
-    }*/
+
 
     //Слушатель изменений для "user", здесь немного путаница в названиях: здесь объект класса QuerySnapshot (список) называется
     // queryDocumentSnapshots (как будто это объект класса QueryDocumentSnapshot, на самом деле -- это "user", внимательно смотрим), оставил так, потому что так написано
@@ -115,10 +84,7 @@ class FireDBHelper {
         db.collection(table).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
-                if (queryDocumentSnapshots != null) {
-                    List<DUnit> units = queryDocumentSnapshots.toObjects(DUnit.class);
-//                    adapter.setUsers(users);
-                }
+                getElementFromDB(table);
             }
         });
     }

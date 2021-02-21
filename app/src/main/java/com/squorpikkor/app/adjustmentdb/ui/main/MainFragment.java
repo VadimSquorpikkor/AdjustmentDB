@@ -42,6 +42,12 @@ public class MainFragment extends Fragment {
             String serial = tSerial.getText().toString();
             mViewModel.saveDUnitToDB(new DUnit(name, serial));
         });
+        view.findViewById(R.id.buttonReadFromBD).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mViewModel.getDUnitFromBD();
+            }
+        });
         return view;
     }
 

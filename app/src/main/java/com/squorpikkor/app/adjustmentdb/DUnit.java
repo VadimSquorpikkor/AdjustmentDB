@@ -4,6 +4,9 @@ public class DUnit {
     String name;
     String serial;
 
+    public DUnit() {
+    }
+
     public DUnit(String name, String serial) {
         this.name = name;
         this.serial = serial;

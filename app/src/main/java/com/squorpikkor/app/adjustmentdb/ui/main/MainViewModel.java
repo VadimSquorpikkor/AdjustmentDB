@@ -15,6 +15,7 @@ public class MainViewModel extends ViewModel {
     public MainViewModel() {
         unitsList = new MutableLiveData<>();
         dbh = new FireDBHelper(unitsList);
+        addDUnitTableListener();
     }
 
     void saveDUnitToDB(DUnit unit) {
@@ -22,6 +23,14 @@ public class MainViewModel extends ViewModel {
     }
 
     void addBDListener() {
+        dbh.addDBListener(DUNIT_TABLE);
+    }
+
+    void getDUnitFromBD() {
+        dbh.getElementFromDB(DUNIT_TABLE);
+    }
+
+    void addDUnitTableListener() {
         dbh.addDBListener(DUNIT_TABLE);
     }
 }
