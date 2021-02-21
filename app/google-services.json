@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "446270217351",
+    "project_id": "adjustmentdb",
+    "storage_bucket": "adjustmentdb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:446270217351:android:cd7adfd6cb207be0436c22",
+        "android_client_info": {
+          "package_name": "com.squorpikkor.app.adjustmentdb"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "446270217351-lq8eak5qoh0de97e3f78l31rg84p47ue.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.squorpikkor.app.adjustmentdb",
+            "certificate_hash": "a2e36856ded4d7640ad87072c0785bc5fc5602bc"
+          }
+        },
+        {
+          "client_id": "446270217351-p076b1g4tr9alkni9hm40lt9ovf92eep.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB97rRpIqg1ySXpIBTEGSIokCxBw73r7YE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "446270217351-p076b1g4tr9alkni9hm40lt9ovf92eep.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
