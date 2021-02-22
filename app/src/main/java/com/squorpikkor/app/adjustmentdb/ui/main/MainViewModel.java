@@ -18,6 +18,7 @@ public class MainViewModel extends ViewModel {
         addDUnitTableListener();
     }
 
+    /**Сохраняет DUnit в БД в соответствующую таблицу*/
     void saveDUnitToDB(DUnit unit) {
         dbh.addElementToDB(unit, DUNIT_TABLE);
     }

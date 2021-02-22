@@ -20,7 +20,6 @@ import java.util.ArrayList;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 
-
 class FireDBHelper {
 
     FirebaseFirestore db;
@@ -31,7 +30,7 @@ class FireDBHelper {
         units = list;
     }
 
-    // Add a new document with a generated ID
+    /** Add a new document with a generated ID */
     void addElementToDB(DUnit unit, String table) {
         db.collection(table)
                 .add(unit)
@@ -49,6 +48,11 @@ class FireDBHelper {
                 });
     }
 
+    /** Метод загружает элементы из БД (все в текущей таблице). Трюк в том, что метод при получении данных
+    * заносит их в коллекцию объектов, которая является Mutable из ViewModel, ссылка на эту коллекцию
+    * объект класса FireDBHelper получает в конструкторе. Получается, что приложение, получив данные из БД
+    * в облаке сохраняет их в коллекцию, на которую подписан RecyclerView, таким образом изменения в
+    * БД автоматом отображаются в списке RecyclerView */
     void getElementFromDB(String table) {
         db.collection(table).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -59,9 +63,10 @@ class FireDBHelper {
                     //QuerySnapshot -- это список QueryDocumentSnapshot (список всех "user"-ов в таблице "users" Базы Данных )
                     //QueryDocumentSnapshot -- это объект в БД, один "user", у которого можно будет прочитать свойства
                     /*List<DUnit> units*/units.setValue((ArrayList<DUnit>) querySnapshot.toObjects(DUnit.class));
-                    for (DUnit unit:units.getValue()) {
-                        Log.e(TAG, "onComplete: name - "+unit.getName()+" "+unit.getSerial());
-                    }
+//                    if (units.getValue() == null) return;
+//                    for (DUnit unit:units.getValue()) {
+//                        Log.e(TAG, "onComplete: name - "+unit.getName()+" "+unit.getSerial());
+//                    }
                 } else {
                     Log.e(TAG, "Error - " + task.getException());
                 }
@@ -69,9 +74,12 @@ class FireDBHelper {
         });
     }
 
-    //Слушатель изменений для "user", здесь немного путаница в названиях: здесь объект класса QuerySnapshot (список) называется
-    // queryDocumentSnapshots (как будто это объект класса QueryDocumentSnapshot, на самом деле -- это "user", внимательно смотрим), оставил так, потому что так написано
-    // в оф. документации
+    /** Слушатель изменений для "user", здесь немного путаница в названиях: здесь объект класса QuerySnapshot (список) называется
+    * queryDocumentSnapshots (как будто это объект класса QueryDocumentSnapshot, на самом деле -- это "user", внимательно смотрим), оставил так, потому что так написано
+    * в оф. документации
+    * Если срабатывает событие, слушатель запускает загрузку ВСЕХ объектов из БД
+    * В будущем нужно будет загружать не все элементы, а только новые элементы в БД (или удалять удаленные из БД)
+    * иначе, когда элементов будет много, будет долго, да и трафик лишний */
     void addDBListener(String table) {
         db.collection(table).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override

@@ -27,8 +27,6 @@ import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 
 public class MainFragment extends Fragment {
 
-    private MainViewModel mViewModel;
-
     RecyclerView recyclerViewUnits;
     ArrayList<DUnit> units;
 
@@ -42,7 +40,7 @@ public class MainFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.main_fragment, container, false);
         recyclerViewUnits = view.findViewById(R.id.recycler_units);
-        mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        MainViewModel mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         units = new ArrayList<>();
         units.add(new DUnit("q", "123"));
@@ -50,12 +48,13 @@ public class MainFragment extends Fragment {
         final MutableLiveData<ArrayList<DUnit>> units = mViewModel.getUnitsList();
         units.observe(getViewLifecycleOwner(), s -> {
             this.units = units.getValue();
-            Log.e(TAG, "onCreateView: "+units.getValue().size());
+            if (units.getValue()!=null) Log.e(TAG, "onCreateView: "+units.getValue().size());
             DUnitAdapter unitsAdapter = new DUnitAdapter(this.units);
             recyclerViewUnits.setLayoutManager(new LinearLayoutManager(getActivity()));
             recyclerViewUnits.setAdapter(unitsAdapter);
         });
 
+        /**Открываем фрагмент со сканером QR-кода и кнопкой добавления в БД*/
         view.findViewById(R.id.floatingActionButton).setOnClickListener(v -> {
             // Create new fragment and transaction
             Fragment newFragment = ScannerFragment.newInstance();

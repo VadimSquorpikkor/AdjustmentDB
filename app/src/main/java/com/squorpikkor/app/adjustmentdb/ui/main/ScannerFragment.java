@@ -1,7 +1,6 @@
 package com.squorpikkor.app.adjustmentdb.ui.main;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -15,7 +14,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,7 +25,10 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
+import java.util.Objects;
 
 public class ScannerFragment extends Fragment {
 
@@ -36,10 +37,8 @@ public class ScannerFragment extends Fragment {
     EditText tSerial;
     TextView txtBarcodeValue;
     SurfaceView surfaceView;
-    private BarcodeDetector barcodeDetector;
     private CameraSource cameraSource;
     private static final int REQUEST_CAMERA_PERMISSION = 201;
-    Button btnAction;
     String intentData = "";
 
     public static ScannerFragment newInstance() {
@@ -49,36 +48,28 @@ public class ScannerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-
         View view = inflater.inflate(R.layout.fragment_scanner, container, false);
-
         tName = view.findViewById(R.id.editTextName);
         tSerial = view.findViewById(R.id.editTextSerial);
-
         mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
-
         txtBarcodeValue = view.findViewById(R.id.txtBarcodeValue);
         surfaceView = view.findViewById(R.id.surfaceView);
-//        btnAction = view.findViewById(R.id.btnAction);
 
         view.findViewById(R.id.buttonAddToBD).setOnClickListener(view1 -> {
             String name = tName.getText().toString();
             String serial = tSerial.getText().toString();
             mViewModel.saveDUnitToDB(new DUnit(name, serial));
-            getFragmentManager().popBackStackImmediate();
+            if (getFragmentManager() != null) {
+                getFragmentManager().popBackStackImmediate();
+            }
         });
 
         return view;
     }
 
-
-
     private void initialiseDetectorsAndSources() {
-
         Toast.makeText(getContext(), "Barcode scanner started", Toast.LENGTH_SHORT).show();
-
-        barcodeDetector = new BarcodeDetector.Builder(getActivity())
+        BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(Objects.requireNonNull(getActivity()))
                 .setBarcodeFormats(Barcode.ALL_FORMATS)
                 .build();
 
@@ -91,7 +82,7 @@ public class ScannerFragment extends Fragment {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
                 try {
-                    if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.checkSelfPermission(Objects.requireNonNull(getActivity()), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                         cameraSource.start(surfaceView.getHolder());
                     } else {
                         ActivityCompat.requestPermissions(getActivity(), new
@@ -101,8 +92,6 @@ public class ScannerFragment extends Fragment {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-
             }
 
             @Override
@@ -123,7 +112,7 @@ public class ScannerFragment extends Fragment {
             }
 
             @Override
-            public void receiveDetections(Detector.Detections<Barcode> detections) {
+            public void receiveDetections(@NotNull Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> barcodes = detections.getDetectedItems();
                 if (barcodes.size() != 0) {
                     txtBarcodeValue.post(() -> {
