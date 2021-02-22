@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,12 +24,16 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
+import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 
 import java.io.IOException;
 
 public class ScannerFragment extends Fragment {
 
+    private MainViewModel mViewModel;
+    EditText tName;
+    EditText tSerial;
     TextView txtBarcodeValue;
     SurfaceView surfaceView;
     private BarcodeDetector barcodeDetector;
@@ -35,8 +41,6 @@ public class ScannerFragment extends Fragment {
     private static final int REQUEST_CAMERA_PERMISSION = 201;
     Button btnAction;
     String intentData = "";
-    boolean isEmail = false;
-
 
     public static ScannerFragment newInstance() {
         return new ScannerFragment();
@@ -49,25 +53,20 @@ public class ScannerFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_scanner, container, false);
 
+        tName = view.findViewById(R.id.editTextName);
+        tSerial = view.findViewById(R.id.editTextSerial);
+
+        mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+
         txtBarcodeValue = view.findViewById(R.id.txtBarcodeValue);
         surfaceView = view.findViewById(R.id.surfaceView);
-        btnAction = view.findViewById(R.id.btnAction);
+//        btnAction = view.findViewById(R.id.btnAction);
 
-
-        btnAction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                /*if (intentData.length() > 0) {
-                    if (isEmail)
-                        startActivity(new Intent(ScannerFragment.this, EmailActivity.class).putExtra("email_address", intentData));
-                    else {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(intentData)));
-                    }
-                }*/
-
-
-            }
+        view.findViewById(R.id.buttonAddToBD).setOnClickListener(view1 -> {
+            String name = tName.getText().toString();
+            String serial = tSerial.getText().toString();
+            mViewModel.saveDUnitToDB(new DUnit(name, serial));
+            getFragmentManager().popBackStackImmediate();
         });
 
         return view;
@@ -127,31 +126,16 @@ public class ScannerFragment extends Fragment {
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> barcodes = detections.getDetectedItems();
                 if (barcodes.size() != 0) {
+                    txtBarcodeValue.post(() -> {
+                        intentData = barcodes.valueAt(0).displayValue;
+                        txtBarcodeValue.setText(intentData);
 
+                        String[] ar = intentData.split(" ");
+                        tName.setText(ar[0]);
+                        tSerial.setText(ar[1]);
 
-                    txtBarcodeValue.post(new Runnable() {
-
-                        @Override
-                        public void run() {
-
-                            if (barcodes.valueAt(0).email != null) {
-                                txtBarcodeValue.removeCallbacks(null);
-                                intentData = barcodes.valueAt(0).email.address;
-                                txtBarcodeValue.setText(intentData);
-                                isEmail = true;
-                                btnAction.setText("ADD CONTENT TO THE MAIL");
-                            } else {
-                                isEmail = false;
-                                btnAction.setText("LAUNCH URL");
-                                intentData = barcodes.valueAt(0).displayValue;
-                                txtBarcodeValue.setText(intentData);
-
-                            }
-
-                            cameraSource.stop();
-                        }
+                        cameraSource.stop();
                     });
-
                 }
             }
         });

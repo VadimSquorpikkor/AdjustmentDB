@@ -28,8 +28,7 @@ import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 public class MainFragment extends Fragment {
 
     private MainViewModel mViewModel;
-    EditText tName;
-    EditText tSerial;
+
     RecyclerView recyclerViewUnits;
     ArrayList<DUnit> units;
 
@@ -42,16 +41,7 @@ public class MainFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.main_fragment, container, false);
-        tName = view.findViewById(R.id.editTextName);
-        tSerial = view.findViewById(R.id.editTextSerial);
-        view.findViewById(R.id.buttonAddToBD).setOnClickListener(view1 -> {
-            String name = tName.getText().toString();
-            String serial = tSerial.getText().toString();
-            mViewModel.saveDUnitToDB(new DUnit(name, serial));
-        });
-
         recyclerViewUnits = view.findViewById(R.id.recycler_units);
-
         mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         units = new ArrayList<>();
@@ -66,7 +56,7 @@ public class MainFragment extends Fragment {
             recyclerViewUnits.setAdapter(unitsAdapter);
         });
 
-        view.findViewById(R.id.buttonQRScanner).setOnClickListener(v -> {
+        view.findViewById(R.id.floatingActionButton).setOnClickListener(v -> {
             // Create new fragment and transaction
             Fragment newFragment = ScannerFragment.newInstance();
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
