@@ -13,19 +13,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:inputType="textPersonName"
-        android:text="БДКГ-02"
+        android:hint="БДКГ-02"
+        tools:text="БДКГ-02"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline2" />
+        app:layout_constraintTop_toBottomOf="@+id/recycler_units" />
 
     <EditText
         android:id="@+id/editTextSerial"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:inputType="textPersonName"
-        android:text="123.002"
+        android:hint="123.002"
+        tools:text="123.002"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextName" />
@@ -35,23 +35,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Добавить в БД"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextSerial" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.33"/>
-
-    <Button
-        android:id="@+id/buttonReadFromBD"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Прочитать из базы"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_units"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonAddToBD" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/editTextName"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

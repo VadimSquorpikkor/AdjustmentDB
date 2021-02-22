@@ -22,15 +22,15 @@ public class MainViewModel extends ViewModel {
         dbh.addElementToDB(unit, DUNIT_TABLE);
     }
 
-    void addBDListener() {
-        dbh.addDBListener(DUNIT_TABLE);
-    }
-
     void getDUnitFromBD() {
         dbh.getElementFromDB(DUNIT_TABLE);
     }
 
     void addDUnitTableListener() {
         dbh.addDBListener(DUNIT_TABLE);
+    }
+
+    public MutableLiveData<ArrayList<DUnit>> getUnitsList() {
+        return unitsList;
     }
 }

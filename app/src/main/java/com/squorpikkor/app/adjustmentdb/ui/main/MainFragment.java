@@ -1,5 +1,6 @@
 package com.squorpikkor.app.adjustmentdb.ui.main;
 
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -7,24 +8,29 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.QuickContactBadge;
 
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
+
+import java.util.ArrayList;
+
+import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 
 public class MainFragment extends Fragment {
 
     private MainViewModel mViewModel;
     EditText tName;
     EditText tSerial;
-    Button bSend;
-
+    RecyclerView recyclerViewUnits;
+    ArrayList<DUnit> units;
 
     public static MainFragment newInstance() {
         return new MainFragment();
@@ -42,23 +48,24 @@ public class MainFragment extends Fragment {
             String serial = tSerial.getText().toString();
             mViewModel.saveDUnitToDB(new DUnit(name, serial));
         });
-        view.findViewById(R.id.buttonReadFromBD).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mViewModel.getDUnitFromBD();
-            }
+
+        recyclerViewUnits = view.findViewById(R.id.recycler_units);
+
+        mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+
+        units = new ArrayList<>();
+        units.add(new DUnit("q", "123"));
+
+        final MutableLiveData<ArrayList<DUnit>> units = mViewModel.getUnitsList();
+        units.observe(getViewLifecycleOwner(), s -> {
+            this.units = units.getValue();
+            Log.e(TAG, "onCreateView: "+units.getValue().size());
+            DUnitAdapter unitsAdapter = new DUnitAdapter(this.units);
+            recyclerViewUnits.setLayoutManager(new LinearLayoutManager(getActivity()));
+            recyclerViewUnits.setAdapter(unitsAdapter);
         });
+
         return view;
     }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
-        //mViewModel.saveDUnitToDB(new DUnit("БДКГ-02", "123.002"));
-
-    }
-
-
 
 }
