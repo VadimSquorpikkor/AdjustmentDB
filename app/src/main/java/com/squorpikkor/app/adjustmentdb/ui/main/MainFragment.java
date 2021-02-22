@@ -1,5 +1,6 @@
 package com.squorpikkor.app.adjustmentdb.ui.main;
 
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -63,6 +64,18 @@ public class MainFragment extends Fragment {
             DUnitAdapter unitsAdapter = new DUnitAdapter(this.units);
             recyclerViewUnits.setLayoutManager(new LinearLayoutManager(getActivity()));
             recyclerViewUnits.setAdapter(unitsAdapter);
+        });
+
+        view.findViewById(R.id.buttonQRScanner).setOnClickListener(v -> {
+            // Create new fragment and transaction
+            Fragment newFragment = ScannerFragment.newInstance();
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            // Replace whatever is in the fragment_container view with this fragment,
+            // and add the transaction to the back stack
+            transaction.replace(R.id.container, newFragment);
+            transaction.addToBackStack(null);
+            // Commit the transaction
+            transaction.commit();
         });
 
         return view;
