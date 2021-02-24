@@ -43,7 +43,6 @@ public class MainFragment extends Fragment {
         MainViewModel mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         units = new ArrayList<>();
-        units.add(new DUnit("q", "123"));
 
         final MutableLiveData<ArrayList<DUnit>> units = mViewModel.getUnitsList();
         units.observe(getViewLifecycleOwner(), s -> {

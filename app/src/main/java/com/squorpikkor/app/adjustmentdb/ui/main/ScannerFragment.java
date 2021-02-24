@@ -8,12 +8,14 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,12 +25,16 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.squorpikkor.app.adjustmentdb.DUnit;
+import com.squorpikkor.app.adjustmentdb.Encrypter;
 import com.squorpikkor.app.adjustmentdb.R;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+
+import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 
 public class ScannerFragment extends Fragment {
 
@@ -40,6 +46,8 @@ public class ScannerFragment extends Fragment {
     private CameraSource cameraSource;
     private static final int REQUEST_CAMERA_PERMISSION = 201;
     String intentData = "";
+    Button sendButton;
+    private static final String SPLIT_SYMBOL = " ";
 
     public static ScannerFragment newInstance() {
         return new ScannerFragment();
@@ -51,11 +59,15 @@ public class ScannerFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_scanner, container, false);
         tName = view.findViewById(R.id.editTextName);
         tSerial = view.findViewById(R.id.editTextSerial);
+        sendButton = view.findViewById(R.id.buttonAddToBD);
         mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
         txtBarcodeValue = view.findViewById(R.id.txtBarcodeValue);
         surfaceView = view.findViewById(R.id.surfaceView);
+        txtBarcodeValue.setVisibility(View.GONE);
+        sendButton.setEnabled(false);
 
-        view.findViewById(R.id.buttonAddToBD).setOnClickListener(view1 -> {
+
+        sendButton.setOnClickListener(view1 -> {
             String name = tName.getText().toString();
             String serial = tSerial.getText().toString();
             mViewModel.saveDUnitToDB(new DUnit(name, serial));
@@ -63,6 +75,8 @@ public class ScannerFragment extends Fragment {
                 getFragmentManager().popBackStackImmediate();
             }
         });
+
+
 
         return view;
     }
@@ -119,15 +133,30 @@ public class ScannerFragment extends Fragment {
                         intentData = barcodes.valueAt(0).displayValue;
                         txtBarcodeValue.setText(intentData);
 
-                        String[] ar = intentData.split(" ");
-                        tName.setText(ar[0]);
-                        tSerial.setText(ar[1]);
+                        txtBarcodeValue.setVisibility(View.VISIBLE);
+                        Log.e(TAG, "************* " + decodeMe(intentData));
 
+                        String[] ar = intentData.split(SPLIT_SYMBOL);
+                        if (ar.length == 2) {
+                            tName.setText(ar[0]);
+                            tSerial.setText(ar[1]);
+                            sendButton.setEnabled(true);
+
+
+                        }
                         cameraSource.stop();
                     });
                 }
             }
         });
+    }
+
+    private String decodeMe(String code) {
+        String output = "";
+        String inputString = code;
+        byte[] byteArray = inputString.getBytes(StandardCharsets.UTF_16LE);
+        output = new String(Encrypter.convertData(byteArray), StandardCharsets.UTF_16LE);
+        return output;
     }
 
 
