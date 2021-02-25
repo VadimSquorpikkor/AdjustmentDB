@@ -37,7 +37,7 @@ class DUnitAdapter extends RecyclerView.Adapter<DUnitAdapter.DUnitViewHolder>{
     public void onBindViewHolder(@NonNull DUnitViewHolder holder, int position) {
         DUnit unit = units.get(position);
         holder.tName.setText(unit.getName());
-        holder.tSerial.setText(unit.getSerial());
+        holder.tSerial.setText(unit.getInnerSerial());
     }
 
     /**Просто возвращает кол-во элементов в массиве*/
