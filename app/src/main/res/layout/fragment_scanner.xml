@@ -65,21 +65,19 @@
         android:layout_height="wrap_content"
         android:background="#ffffff"
         android:paddingHorizontal="4dp"
-        android:textColor="#FF9800"
-        android:textSize="34sp"
-        app:layout_constraintBottom_toBottomOf="@+id/surfaceView"
+        android:textColor="#333333"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="@+id/surfaceView"
-        app:layout_constraintStart_toStartOf="@+id/surfaceView"
         app:layout_constraintTop_toTopOf="@+id/surfaceView"
         tools:text="БДКГ-02 12345" />
 
-<!--        style="@style/nice_button"-->
-<!--        android:layout_margin="8dp"-->
     <Button
+        style="@style/nice_button"
+        android:layout_margin="8dp"
         android:id="@+id/buttonAddToBD"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Добавить в БД"
+        android:text="Нет данных"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

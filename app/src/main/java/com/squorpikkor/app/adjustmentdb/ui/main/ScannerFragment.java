@@ -22,7 +22,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
@@ -148,9 +147,8 @@ public class ScannerFragment extends Fragment {
            if (units==null)return;
            if (units.size()>1) Log.e(TAG, "* Есть несколько устройств с таким серийником!!!");
            if (units.size() != 0) insertDataToFields(units.get(0));
-
+           sendButton.setText("Обновить данные в БД");
         });
-
 
         return view;
     }
@@ -163,7 +161,7 @@ public class ScannerFragment extends Fragment {
     }
 
     private void initialiseDetectorsAndSources() {
-        Toast.makeText(getContext(), "Barcode scanner started", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getContext(), "Barcode scanner started", Toast.LENGTH_SHORT).show();
         BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(Objects.requireNonNull(getActivity()))
                 .setBarcodeFormats(Barcode.ALL_FORMATS)
                 .build();
@@ -203,7 +201,7 @@ public class ScannerFragment extends Fragment {
         barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
             @Override
             public void release() {
-                Toast.makeText(getContext(), "To prevent memory leaks barcode scanner has been stopped", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(), "To prevent memory leaks barcode scanner has been stopped", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -224,7 +222,7 @@ public class ScannerFragment extends Fragment {
                             tName.setText(name);
                             tInnerSerial.setText(innerSerial);
                             sendButton.setEnabled(true);
-
+                            sendButton.setText("Добавить в БД");
                             mViewModel.getDUnitByNameAndInnerSerial(name, innerSerial);
 
                         }
