@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
@@ -35,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Objects;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
@@ -62,6 +64,12 @@ public class ScannerFragment extends Fragment {
     private static final int REQUEST_CAMERA_PERMISSION = 201;
     String intentData = "";
     private static final String SPLIT_SYMBOL = " ";
+
+    //todo по сути — для units не нужна коллекция, нужен только один DUnit. С другой стороны БД
+    // отдает всё, чтоона нашла по данному серийнику и это всё она отдает. Забота ScannerFragment'a
+    // решать, что с этим всем делать, если нашлось несколько, то можно предупредить пользователя,
+    // что есть несколько устройств в базе с одинаковым именем
+    ArrayList<DUnit> units;
 
     public static ScannerFragment newInstance() {
         return new ScannerFragment();
@@ -123,6 +131,7 @@ public class ScannerFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 tState.setText(parent.getItemAtPosition(position).toString());
+                if (position == 0) tState.setText("");
             }
 
             @Override
@@ -131,9 +140,26 @@ public class ScannerFragment extends Fragment {
             }
         });
 
+        units = new ArrayList<>();
+
+        final MutableLiveData<ArrayList<DUnit>> selectedUnits = mViewModel.getSelectedUnits();
+        selectedUnits.observe(getViewLifecycleOwner(), s -> {
+           units = selectedUnits.getValue();
+           if (units==null)return;
+           if (units.size()>1) Log.e(TAG, "* Есть несколько устройств с таким серийником!!!");
+           if (units.size() != 0) insertDataToFields(units.get(0));
+
+        });
 
 
         return view;
+    }
+
+    void insertDataToFields(DUnit unit) {
+        tName.setText(unit.getName());
+        tInnerSerial.setText(unit.getInnerSerial());
+        tSerial.setText(unit.getSerial());
+        tState.setText(unit.getState());
     }
 
     private void initialiseDetectorsAndSources() {
@@ -189,14 +215,17 @@ public class ScannerFragment extends Fragment {
                         txtBarcodeValue.setText(intentData);
 
                         txtBarcodeValue.setVisibility(View.VISIBLE);
-                        Log.e(TAG, "************* " + decodeMe(intentData));
+                        Log.e(TAG, "******decode******* " + decodeMe(intentData));
 
                         String[] ar = intentData.split(SPLIT_SYMBOL);
                         if (ar.length == 2) {
-                            tName.setText(ar[0]);
-                            tInnerSerial.setText(ar[1]);
+                            String name = ar[0];
+                            String innerSerial = ar[1];
+                            tName.setText(name);
+                            tInnerSerial.setText(innerSerial);
                             sendButton.setEnabled(true);
 
+                            mViewModel.getDUnitByNameAndInnerSerial(name, innerSerial);
 
                         }
                         cameraSource.stop();
