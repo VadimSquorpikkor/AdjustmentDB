@@ -11,7 +11,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
-        versionName "1.06"
+        versionName "1.07"
+        setProperty("archivesBaseName", "AdjustmentDB-v" + versionName)
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

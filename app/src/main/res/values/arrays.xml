@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="state_array">
+        <item>На сборке</item>
+        <item>На регулировке</item>
+        <item>На линейке</item>
+    </string-array>
+</resources>

@@ -52,7 +52,10 @@ class FireDBHelper {
     * заносит их в коллекцию объектов, которая является Mutable из ViewModel, ссылка на эту коллекцию
     * объект класса FireDBHelper получает в конструкторе. Получается, что приложение, получив данные из БД
     * в облаке сохраняет их в коллекцию, на которую подписан RecyclerView, таким образом изменения в
-    * БД автоматом отображаются в списке RecyclerView */
+    * БД автоматом отображаются в списке RecyclerView
+    *
+    * QuerySnapshot -- это список QueryDocumentSnapshot (список всех "user"-ов в таблице "users" Базы Данных )
+    * QueryDocumentSnapshot -- это объект в БД, один "user", у которого можно будет прочитать свойства */
     void getElementFromDB(String table) {
         db.collection(table).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -60,13 +63,7 @@ class FireDBHelper {
                 if (task.isSuccessful()) {
                     QuerySnapshot querySnapshot = task.getResult();
                     if (querySnapshot == null) return;
-                    //QuerySnapshot -- это список QueryDocumentSnapshot (список всех "user"-ов в таблице "users" Базы Данных )
-                    //QueryDocumentSnapshot -- это объект в БД, один "user", у которого можно будет прочитать свойства
-                    /*List<DUnit> units*/units.setValue((ArrayList<DUnit>) querySnapshot.toObjects(DUnit.class));
-//                    if (units.getValue() == null) return;
-//                    for (DUnit unit:units.getValue()) {
-//                        Log.e(TAG, "onComplete: name - "+unit.getName()+" "+unit.getSerial());
-//                    }
+                    units.setValue((ArrayList<DUnit>) querySnapshot.toObjects(DUnit.class));
                 } else {
                     Log.e(TAG, "Error - " + task.getException());
                 }

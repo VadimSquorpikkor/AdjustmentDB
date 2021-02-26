@@ -22,9 +22,9 @@ class DUnitAdapter extends RecyclerView.Adapter<DUnitAdapter.DUnitViewHolder>{
         this.units = units;
     }
 
+    /**Присваиваем xml лэйаут к итему RecyclerView */
     @NonNull
     @Override
-    /**Присваиваем xml лэйаут к итему RecyclerView */
     public DUnitViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.dunit_item, parent, false);
         return new DUnitViewHolder(view);
@@ -37,7 +37,9 @@ class DUnitAdapter extends RecyclerView.Adapter<DUnitAdapter.DUnitViewHolder>{
     public void onBindViewHolder(@NonNull DUnitViewHolder holder, int position) {
         DUnit unit = units.get(position);
         holder.tName.setText(unit.getName());
-        holder.tSerial.setText(unit.getInnerSerial());
+        holder.tInnerSerial.setText(unit.getInnerSerial());
+        holder.tSerial.setText(unit.getSerial());
+        holder.tState.setText(unit.getState());
     }
 
     /**Просто возвращает кол-во элементов в массиве*/
@@ -48,12 +50,16 @@ class DUnitAdapter extends RecyclerView.Adapter<DUnitAdapter.DUnitViewHolder>{
 
     static class DUnitViewHolder extends RecyclerView.ViewHolder {
         private final TextView tName;
+        private final TextView tInnerSerial;
         private final TextView tSerial;
+        private final TextView tState;
 
         public DUnitViewHolder(@NonNull View itemView) {
             super(itemView);
             tName = itemView.findViewById(R.id.textName);
+            tInnerSerial = itemView.findViewById(R.id.textInnerSerial);
             tSerial = itemView.findViewById(R.id.textSerial);
+            tState = itemView.findViewById(R.id.textState);
         }
     }
 }

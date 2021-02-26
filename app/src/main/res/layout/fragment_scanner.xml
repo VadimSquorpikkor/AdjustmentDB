@@ -6,55 +6,65 @@
     android:layout_height="match_parent"
     tools:context=".ui.main.ScannerFragment">
 
-
-    <SurfaceView
-        android:id="@+id/surfaceView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/buttonAddToBD"
-
-        app:layout_constraintTop_toBottomOf="@+id/spinner"
-        tools:layout_editor_absoluteX="0dp" />
-
     <EditText
         android:id="@+id/editTextName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="БДКГ-02"
+        style="@style/for_data_input"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="БДКГ-02" />
 
     <EditText
-        android:id="@+id/editTextSerial"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="12345"
+        android:id="@+id/editTextInnerSerial"
+        style="@style/for_data_input"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextName"
         tools:text="12345" />
 
-    <Button
-        android:id="@+id/buttonAddToBD"
+    <EditText
+        android:id="@+id/editTextSerial"
+        style="@style/for_data_input"
+        android:inputType="textPersonName"
+        tools:text="123.002"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextInnerSerial" />
+
+    <EditText
+        android:id="@+id/editTextState"
+        style="@style/for_data_input"
+        android:inputType="textPersonName"
+        tools:text="На линейке"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextSerial" />
+
+    <Spinner
+        android:id="@+id/spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Добавить в БД"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextState" />
+
+    <SurfaceView
+        android:id="@+id/surfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/buttonAddToBD"
+        app:layout_constraintTop_toBottomOf="@+id/spinner"
+        tools:layout_editor_absoluteX="0dp" />
 
     <TextView
         android:id="@+id/txtBarcodeValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="4dp"
         android:background="#ffffff"
-        android:textColor="#4CAF50"
+        android:paddingHorizontal="4dp"
+        android:textColor="#FF9800"
         android:textSize="34sp"
         app:layout_constraintBottom_toBottomOf="@+id/surfaceView"
         app:layout_constraintEnd_toEndOf="@+id/surfaceView"
@@ -62,24 +72,62 @@
         app:layout_constraintTop_toTopOf="@+id/surfaceView"
         tools:text="БДКГ-02 12345" />
 
-    <Spinner
-        android:id="@+id/spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextTextPersonName" />
-
-    <EditText
-        android:id="@+id/editTextTextPersonName"
+    <Button
+        android:id="@+id/buttonAddToBD"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:hint="123.002"
-        tools:text="123.002"
+        android:text="Добавить в БД"
+
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/actionButtonEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#FF5722"
+        android:clickable="true"
+        app:backgroundTint="#F44336"
+        android:layout_margin="25dp"
+        android:src="@drawable/ic_baseline_edit_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:gravity="center_vertical|end"
+        android:text="Название"
+        app:layout_constraintEnd_toStartOf="@+id/editTextName"
+        app:layout_constraintTop_toTopOf="@+id/editTextName" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:gravity="center_vertical|end"
+        android:text="Внутренний\nномер"
+        app:layout_constraintEnd_toStartOf="@+id/editTextInnerSerial"
+        app:layout_constraintTop_toBottomOf="@+id/editTextName" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:gravity="center_vertical|end"
+        android:text="Серийный\nномер"
+        app:layout_constraintEnd_toStartOf="@+id/editTextSerial"
+        app:layout_constraintTop_toBottomOf="@+id/editTextInnerSerial" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:gravity="center_vertical|end"
+        android:text="Статус\nприбора"
+        app:layout_constraintEnd_toStartOf="@+id/editTextState"
         app:layout_constraintTop_toBottomOf="@+id/editTextSerial" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

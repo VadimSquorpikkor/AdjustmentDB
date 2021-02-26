@@ -15,8 +15,11 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,15 +41,26 @@ import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 
 public class ScannerFragment extends Fragment {
 
+    //todo Разделить на два фрагмента: QR-сканер и отображение и редактирование данных. А лучше —
+    // фрагмент сканнера слелать внутри фрагмента данных, кнопка "Добавить в БД" так останется внизу
+    // (ну и где это будет нужно)
+
     private MainViewModel mViewModel;
+
     EditText tName;
+    EditText tInnerSerial;
     EditText tSerial;
+    EditText tState;
+
     TextView txtBarcodeValue;
     SurfaceView surfaceView;
+    Button sendButton;
+
+    boolean state;
+
     private CameraSource cameraSource;
     private static final int REQUEST_CAMERA_PERMISSION = 201;
     String intentData = "";
-    Button sendButton;
     private static final String SPLIT_SYMBOL = " ";
 
     public static ScannerFragment newInstance() {
@@ -57,22 +71,63 @@ public class ScannerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_scanner, container, false);
-        tName = view.findViewById(R.id.editTextName);
-        tSerial = view.findViewById(R.id.editTextSerial);
-        sendButton = view.findViewById(R.id.buttonAddToBD);
         mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+
+        tName = view.findViewById(R.id.editTextName);
+        tInnerSerial = view.findViewById(R.id.editTextInnerSerial);
+        tSerial = view.findViewById(R.id.editTextSerial);
+        tState = view.findViewById(R.id.editTextState);
+
+        tName.setEnabled(false);
+        tInnerSerial.setEnabled(false);
+        tSerial.setEnabled(false);
+        tState.setEnabled(false);
+
+        sendButton = view.findViewById(R.id.buttonAddToBD);
         txtBarcodeValue = view.findViewById(R.id.txtBarcodeValue);
         surfaceView = view.findViewById(R.id.surfaceView);
         txtBarcodeValue.setVisibility(View.GONE);
         sendButton.setEnabled(false);
 
-
+        /**Создает новый объект DUnit, заполняет его данными из формы и отправляет объект в БД*/
         sendButton.setOnClickListener(view1 -> {
             String name = tName.getText().toString();
+            String innerSerial = tInnerSerial.getText().toString();
             String serial = tSerial.getText().toString();
-            mViewModel.saveDUnitToDB(new DUnit(name, serial));
+            String state = tState.getText().toString();
+            mViewModel.saveDUnitToDB(new DUnit(name, innerSerial, serial, state));
             if (getFragmentManager() != null) {
                 getFragmentManager().popBackStackImmediate();
+            }
+        });
+
+        /**Кнопка включения/включения режима редактирования для полей EditText*/
+        view.findViewById(R.id.actionButtonEdit).setOnClickListener(v -> {
+            state = !state;
+            tName.setEnabled(state);
+            tInnerSerial.setEnabled(state);
+            tSerial.setEnabled(state);
+            tState.setEnabled(state);
+        });
+
+        Spinner spinner = (Spinner) view.findViewById(R.id.spinner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.state_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                tState.setText(parent.getItemAtPosition(position).toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
             }
         });
 
@@ -139,7 +194,7 @@ public class ScannerFragment extends Fragment {
                         String[] ar = intentData.split(SPLIT_SYMBOL);
                         if (ar.length == 2) {
                             tName.setText(ar[0]);
-                            tSerial.setText(ar[1]);
+                            tInnerSerial.setText(ar[1]);
                             sendButton.setEnabled(true);
 
 

@@ -4,26 +4,25 @@ public class DUnit {
     String name; //БДКГ-02
     String innerSerial; //№12345
     String serial; //132.002
-    int category;
+    String state; //"На линейке"
 
-    public static final String НА_СБОРКЕ = "На сборке";
-    public static final String НА_РЕГУЛИРОВКЕ = "На регулировке";
-    public static final String НА_ЛИНЕЙКЕ = "На линейке";
-
-    public int getCategory() {
-        return category;
-    }
-
-    public void setCategory(int category) {
-        this.category = category;
-    }
-
+    /**Конструктор без параметров нужен для работы с Firebase*/
     public DUnit() {
     }
 
-    public DUnit(String name, String serial) {
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public DUnit(String name, String innerSerial, String serial, String state) {
         this.name = name;
-        this.innerSerial = serial;
+        this.innerSerial = innerSerial;
+        this.serial = serial;
+        this.state = state;
     }
 
     public String getName() {
