@@ -28,16 +28,15 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.squorpikkor.app.adjustmentdb.DUnit;
-import com.squorpikkor.app.adjustmentdb.Encrypter;
 import com.squorpikkor.app.adjustmentdb.R;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static com.squorpikkor.app.adjustmentdb.Encrypter.decodeMe;
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 
 public class ScannerFragment extends Fragment {
@@ -210,10 +209,10 @@ public class ScannerFragment extends Fragment {
                 if (barcodes.size() != 0) {
                     txtBarcodeValue.post(() -> {
                         intentData = barcodes.valueAt(0).displayValue;
-                        txtBarcodeValue.setText(intentData);
 
+                        intentData = decodeMe(intentData);
+                        txtBarcodeValue.setText(intentData);
                         txtBarcodeValue.setVisibility(View.VISIBLE);
-                        Log.e(TAG, "******decode******* " + decodeMe(intentData));
 
                         String[] ar = intentData.split(SPLIT_SYMBOL);
                         if (ar.length == 2) {
@@ -232,15 +231,6 @@ public class ScannerFragment extends Fragment {
             }
         });
     }
-
-    private String decodeMe(String code) {
-        String output = "";
-        String inputString = code;
-        byte[] byteArray = inputString.getBytes(StandardCharsets.UTF_16LE);
-        output = new String(Encrypter.convertData(byteArray), StandardCharsets.UTF_16LE);
-        return output;
-    }
-
 
     @Override
     public void onPause() {

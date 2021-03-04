@@ -2,29 +2,42 @@ package com.squorpikkor.app.adjustmentdb;
 
 public class Encrypter {
 
-    /**
-     * The key is used in encryption algorithm
-     */
-    private final static byte[] mKey = new byte[]{
-            108, (byte) 234, 63, (byte) 156, 78, 47, 9, 73, (byte) 217, 48, (byte) 158};
+    private final static int[] mKey = new int[]{
+             128, 214, 36, 111, 87, 74, 8, 33, 117, 48, 158};
 
-    /**
-     * Encrypts given byte array and decode it if array has been already encrypted
-     *
-     * @param inArray a byte array to encrypt
-     * @return encrypted byte array
-     */
-    public static byte[] convertData(byte[] inArray) {
-        byte[] outArray = new byte[inArray.length];
+    public static int[] convertData(int[] inArray) {
+        int[] outArray = new int[inArray.length];
         int kN = 0;
         for (int i = 0; i < inArray.length; i++) {
-            byte b1 = inArray[i];
-            byte b2 = mKey[kN];
-            outArray[i] = (byte) (b1 ^ b2);
+            int b1 = inArray[i];
+            int b2 = mKey[kN];
+            outArray[i] = b1 ^ b2;
             kN++;
             if (kN >= mKey.length)
                 kN = 0;
         }
         return outArray;
+    }
+
+    static int[] arrFromString(String s) {
+        int[] arr = new int[s.length()];
+        for (int i = 0; i < s.length(); i++) {
+            arr[i] = s.charAt(i);
+        }
+        return arr;
+    }
+
+    static String stringFromArr(int[] arr) {
+        StringBuilder s = new StringBuilder();
+        char ch;
+        for (int i = 0; i < arr.length; i++) {
+            ch = (char)arr[i];
+            s.append(ch);
+        }
+        return s.toString();
+    }
+
+    public static String decodeMe(String code) {
+        return stringFromArr(Encrypter.convertData(arrFromString(code)));
     }
 }
