@@ -47,6 +47,7 @@ public class ScannerFragment extends Fragment {
 
     private MainViewModel mViewModel;
 
+    EditText tId;
     EditText tName;
     EditText tInnerSerial;
     EditText tSerial;
@@ -58,10 +59,13 @@ public class ScannerFragment extends Fragment {
 
     boolean state;
 
+    boolean isRepairDev;
+
     private CameraSource cameraSource;
     private static final int REQUEST_CAMERA_PERMISSION = 201;
     String intentData = "";
     private static final String SPLIT_SYMBOL = " ";
+    private static final String REPAIR_UNIT = "Ремонт";
 
     //todo по сути — для units не нужна коллекция, нужен только один DUnit. С другой стороны БД
     // отдает всё, чтоона нашла по данному серийнику и это всё она отдает. Забота ScannerFragment'a
@@ -79,11 +83,13 @@ public class ScannerFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_scanner, container, false);
         mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
+        tId = view.findViewById(R.id.editTextId);
         tName = view.findViewById(R.id.editTextName);
         tInnerSerial = view.findViewById(R.id.editTextInnerSerial);
         tSerial = view.findViewById(R.id.editTextSerial);
         tState = view.findViewById(R.id.editTextState);
 
+        tId.setEnabled(false);
         tName.setEnabled(false);
         tInnerSerial.setEnabled(false);
         tSerial.setEnabled(false);
@@ -97,11 +103,13 @@ public class ScannerFragment extends Fragment {
 
         /**Создает новый объект DUnit, заполняет его данными из формы и отправляет объект в БД*/
         sendButton.setOnClickListener(view1 -> {
+            String id = tId.getText().toString();
             String name = tName.getText().toString();
             String innerSerial = tInnerSerial.getText().toString();
             String serial = tSerial.getText().toString();
             String state = tState.getText().toString();
-            mViewModel.saveDUnitToDB(new DUnit(name, innerSerial, serial, state));
+            if (isRepairDev) mViewModel.saveRepairUnitToDB(new DUnit(id, name, innerSerial, serial, state));
+            else mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state));
             if (getFragmentManager() != null) {
                 getFragmentManager().popBackStackImmediate();
             }
@@ -110,6 +118,7 @@ public class ScannerFragment extends Fragment {
         /**Кнопка включения/включения режима редактирования для полей EditText*/
         view.findViewById(R.id.actionButtonEdit).setOnClickListener(v -> {
             state = !state;
+            tId.setEnabled(state);
             tName.setEnabled(state);
             tInnerSerial.setEnabled(state);
             tSerial.setEnabled(state);
@@ -146,13 +155,26 @@ public class ScannerFragment extends Fragment {
            if (units==null)return;
            if (units.size()>1) Log.e(TAG, "* Есть несколько устройств с таким серийником!!!");
            if (units.size() != 0) insertDataToFields(units.get(0));
-           sendButton.setText("Обновить данные в БД");
+           if (isRepairDev) sendButton.setText("Отправить данные в БД (ремонт)");
+           else sendButton.setText("Отправить данные в БД");
+        });
+
+        final MutableLiveData<Boolean> isRepairUnit = mViewModel.getIsRepair();
+        isRepairUnit.observe(getViewLifecycleOwner(), isRepair -> {
+            if (isRepair) {
+                isRepairDev = true;
+                tId.setVisibility(View.VISIBLE);
+            } else {
+                isRepairDev = false;
+                tId.setVisibility(View.GONE);
+            }
         });
 
         return view;
     }
 
     void insertDataToFields(DUnit unit) {
+        tId.setText(unit.getId());
         tName.setText(unit.getName());
         tInnerSerial.setText(unit.getInnerSerial());
         tSerial.setText(unit.getSerial());
@@ -209,27 +231,40 @@ public class ScannerFragment extends Fragment {
                 if (barcodes.size() != 0) {
                     txtBarcodeValue.post(() -> {
                         intentData = barcodes.valueAt(0).displayValue;
-
-                        intentData = decodeMe(intentData);
-                        txtBarcodeValue.setText(intentData);
-                        txtBarcodeValue.setVisibility(View.VISIBLE);
-
-                        String[] ar = intentData.split(SPLIT_SYMBOL);
-                        if (ar.length == 2) {
-                            String name = ar[0];
-                            String innerSerial = ar[1];
-                            tName.setText(name);
-                            tInnerSerial.setText(innerSerial);
-                            sendButton.setEnabled(true);
-                            sendButton.setText("Добавить в БД");
-                            mViewModel.getDUnitByNameAndInnerSerial(name, innerSerial);
-
-                        }
+                        workingWithBarCode(intentData);
                         cameraSource.stop();
                     });
                 }
             }
         });
+    }
+
+    private void workingWithBarCode(String intentData) {
+        intentData = decodeMe(intentData);
+        txtBarcodeValue.setText(intentData);
+        txtBarcodeValue.setVisibility(View.VISIBLE);
+
+        String[] ar = intentData.split(SPLIT_SYMBOL);
+        if (ar.length == 2) {
+            //Для серии: имя+внутренний_серийный (БДКГ-02 1234)
+            //Для ремонта: "Ремонт"+id (Ремонт 0001)
+            String name = ar[0];
+            String innerSerial = ar[1];
+            if (name.equals(REPAIR_UNIT)) {//Если это ремонт
+                mViewModel.setIsRepair(true);
+                tId.setText(innerSerial);
+                sendButton.setEnabled(true);
+                sendButton.setText("Добавить в БД (ремонт)");
+                mViewModel.getRepairUnitById(innerSerial);
+            } else {
+                mViewModel.setIsRepair(false);
+                tName.setText(name);//Если это серия
+                tInnerSerial.setText(innerSerial);
+                sendButton.setEnabled(true);
+                sendButton.setText("Добавить в БД");
+                mViewModel.getDUnitByNameAndInnerSerial(name, innerSerial);
+            }
+        }
     }
 
     @Override

@@ -19,6 +19,7 @@ import com.squorpikkor.app.adjustmentdb.DUnit;
 import java.util.ArrayList;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIRS_TABLE;
 
 class FireDBHelper {
 
@@ -33,8 +34,10 @@ class FireDBHelper {
      * его содержимое будет перезаписано вновь предоставленными данными
      */
     void addElementToDB(DUnit unit, String table) {
+        String documentName = "" + unit.getName() + "_" + unit.getInnerSerial();//2140_45665
+        if (table.equals(REPAIRS_TABLE)) documentName = "r_" + unit.getId();//r_0001
         db.collection(table)
-                .document("" + unit.getName() + "_" + unit.getInnerSerial())
+                .document(documentName)
                 .set(unit)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -95,11 +98,6 @@ class FireDBHelper {
             }
         });
     }
-
-    //todo сделать метод, который будет сохранять все полученные типы БД в Set и сохранять этот сет
-    // на облаке (это будет отдельная таблица) — так у всех экземпляров приложения будет список
-    // возможных типов, по которому можно будет через спиннер сделать фильтр для отображения
-    // устройств по их типам
 
     /**
      * Слушатель изменений для "user", здесь немного путаница в названиях: здесь объект класса QuerySnapshot (список) называется

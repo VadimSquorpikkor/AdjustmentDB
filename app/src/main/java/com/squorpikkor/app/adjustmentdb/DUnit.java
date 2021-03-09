@@ -5,9 +5,19 @@ public class DUnit {
     String innerSerial; //№12345
     String serial; //132.002
     String state; //"На линейке"
+    String id; //"0001"
 
     /**Конструктор без параметров нужен для работы с Firebase*/
     public DUnit() {
+    }
+
+
+    public DUnit(String id, String name, String innerSerial, String serial, String state) {
+        this.id = id;
+        this.name = name;
+        this.innerSerial = innerSerial;
+        this.serial = serial;
+        this.state = state;
     }
 
     public String getState() {
@@ -15,13 +25,6 @@ public class DUnit {
     }
 
     public void setState(String state) {
-        this.state = state;
-    }
-
-    public DUnit(String name, String innerSerial, String serial, String state) {
-        this.name = name;
-        this.innerSerial = innerSerial;
-        this.serial = serial;
         this.state = state;
     }
 
@@ -47,5 +50,13 @@ public class DUnit {
 
     public void setSerial(String serial) {
         this.serial = serial;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

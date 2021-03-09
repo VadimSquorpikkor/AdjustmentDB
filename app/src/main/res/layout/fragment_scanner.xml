@@ -7,11 +7,19 @@
     tools:context=".ui.main.ScannerFragment">
 
     <EditText
-        android:id="@+id/editTextName"
+        android:id="@+id/editTextId"
         style="@style/for_data_input"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        tools:text="0001" />
+
+    <EditText
+        android:id="@+id/editTextName"
+        style="@style/for_data_input"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextId"
         tools:text="БДКГ-02" />
 
     <EditText
@@ -129,5 +137,15 @@
         android:text="Статус\nприбора"
         app:layout_constraintEnd_toStartOf="@+id/editTextState"
         app:layout_constraintTop_toBottomOf="@+id/editTextSerial" />
+
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:gravity="center_vertical|end"
+        android:text="ID\n(для ремонта)"
+        app:layout_constraintEnd_toStartOf="@+id/editTextId"
+        app:layout_constraintTop_toTopOf="@+id/editTextId" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
