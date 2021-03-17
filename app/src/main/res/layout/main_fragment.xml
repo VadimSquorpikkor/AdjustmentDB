@@ -8,24 +8,73 @@
     tools:context=".ui.main.MainFragment">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_units"
+        android:id="@+id/recycler_serial_units"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/tabLayout" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_repair_units"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tabLayout" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="25dp"
-        android:backgroundTint="#FF5722"
+        android:backgroundTint="@color/main_orange"
         android:clickable="true"
-        android:src="@drawable/ic_baseline_add_24"
+        android:src="@drawable/ic_baseline_camera_24"
         app:backgroundTint="#F44336"
         app:elevation="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:rippleColor="#FFFFFF" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tabIndicatorColor="@color/main_orange">
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/serialTab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Серия" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/repairTab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ремонт" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <TextView
+        android:id="@+id/versionText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="1.09"
+        android:textColor="@color/main_orange"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_margin="10dp"
+        android:elevation="10dp"/>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

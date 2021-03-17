@@ -2,6 +2,8 @@ package com.squorpikkor.app.adjustmentdb.ui.main;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.squorpikkor.app.adjustmentdb.BuildConfig;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 
 import java.util.ArrayList;
@@ -15,7 +17,7 @@ public class MainViewModel extends ViewModel {
     public static final String NAME = "name";
     public static final String ID = "id";
     FireDBHelper dbh;
-    private final MutableLiveData<ArrayList<DUnit>> unitsList;
+    private final MutableLiveData<ArrayList<DUnit>> serialUnitsList;
     private final MutableLiveData<ArrayList<DUnit>> repairsUnitsList;
     private final MutableLiveData<ArrayList<DUnit>> selectedUnits;
     private final MutableLiveData<ArrayList<DUnit>> selectedRepairUnits;
@@ -24,13 +26,14 @@ public class MainViewModel extends ViewModel {
     private MutableLiveData<Boolean> isRepair;
 
     public MainViewModel() {
-        unitsList = new MutableLiveData<>();
+        serialUnitsList = new MutableLiveData<>();
         repairsUnitsList = new MutableLiveData<>();
         selectedUnits = new MutableLiveData<>();
         selectedRepairUnits = new MutableLiveData<>();
         dbh = new FireDBHelper();
         isRepair = new MutableLiveData<>();
         addDUnitTableListener();
+        addRepairUnitTableListener();
     }
 
     /**Отслеживание: текущий (отсканированный в данный момент) девайс — это ремонт или серия*/
@@ -53,12 +56,12 @@ public class MainViewModel extends ViewModel {
     }
 
     void getDUnitFromBD() {
-        dbh.getElementFromDB(DUNIT_TABLE, unitsList);
+        dbh.getElementFromDB(DUNIT_TABLE, serialUnitsList);
     }
 
     /**Слушатель для таблицы серийных приборов*/
     void addDUnitTableListener() {
-        dbh.addDBListener(DUNIT_TABLE, unitsList);
+        dbh.addDBListener(DUNIT_TABLE, serialUnitsList);
     }
 
     /**Слушатель для таблицы ремонтных приборов*/
@@ -66,8 +69,12 @@ public class MainViewModel extends ViewModel {
         dbh.addDBListener(REPAIRS_TABLE, repairsUnitsList);
     }
 
-    public MutableLiveData<ArrayList<DUnit>> getUnitsList() {
-        return unitsList;
+    public MutableLiveData<ArrayList<DUnit>> getSerialUnitsList() {
+        return serialUnitsList;
+    }
+
+    public MutableLiveData<ArrayList<DUnit>> getRepairUnitsList() {
+        return repairsUnitsList;
     }
 
     public MutableLiveData<ArrayList<DUnit>> getSelectedUnits() {
@@ -92,5 +99,9 @@ public class MainViewModel extends ViewModel {
     void getRepairUnitById(String id) {
 //        dbh.readFromDBByParameter(REPAIRS_TABLE, ID, id, selectedRepairUnits);
         dbh.readFromDBByParameter(REPAIRS_TABLE, ID, id, selectedUnits);// пока selectedUnits — всё равно всё выводится в одни и те же поля фрагмента
+    }
+
+    public String getVersion() {
+        return BuildConfig.VERSION_NAME;
     }
 }
