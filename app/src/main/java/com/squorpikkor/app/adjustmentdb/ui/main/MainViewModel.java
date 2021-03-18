@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.squorpikkor.app.adjustmentdb.BuildConfig;
 import com.squorpikkor.app.adjustmentdb.DUnit;
+import com.squorpikkor.app.adjustmentdb.DevType;
 
 import java.util.ArrayList;
 
@@ -12,6 +13,11 @@ public class MainViewModel extends ViewModel {
 
     public static final String DUNIT_TABLE = "units";
     public static final String REPAIRS_TABLE = "repairs";
+    public static final String DEV_TYPES_TABLE = "dev_types";
+
+    public static final String REPAIR_STATES_TABLE = "repair_states";
+    public static final String SERIAL_STATES_TABLE = "serial_states";
+
     public static final String INNER_SERIAL = "innerSerial";
     public static final String SERIAL = "serial";
     public static final String NAME = "name";
@@ -21,6 +27,11 @@ public class MainViewModel extends ViewModel {
     private final MutableLiveData<ArrayList<DUnit>> repairsUnitsList;
     private final MutableLiveData<ArrayList<DUnit>> selectedUnits;
     private final MutableLiveData<ArrayList<DUnit>> selectedRepairUnits;
+
+    private final MutableLiveData<ArrayList<DevType>> devTypeList;
+
+    private final MutableLiveData<ArrayList<String>> serialStatesList;
+    private final MutableLiveData<ArrayList<String>> repairStatesList;
 
 
     private MutableLiveData<Boolean> isRepair;
@@ -32,8 +43,15 @@ public class MainViewModel extends ViewModel {
         selectedRepairUnits = new MutableLiveData<>();
         dbh = new FireDBHelper();
         isRepair = new MutableLiveData<>();
+        isRepair.setValue(false);
+        devTypeList = new MutableLiveData<>();
+        serialStatesList = new MutableLiveData<>();
+        repairStatesList = new MutableLiveData<>();
         addDUnitTableListener();
         addRepairUnitTableListener();
+        addDevTypeTableListener();
+        addSerialStateTableListener();
+        addRepairStateTableListener();
     }
 
     /**Отслеживание: текущий (отсканированный в данный момент) девайс — это ремонт или серия*/
@@ -69,6 +87,36 @@ public class MainViewModel extends ViewModel {
         dbh.addDBListener(REPAIRS_TABLE, repairsUnitsList);
     }
 
+    /**Слушатель для таблицы имен приборов*/
+    void addDevTypeTableListener() {
+        dbh.addDevTypeListener(DEV_TYPES_TABLE, devTypeList);
+    }
+
+    /**Слушатель для таблицы названий статусов серийных приборов*/
+    void addSerialStateTableListener() {
+        dbh.addStringArrayListener(SERIAL_STATES_TABLE, serialStatesList, NAME);
+    }
+
+    /**Слушатель для таблицы названий статусов ремонтных приборов*/
+    void addRepairStateTableListener() {
+        dbh.addStringArrayListener(REPAIR_STATES_TABLE, repairStatesList, NAME);
+    }
+
+    /**Список названий статусов серийных приборов*/
+    public MutableLiveData<ArrayList<String>> getSerialStatesList() {
+        return serialStatesList;
+    }
+
+    /**Список названий статусов ремонтных приборов*/
+    public MutableLiveData<ArrayList<String>> getRepairStatesList() {
+        return repairStatesList;
+    }
+
+    /**Список имен (названий) приборов*/
+    public MutableLiveData<ArrayList<DevType>> getDevTypeList() {
+        return devTypeList;
+    }
+
     public MutableLiveData<ArrayList<DUnit>> getSerialUnitsList() {
         return serialUnitsList;
     }
@@ -78,7 +126,6 @@ public class MainViewModel extends ViewModel {
     }
 
     public MutableLiveData<ArrayList<DUnit>> getSelectedUnits() {
-//        Log.e(TAG, "getSelectedUnits: SIZE = "+selectedUnits.getValue().size());
         return selectedUnits;
     }
 

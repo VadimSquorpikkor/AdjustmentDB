@@ -69,6 +69,8 @@ public class MainFragment extends Fragment {
             recyclerViewRepairUnits.setAdapter(unitsAdapter);
         });
 
+
+
         /**Открываем фрагмент со сканером QR-кода и кнопкой добавления в БД*/
         view.findViewById(R.id.floatingActionButton).setOnClickListener(v -> {
             // Create new fragment and transaction

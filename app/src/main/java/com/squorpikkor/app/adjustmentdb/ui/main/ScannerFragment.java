@@ -28,6 +28,7 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.squorpikkor.app.adjustmentdb.DUnit;
+import com.squorpikkor.app.adjustmentdb.DevType;
 import com.squorpikkor.app.adjustmentdb.R;
 
 import org.jetbrains.annotations.NotNull;
@@ -66,12 +67,20 @@ public class ScannerFragment extends Fragment {
     String intentData = "";
     private static final String SPLIT_SYMBOL = " ";
     private static final String REPAIR_UNIT = "Ремонт";
+    private static final String NO_SELECTION = "- не выбрано -";
+
+    ArrayList<DevType> devTypeList;
+    ArrayList<String> devSpinnerList;
+
+    ArrayList<String> serialStateSpinnerList;
+    ArrayList<String> repairStateSpinnerList;
 
     //todo по сути — для units не нужна коллекция, нужен только один DUnit. С другой стороны БД
     // отдает всё, чтоона нашла по данному серийнику и это всё она отдает. Забота ScannerFragment'a
     // решать, что с этим всем делать, если нашлось несколько, то можно предупредить пользователя,
     // что есть несколько устройств в базе с одинаковым именем
     ArrayList<DUnit> units;
+
 
     public static ScannerFragment newInstance() {
         return new ScannerFragment();
@@ -118,34 +127,13 @@ public class ScannerFragment extends Fragment {
         /**Кнопка включения/включения режима редактирования для полей EditText*/
         view.findViewById(R.id.actionButtonEdit).setOnClickListener(v -> {
             state = !state;
-            tId.setEnabled(state);
-            tName.setEnabled(state);
+//            tId.setEnabled(state);
+//            tName.setEnabled(state);
             tInnerSerial.setEnabled(state);
             tSerial.setEnabled(state);
-            tState.setEnabled(state);
+//            tState.setEnabled(state);
         });
 
-        Spinner spinner = (Spinner) view.findViewById(R.id.spinner);
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
-                R.array.state_array, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
-        spinner.setAdapter(adapter);
-
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                tState.setText(parent.getItemAtPosition(position).toString());
-                if (position == 0) tState.setText("");
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
 
         units = new ArrayList<>();
 
@@ -159,14 +147,122 @@ public class ScannerFragment extends Fragment {
            else sendButton.setText("Отправить данные в БД");
         });
 
+
+//--------------------------------------------------------------------------------------------------
+        serialStateSpinnerList = new ArrayList<>();
+        Spinner stateSpinner = (Spinner) view.findViewById(R.id.serial_state_spinner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<String> serialStateAdapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item, serialStateSpinnerList);
+        // Specify the layout to use when the list of choices appears
+        serialStateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        stateSpinner.setAdapter(serialStateAdapter);
+        stateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                tState.setText(parent.getItemAtPosition(position).toString());
+                if (position == 0) tState.setText("");
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        MutableLiveData<ArrayList<String>> states = mViewModel.getSerialStatesList();
+        states.observe(getViewLifecycleOwner(), s -> {
+            Log.e(TAG, "onComplete: "+states.getValue().get(0));
+            serialStateSpinnerList.clear();
+            serialStateSpinnerList.add(NO_SELECTION);
+            serialStateSpinnerList.addAll(states.getValue());
+            stateSpinner.setAdapter(serialStateAdapter);
+        });
+//--------------------------------------------------------------------------------------------------
+
+        repairStateSpinnerList = new ArrayList<>();
+        Spinner repairStateSpinner = (Spinner) view.findViewById(R.id.repair_state_spinner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<String> repairStateAdapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item,  repairStateSpinnerList);
+        // Specify the layout to use when the list of choices appears
+        repairStateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        repairStateSpinner.setAdapter(repairStateAdapter);
+        repairStateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                tState.setText(parent.getItemAtPosition(position).toString());
+                if (position == 0) tState.setText("");
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        MutableLiveData<ArrayList<String>> states2 = mViewModel.getRepairStatesList();
+        states2.observe(getViewLifecycleOwner(), s -> {
+            Log.e(TAG, "onComplete: "+states.getValue().get(0));
+            repairStateSpinnerList.clear();
+            repairStateSpinnerList.add(NO_SELECTION);
+            repairStateSpinnerList.addAll(states2.getValue());
+            repairStateSpinner.setAdapter(repairStateAdapter);
+        });
+//--------------------------------------------------------------------------------------------------
+        devSpinnerList = new ArrayList<>();
+        Spinner devSpinner = (Spinner) view.findViewById(R.id.dev_types_spinner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<String> devAdapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item,  devSpinnerList);
+        // Specify the layout to use when the list of choices appears
+        devAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        devSpinner.setAdapter(devAdapter);
+        devSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                tName.setText(parent.getItemAtPosition(position).toString());
+                if (position == 0) tName.setText("");
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        final MutableLiveData<ArrayList<DevType>> devTypes = mViewModel.getDevTypeList();
+        devTypes.observe(getViewLifecycleOwner(), s -> {
+            this.devTypeList = devTypes.getValue();
+            devSpinnerList.clear();
+            devSpinnerList.add(NO_SELECTION);
+            if (this.devTypeList != null){
+                Log.e(TAG, "onCreateView: " + this.devTypeList.size());
+                for (int i = 0; i < this.devTypeList.size(); i++) {
+                    devSpinnerList.add(devTypeList.get(i).getName());
+                }
+
+                devSpinner.setAdapter(devAdapter);
+            }
+        });
+//--------------------------------------------------------------------------------------------------
         final MutableLiveData<Boolean> isRepairUnit = mViewModel.getIsRepair();
         isRepairUnit.observe(getViewLifecycleOwner(), isRepair -> {
             if (isRepair) {
                 isRepairDev = true;
                 tId.setVisibility(View.VISIBLE);
+                view.findViewById(R.id.textView6).setVisibility(View.VISIBLE);
+                repairStateSpinner.setVisibility(View.VISIBLE);
+                stateSpinner.setVisibility(View.GONE);
             } else {
                 isRepairDev = false;
                 tId.setVisibility(View.GONE);
+                view.findViewById(R.id.textView6).setVisibility(View.GONE);
+                repairStateSpinner.setVisibility(View.GONE);
+                stateSpinner.setVisibility(View.VISIBLE);
             }
         });
 

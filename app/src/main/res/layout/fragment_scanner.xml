@@ -50,13 +50,34 @@
         app:layout_constraintTop_toBottomOf="@+id/editTextSerial" />
 
     <Spinner
-        android:id="@+id/spinner"
-        android:layout_width="wrap_content"
+        android:id="@+id/dev_types_spinner"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
+        android:layout_marginHorizontal="40dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextState" />
+
+    <Spinner
+        android:id="@+id/serial_state_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_marginHorizontal="40dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dev_types_spinner" />
+
+    <Spinner
+        android:id="@+id/repair_state_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_marginHorizontal="40dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/serial_state_spinner" />
 
     <SurfaceView
         android:id="@+id/surfaceView"
@@ -64,7 +85,7 @@
         android:layout_height="0dp"
         android:layout_margin="8dp"
         app:layout_constraintBottom_toTopOf="@+id/buttonAddToBD"
-        app:layout_constraintTop_toBottomOf="@+id/spinner"
+        app:layout_constraintTop_toBottomOf="@+id/repair_state_spinner"
         tools:layout_editor_absoluteX="0dp" />
 
     <TextView

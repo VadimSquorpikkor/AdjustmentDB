@@ -10,13 +10,17 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.squorpikkor.app.adjustmentdb.DState;
 import com.squorpikkor.app.adjustmentdb.DUnit;
+import com.squorpikkor.app.adjustmentdb.DevType;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIRS_TABLE;
@@ -34,11 +38,30 @@ class FireDBHelper {
      * его содержимое будет перезаписано вновь предоставленными данными
      */
     void addElementToDB(DUnit unit, String table) {
+        //Если это серийный
         String documentName = "" + unit.getName() + "_" + unit.getInnerSerial();//2140_45665
+        //Если это ремонтный
         if (table.equals(REPAIRS_TABLE)) documentName = "r_" + unit.getId();//r_0001
+        //В коллекцию устройств добавляем/обновляем устройство
         db.collection(table)
                 .document(documentName)
                 .set(unit)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.e(TAG, "DocumentSnapshot successfully written!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "Error writing document", e);
+                    }
+                });
+        //В коллекцию статусов текущего устройства добавляем статус: описание+дата (добавляем коллекцию в коллекцию)
+        db.collection(table)
+                .document(documentName)
+                .collection("states").document().set(new DState(new Date() ,unit.getState()))
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -115,6 +138,54 @@ class FireDBHelper {
             }
         });
     }
+
+    void getDevTypeFromDB(String table, MutableLiveData<ArrayList<DevType>> dev) {
+        db.collection(table).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    QuerySnapshot querySnapshot = task.getResult();
+                    if (querySnapshot == null) return;
+                    dev.setValue((ArrayList<DevType>) querySnapshot.toObjects(DevType.class));
+                } else {
+                    Log.e(TAG, "Error - " + task.getException());
+                }
+            }
+        });
+    }
+
+    void getStringArrayFromDB(String table, MutableLiveData<ArrayList<String>> mList, String fieldName) {
+        db.collection(table).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                ArrayList<String> list = new ArrayList<>();
+                for (DocumentSnapshot document : task.getResult()) {
+                    list.add(document.get(fieldName).toString());
+                }
+                mList.setValue(list);
+            }
+        });
+    }
+
+    void addDevTypeListener(String table, MutableLiveData<ArrayList<DevType>> dev) {
+        db.collection(table).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
+                getDevTypeFromDB(table, dev);
+            }
+        });
+    }
+
+    void addStringArrayListener(String table, MutableLiveData<ArrayList<String>> mList, String fieldName) {
+        db.collection(table).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
+                //getStringFromDB(table, s);
+                getStringArrayFromDB(table, mList, fieldName);
+            }
+        });
+    }
+
 
     //todo paramValue переделать в Object. С другой стороны — это пока не важно, у меня и так пока все параметры String
     void readFromDBByParameter(String table, String paramName, String paramValue, MutableLiveData<ArrayList<DUnit>> selectedUnits) {
