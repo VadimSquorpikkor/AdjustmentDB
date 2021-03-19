@@ -9,11 +9,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squorpikkor.app.adjustmentdb.DState;
 import com.squorpikkor.app.adjustmentdb.DUnit;
@@ -38,6 +40,7 @@ class FireDBHelper {
      * его содержимое будет перезаписано вновь предоставленными данными
      */
     void addElementToDB(DUnit unit, String table) {
+        Log.e(TAG, "addElementToDB: "+unit.getState());
         //Если это серийный
         String documentName = "" + unit.getName() + "_" + unit.getInnerSerial();//2140_45665
         //Если это ремонтный
@@ -58,22 +61,27 @@ class FireDBHelper {
                         Log.e(TAG, "Error writing document", e);
                     }
                 });
-        //В коллекцию статусов текущего устройства добавляем статус: описание+дата (добавляем коллекцию в коллекцию)
-        db.collection(table)
-                .document(documentName)
-                .collection("states").document().set(new DState(new Date() ,unit.getState()))
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.e(TAG, "DocumentSnapshot successfully written!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e(TAG, "Error writing document", e);
-                    }
-                });
+        // В коллекцию статусов текущего устройства добавляем статус: описание+дата (добавляем
+        // коллекцию в коллекцию). Если поля статуса оставить пустым, то статус не будет добавлне
+        // (нужно, наример, если необходимо просто добавить серийный номер, никакого статуса в этом
+        // случае быть не может)
+        if (!unit.getState().equals("")) {
+            db.collection(table)
+                    .document(documentName)
+                    .collection("states").document().set(new DState(new Date(), unit.getState()))
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.e(TAG, "DocumentSnapshot successfully written!");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e(TAG, "Error writing document", e);
+                        }
+                    });
+        }
     }
     /**
      * Add a new document with a generated ID
@@ -97,7 +105,7 @@ class FireDBHelper {
 
     /**
      * Метод загружает элементы из БД (все в текущей таблице). Трюк в том, что метод при получении данных
-     * заносит их в коллекцию объектов, которая является Mutable из ViewModel, ссылка на эту коллекцию
+     * заносит их в коллекцию объектов, которая является MutableLiveData из ViewModel, ссылка на эту коллекцию
      * объект класса FireDBHelper получает в конструкторе. Получается, что приложение, получив данные из БД
      * в облаке сохраняет их в коллекцию, на которую подписан RecyclerView, таким образом изменения в
      * БД автоматом отображаются в списке RecyclerView
@@ -154,6 +162,31 @@ class FireDBHelper {
         });
     }
 
+    void getStatesFromDB(String table, String documentName, String table2, MutableLiveData<ArrayList<DState>> states) {
+        db.collection(table).document(documentName).collection(table2).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    QuerySnapshot querySnapshot = task.getResult();
+                    if (querySnapshot == null) return;
+                    ArrayList<DState> newStates = new ArrayList<>();
+                    for (QueryDocumentSnapshot q:querySnapshot) {
+                        Timestamp timestamp = (Timestamp)q.get("date");
+                        /*Log.e(TAG, "1: "+q.get("date"));
+                        Log.e(TAG, "2: "+timestamp.toDate());
+                        Log.e(TAG, "2: "+timestamp.toDate());
+                        Log.e(TAG, "2: "+getRightDate(timestamp.getSeconds()));
+                        Log.e(TAG, "3: "+q.get("state"));*/
+                        newStates.add(new DState(timestamp.toDate(), q.get("state").toString()));
+                    }
+                    states.setValue(newStates);
+                } else {
+                    Log.e(TAG, "Error - " + task.getException());
+                }
+            }
+        });
+    }
+
     void getStringArrayFromDB(String table, MutableLiveData<ArrayList<String>> mList, String fieldName) {
         db.collection(table).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -161,6 +194,7 @@ class FireDBHelper {
                 ArrayList<String> list = new ArrayList<>();
                 for (DocumentSnapshot document : task.getResult()) {
                     list.add(document.get(fieldName).toString());
+                    /////mList.getValue().add(document.get(fieldName).toString());
                 }
                 mList.setValue(list);
             }

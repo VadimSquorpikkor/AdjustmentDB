@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.squorpikkor.app.adjustmentdb.BuildConfig;
+import com.squorpikkor.app.adjustmentdb.DState;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.DevType;
 
@@ -14,6 +15,7 @@ public class MainViewModel extends ViewModel {
     public static final String DUNIT_TABLE = "units";
     public static final String REPAIRS_TABLE = "repairs";
     public static final String DEV_TYPES_TABLE = "dev_types";
+    public static final String TABLE_INNER_STATES = "states";
 
     public static final String REPAIR_STATES_TABLE = "repair_states";
     public static final String SERIAL_STATES_TABLE = "serial_states";
@@ -33,6 +35,8 @@ public class MainViewModel extends ViewModel {
     private final MutableLiveData<ArrayList<String>> serialStatesList;
     private final MutableLiveData<ArrayList<String>> repairStatesList;
 
+    private final MutableLiveData<ArrayList<DState>> unitStatesList;
+
 
     private MutableLiveData<Boolean> isRepair;
 
@@ -47,6 +51,7 @@ public class MainViewModel extends ViewModel {
         devTypeList = new MutableLiveData<>();
         serialStatesList = new MutableLiveData<>();
         repairStatesList = new MutableLiveData<>();
+        unitStatesList = new MutableLiveData<>();
         addDUnitTableListener();
         addRepairUnitTableListener();
         addDevTypeTableListener();
@@ -121,6 +126,10 @@ public class MainViewModel extends ViewModel {
         return serialUnitsList;
     }
 
+    public MutableLiveData<ArrayList<DState>> getUnitStatesList() {
+        return unitStatesList;
+    }
+
     public MutableLiveData<ArrayList<DUnit>> getRepairUnitsList() {
         return repairsUnitsList;
     }
@@ -135,6 +144,8 @@ public class MainViewModel extends ViewModel {
      *  предупреждение*/
     void getDUnitByNameAndInnerSerial(String name, String innerSerial) {
         dbh.readFromDBByTwoParameters(DUNIT_TABLE, NAME, name, INNER_SERIAL, innerSerial, selectedUnits);
+        String name_db = name+"_"+innerSerial;
+        dbh.getStatesFromDB(DUNIT_TABLE, name_db, TABLE_INNER_STATES, unitStatesList);
     }
 
     /**Получить список ремонтных юнитов из БД по их типу и серийному номеру*/
@@ -146,6 +157,8 @@ public class MainViewModel extends ViewModel {
     void getRepairUnitById(String id) {
 //        dbh.readFromDBByParameter(REPAIRS_TABLE, ID, id, selectedRepairUnits);
         dbh.readFromDBByParameter(REPAIRS_TABLE, ID, id, selectedUnits);// пока selectedUnits — всё равно всё выводится в одни и те же поля фрагмента
+        String name = "r_"+ id;
+        dbh.getStatesFromDB(REPAIRS_TABLE, name, TABLE_INNER_STATES, unitStatesList);
     }
 
     public String getVersion() {

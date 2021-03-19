@@ -21,6 +21,8 @@ import android.widget.TextView;
 import com.google.android.material.tabs.TabLayout;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
+import com.squorpikkor.app.adjustmentdb.ui.main.adapter.DRepairUnitAdapter;
+import com.squorpikkor.app.adjustmentdb.ui.main.adapter.DSerialUnitAdapter;
 
 import java.util.ArrayList;
 
@@ -72,9 +74,22 @@ public class MainFragment extends Fragment {
 
 
         /**Открываем фрагмент со сканером QR-кода и кнопкой добавления в БД*/
-        view.findViewById(R.id.floatingActionButton).setOnClickListener(v -> {
+        /*view.findViewById(R.id.floatingActionButton).setOnClickListener(v -> {
             // Create new fragment and transaction
             Fragment newFragment = ScannerFragment.newInstance();
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            // Replace whatever is in the fragment_container view with this fragment,
+            // and add the transaction to the back stack
+            transaction.replace(R.id.container, newFragment);
+            transaction.addToBackStack(null);
+            // Commit the transaction
+            transaction.commit();
+        });*/
+
+        /**Открываем фрагмент со сканером QR-кода и кнопкой добавления в БД*/
+        view.findViewById(R.id.floatingActionButton2).setOnClickListener(v -> {
+            // Create new fragment and transaction
+            Fragment newFragment = ScannerFragmentNew.newInstance();
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
             // Replace whatever is in the fragment_container view with this fragment,
             // and add the transaction to the back stack
