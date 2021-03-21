@@ -14,17 +14,21 @@ import com.squorpikkor.app.adjustmentdb.R;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesViewHolder>{
+public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesViewHolder> {
 
     private final ArrayList<DState> states;
     private final String DATE_PATTERN = "dd.MM.yyyy HH:mm";
 
-    /**Конструктор, в котором передаем ArrayList для RecyclerView */
+    /**
+     * Конструктор, в котором передаем ArrayList для RecyclerView
+     */
     public StatesAdapter(ArrayList<DState> states) {
         this.states = states;
     }
 
-    /**Присваиваем xml лэйаут к итему RecyclerView */
+    /**
+     * Присваиваем xml лэйаут к итему RecyclerView
+     */
     @NonNull
     @Override
     public StatesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -44,7 +48,9 @@ public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesView
         return formatter.format(time_stamp_server);
     }
 
-    /**Просто возвращает кол-во элементов в массиве*/
+    /**
+     * Просто возвращает кол-во элементов в массиве
+     */
     @Override
     public int getItemCount() {
         return states.size();

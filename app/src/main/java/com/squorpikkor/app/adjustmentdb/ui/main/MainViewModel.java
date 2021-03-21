@@ -1,5 +1,7 @@
 package com.squorpikkor.app.adjustmentdb.ui.main;
 
+import android.util.Log;
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -9,6 +11,8 @@ import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.DevType;
 
 import java.util.ArrayList;
+
+import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 
 public class MainViewModel extends ViewModel {
 
@@ -40,6 +44,12 @@ public class MainViewModel extends ViewModel {
 
     private MutableLiveData<Boolean> isRepair;
 
+    private DUnit selectedUnit;
+
+    public DUnit getSelectedUnit() {
+        return selectedUnit;
+    }
+
     public MainViewModel() {
         serialUnitsList = new MutableLiveData<>();
         repairsUnitsList = new MutableLiveData<>();
@@ -69,12 +79,12 @@ public class MainViewModel extends ViewModel {
     }
 
     /**Сохраняет DUnit в БД в соответствующую таблицу*/
-    void saveDUnitToDB(DUnit unit) {
+    public void saveDUnitToDB(DUnit unit) {
         dbh.addElementToDB(unit, DUNIT_TABLE);
     }
 
     /**Сохраняет ремонтный DUnit в БД в соответствующую таблицу*/
-    void saveRepairUnitToDB(DUnit unit) {
+    public void saveRepairUnitToDB(DUnit unit) {
         dbh.addElementToDB(unit, REPAIRS_TABLE);
     }
 
@@ -104,6 +114,7 @@ public class MainViewModel extends ViewModel {
 
     /**Слушатель для таблицы названий статусов ремонтных приборов*/
     void addRepairStateTableListener() {
+        Log.e(TAG, "addRepairStateTableListener: ");
         dbh.addStringArrayListener(REPAIR_STATES_TABLE, repairStatesList, NAME);
     }
 
@@ -146,6 +157,8 @@ public class MainViewModel extends ViewModel {
         dbh.readFromDBByTwoParameters(DUNIT_TABLE, NAME, name, INNER_SERIAL, innerSerial, selectedUnits);
         String name_db = name+"_"+innerSerial;
         dbh.getStatesFromDB(DUNIT_TABLE, name_db, TABLE_INNER_STATES, unitStatesList);
+//        selectedUnit.setName(name);
+//        selectedUnit.setInnerSerial(innerSerial);
     }
 
     /**Получить список ремонтных юнитов из БД по их типу и серийному номеру*/
@@ -159,6 +172,7 @@ public class MainViewModel extends ViewModel {
         dbh.readFromDBByParameter(REPAIRS_TABLE, ID, id, selectedUnits);// пока selectedUnits — всё равно всё выводится в одни и те же поля фрагмента
         String name = "r_"+ id;
         dbh.getStatesFromDB(REPAIRS_TABLE, name, TABLE_INNER_STATES, unitStatesList);
+//        selectedUnit.setId(id);
     }
 
     public String getVersion() {

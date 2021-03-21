@@ -6,9 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+<!--        android:background="@color/cardview_dark_background"-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/db_info_layout"
-        android:background="@color/cardview_dark_background"
+        android:background="#333333"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="10dp"
@@ -20,20 +21,32 @@
 
 
         <TextView
-            android:id="@+id/textViewName"
+            android:id="@+id/textViewType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_marginTop="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/db_info_layout"
+            android:text="Серия или ремонт"
+            android:textColor="@color/main_orange"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/textViewName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewType"
             tools:text="AT6130"
             android:textColor="@color/main_orange"
             android:textSize="26sp"/>
 
 
         <TextView
-            android:id="@+id/textView9"
+            android:id="@+id/textViewInnerSerial"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -43,25 +56,25 @@
             app:layout_constrainedWidth="true"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/textViewInnerSerial"
+            app:layout_constraintRight_toLeftOf="@+id/textViewInnerSerialValue"
             app:layout_constraintTop_toBottomOf="@+id/textViewName"
             />
 
         <TextView
-            android:id="@+id/textViewInnerSerial"
+            android:id="@+id/textViewInnerSerialValue"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:gravity="start"
             android:layout_margin="10dp"
             tools:text="12345"
-            app:layout_constraintLeft_toRightOf="@+id/textView9"
+            app:layout_constraintLeft_toRightOf="@+id/textViewInnerSerial"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textViewName"
             />
 
         <TextView
-            android:id="@+id/textView1"
+            android:id="@+id/textViewSerial"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -71,21 +84,49 @@
             app:layout_constrainedWidth="true"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/textViewSerial"
-            app:layout_constraintTop_toBottomOf="@+id/textView9"
+            app:layout_constraintRight_toLeftOf="@+id/textViewSerialValue"
+            app:layout_constraintTop_toBottomOf="@+id/textViewInnerSerial"
             />
 
         <TextView
-            android:id="@+id/textViewSerial"
+            android:id="@+id/textViewSerialValue"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:gravity="start"
             android:layout_margin="10dp"
             tools:text="6789"
-            app:layout_constraintLeft_toRightOf="@+id/textView1"
+            app:layout_constraintLeft_toRightOf="@+id/textViewSerial"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView9"
+            app:layout_constraintTop_toBottomOf="@+id/textViewInnerSerial"
+            />
+
+        <TextView
+            android:id="@+id/textViewId"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:gravity="end"
+            android:text="id:"
+            android:layout_margin="10dp"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/textViewIdValue"
+            app:layout_constraintTop_toBottomOf="@+id/textViewSerial"
+            />
+
+        <TextView
+            android:id="@+id/textViewIdValue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:gravity="start"
+            android:layout_margin="10dp"
+            tools:text="0005"
+            app:layout_constraintLeft_toRightOf="@+id/textViewId"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewSerial"
             />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -96,7 +137,7 @@
             app:layout_constraintBottom_toTopOf="@+id/buttonAddToBD"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewSerial" />
+            app:layout_constraintTop_toBottomOf="@+id/textViewIdValue" />
 
         <Button
             android:id="@+id/buttonAddToBD"
@@ -109,6 +150,22 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
+
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/addNewState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="25dp"
+            android:backgroundTint="@color/main_orange"
+            android:clickable="true"
+            app:backgroundTint="#F44336"
+            app:elevation="6dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:rippleColor="#FFFFFF"
+            app:srcCompat="@drawable/ic_baseline_add_24" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

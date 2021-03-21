@@ -188,6 +188,7 @@ class FireDBHelper {
     }
 
     void getStringArrayFromDB(String table, MutableLiveData<ArrayList<String>> mList, String fieldName) {
+        Log.e(TAG, "getStringArrayFromDB: ");
         db.collection(table).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -211,6 +212,7 @@ class FireDBHelper {
     }
 
     void addStringArrayListener(String table, MutableLiveData<ArrayList<String>> mList, String fieldName) {
+        Log.e(TAG, "addStringArrayListener: ");
         db.collection(table).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {

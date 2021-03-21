@@ -19,23 +19,19 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squorpikkor.app.adjustmentdb.DState;
 import com.squorpikkor.app.adjustmentdb.DUnit;
-import com.squorpikkor.app.adjustmentdb.DevType;
 import com.squorpikkor.app.adjustmentdb.R;
-import com.squorpikkor.app.adjustmentdb.ui.main.adapter.DSerialUnitAdapter;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.StatesAdapter;
+import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialog;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -53,9 +49,12 @@ public class ScannerFragmentNew extends Fragment {
     TextView txtBarcodeValue;
     SurfaceView surfaceView;
     Button addToBDButton;
+    FloatingActionButton addNewStateButton;
+    TextView tType;
     TextView tName;
     TextView tInnerSerial;
     TextView tSerial;
+    TextView tId;
     ConstraintLayout infoLayout;
     RecyclerView recyclerUnitsStates;
 
@@ -63,6 +62,8 @@ public class ScannerFragmentNew extends Fragment {
     ArrayList<DState> states;
 
     boolean isRepairDev;
+
+    DUnit selectedUnit;
 
     private CameraSource cameraSource;
     private static final int REQUEST_CAMERA_PERMISSION = 201;
@@ -87,15 +88,23 @@ public class ScannerFragmentNew extends Fragment {
         txtBarcodeValue = view.findViewById(R.id.txtBarcodeValue);
         surfaceView = view.findViewById(R.id.surfaceView);
         addToBDButton = view.findViewById(R.id.buttonAddToBD);
+        tType = view.findViewById(R.id.textViewType);
         tName = view.findViewById(R.id.textViewName);
-        tInnerSerial = view.findViewById(R.id.textViewInnerSerial);
-        tSerial = view.findViewById(R.id.textViewSerial);
+        tInnerSerial = view.findViewById(R.id.textViewInnerSerialValue);
+        tSerial = view.findViewById(R.id.textViewSerialValue);
+        tId = view.findViewById(R.id.textViewIdValue);
         infoLayout = view.findViewById(R.id.db_info_layout);
         recyclerUnitsStates = view.findViewById(R.id.recyclerView);
+        addNewStateButton = view.findViewById(R.id.addNewState);
 
         txtBarcodeValue.setVisibility(View.GONE);
         addToBDButton.setVisibility(View.GONE);
         infoLayout.setVisibility(View.GONE);
+        addNewStateButton.setVisibility(View.GONE);
+
+        addNewStateButton.setOnClickListener(view1 -> {
+            openStatesDialog();
+        });
 
         final MutableLiveData<ArrayList<DUnit>> selectedUnits = mViewModel.getSelectedUnits();
         selectedUnits.observe(getViewLifecycleOwner(), s -> {
@@ -107,8 +116,10 @@ public class ScannerFragmentNew extends Fragment {
             else addToBDButton.setText("Отправить данные в БД");
         });
 
+        /**Отслеживает список статусов (время + текст) текущего устройства*/
         final MutableLiveData<ArrayList<DState>> statesForUnit = mViewModel.getUnitStatesList();
         statesForUnit.observe(getViewLifecycleOwner(), s -> {
+            Log.e(TAG, "onCreateView: mViewModel.getUnitStatesList");
             this.states = statesForUnit.getValue();
             if (statesForUnit.getValue() != null) Log.e(TAG, "onCreateView: " + statesForUnit.getValue().size());
             StatesAdapter statesAdapter = new StatesAdapter(this.states);
@@ -119,12 +130,29 @@ public class ScannerFragmentNew extends Fragment {
         return view;
     }
 
-    void insertDataToFields(DUnit unit) {
-//        tId.setText(unit.getId());
+    private void insertDataToFields(DUnit unit) {
+        tId.setText(unit.getId());
         tName.setText(unit.getName());
         tInnerSerial.setText(unit.getInnerSerial());
         tSerial.setText(unit.getSerial());
 //        tState.setText(unit.getState());
+    }
+
+    private void openStatesDialog() {
+        //должен загружаться тот список, тип прибора который загружен — ремонт или серия. Пока ремонтный список просто для проверки
+
+        ArrayList<String> rightList = mViewModel.getSerialStatesList().getValue();
+        if (mViewModel.getIsRepair().getValue()) rightList = mViewModel.getRepairStatesList().getValue();
+
+//        ArrayList<String> rightList = new ArrayList<>();
+//        rightList.add("Какое-то событие");
+//        rightList.add("Что-то там...");
+//        rightList.add("Что-то там ещё...");
+
+        Log.e(TAG, "** stateList.size() = "+rightList.size());
+
+        SelectStateDialog dialog = new SelectStateDialog(getActivity(), mViewModel, rightList);
+        dialog.show();
     }
 
     private void initialiseDetectorsAndSources() {
@@ -195,11 +223,13 @@ public class ScannerFragmentNew extends Fragment {
             //Для ремонта: "Ремонт"+id (Ремонт 0001)
             String name = ar[0];
             String innerSerial = ar[1];
-            addToBDButton.setVisibility(View.VISIBLE);
+            //addToBDButton.setVisibility(View.VISIBLE);
+            addNewStateButton.setVisibility(View.VISIBLE);
             infoLayout.setVisibility(View.VISIBLE);
             if (name.equals(REPAIR_UNIT)) {//Если это ремонт
                 mViewModel.setIsRepair(true);
                 mViewModel.getRepairUnitById(innerSerial);
+
             } else {
                 mViewModel.setIsRepair(false);
                 mViewModel.getDUnitByNameAndInnerSerial(name, innerSerial);
