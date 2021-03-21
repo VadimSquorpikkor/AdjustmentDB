@@ -163,6 +163,7 @@ class FireDBHelper {
     }
 
     void getStatesFromDB(String table, String documentName, String table2, MutableLiveData<ArrayList<DState>> states) {
+        Log.e(TAG, "getStatesFromDB: ");
         db.collection(table).document(documentName).collection(table2).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -198,6 +199,17 @@ class FireDBHelper {
                     /////mList.getValue().add(document.get(fieldName).toString());
                 }
                 mList.setValue(list);
+            }
+        });
+    }
+
+    void addSelectedUnitListener(String table, String documentName, String table2, MutableLiveData<ArrayList<DState>> unitStatesList) {
+        db.collection(table).document(documentName).collection(table2).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
+                //getDevTypeFromDB(table, dev);
+                //getStatesFromDB(REPAIRS_TABLE, name, TABLE_INNER_STATES, unitStatesList)
+                getStatesFromDB(table, documentName, table2, unitStatesList);
             }
         });
     }

@@ -118,6 +118,16 @@ public class MainViewModel extends ViewModel {
         dbh.addStringArrayListener(REPAIR_STATES_TABLE, repairStatesList, NAME);
     }
 
+    public void addSelectedRepairUnitStatesListListener(String id) {
+        String name = "r_"+ id;
+        dbh.addSelectedUnitListener(REPAIRS_TABLE, name, TABLE_INNER_STATES, unitStatesList);
+    }
+
+    public void addSelectedSerialUnitStatesListListener(String name, String innerSerial) {
+        String name_db = name+"_"+innerSerial;
+        dbh.addSelectedUnitListener(DUNIT_TABLE, name_db, TABLE_INNER_STATES, unitStatesList);
+    }
+
     /**Список названий статусов серийных приборов*/
     public MutableLiveData<ArrayList<String>> getSerialStatesList() {
         return serialStatesList;
@@ -171,7 +181,7 @@ public class MainViewModel extends ViewModel {
 //        dbh.readFromDBByParameter(REPAIRS_TABLE, ID, id, selectedRepairUnits);
         dbh.readFromDBByParameter(REPAIRS_TABLE, ID, id, selectedUnits);// пока selectedUnits — всё равно всё выводится в одни и те же поля фрагмента
         String name = "r_"+ id;
-        dbh.getStatesFromDB(REPAIRS_TABLE, name, TABLE_INNER_STATES, unitStatesList);
+        dbh.getStatesFromDB(REPAIRS_TABLE, name, TABLE_INNER_STATES, unitStatesList);//Список статусов для текущего юнита
 //        selectedUnit.setId(id);
     }
 

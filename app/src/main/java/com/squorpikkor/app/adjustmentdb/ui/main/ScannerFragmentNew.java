@@ -61,9 +61,7 @@ public class ScannerFragmentNew extends Fragment {
     ArrayList<DUnit> units;
     ArrayList<DState> states;
 
-    boolean isRepairDev;
 
-    DUnit selectedUnit;
 
     private CameraSource cameraSource;
     private static final int REQUEST_CAMERA_PERMISSION = 201;
@@ -112,16 +110,16 @@ public class ScannerFragmentNew extends Fragment {
             if (units==null)return;
             if (units.size()>1) Log.e(TAG, "* Есть несколько устройств с таким серийником!!!");
             if (units.size() != 0) insertDataToFields(units.get(0));
-            if (isRepairDev) addToBDButton.setText("Отправить данные в БД (ремонт)");
+            if (mViewModel.getIsRepair().getValue()) addToBDButton.setText("Отправить данные в БД (ремонт)");
             else addToBDButton.setText("Отправить данные в БД");
         });
 
         /**Отслеживает список статусов (время + текст) текущего устройства*/
         final MutableLiveData<ArrayList<DState>> statesForUnit = mViewModel.getUnitStatesList();
         statesForUnit.observe(getViewLifecycleOwner(), s -> {
-            Log.e(TAG, "onCreateView: mViewModel.getUnitStatesList");
+            Log.e(TAG, "onCreateView: список статусов mViewModel.getUnitStatesList");
             this.states = statesForUnit.getValue();
-            if (statesForUnit.getValue() != null) Log.e(TAG, "onCreateView: " + statesForUnit.getValue().size());
+            if (statesForUnit.getValue() != null) Log.e(TAG, "onCreateView список статусов: " + statesForUnit.getValue().size());
             StatesAdapter statesAdapter = new StatesAdapter(this.states);
             recyclerUnitsStates.setLayoutManager(new LinearLayoutManager(getActivity()));
             recyclerUnitsStates.setAdapter(statesAdapter);
@@ -131,10 +129,13 @@ public class ScannerFragmentNew extends Fragment {
     }
 
     private void insertDataToFields(DUnit unit) {
+        Log.e(TAG, "insertDataToFields: ");
         tId.setText(unit.getId());
         tName.setText(unit.getName());
         tInnerSerial.setText(unit.getInnerSerial());
         tSerial.setText(unit.getSerial());
+        if (mViewModel.getIsRepair().getValue()) mViewModel.addSelectedRepairUnitStatesListListener(unit.getId());
+        else mViewModel.addSelectedSerialUnitStatesListListener(unit.getName(), unit.getInnerSerial());
 //        tState.setText(unit.getState());
     }
 
@@ -229,7 +230,7 @@ public class ScannerFragmentNew extends Fragment {
             if (name.equals(REPAIR_UNIT)) {//Если это ремонт
                 mViewModel.setIsRepair(true);
                 mViewModel.getRepairUnitById(innerSerial);
-
+//todo надо добавить: если данные для юнита получены и включен лэйаут с данными, то камеру нужно выключить (она всё ещё включена под лэйаутом!)
             } else {
                 mViewModel.setIsRepair(false);
                 mViewModel.getDUnitByNameAndInnerSerial(name, innerSerial);
