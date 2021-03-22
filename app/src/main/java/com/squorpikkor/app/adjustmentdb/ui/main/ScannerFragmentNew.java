@@ -32,6 +32,7 @@ import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.StatesAdapter;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialog;
+import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialogNew;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -104,6 +105,13 @@ public class ScannerFragmentNew extends Fragment {
             openStatesDialog();
         });
 
+        view.findViewById(R.id.button).setOnClickListener(view1 -> {
+            SelectStateDialogNew dialog = new SelectStateDialogNew();
+            dialog.setCancelable(false);
+//            dialog.setTargetFragment(getTargetFragment(), REQUEST_CODE_KEYWORD_DIALOG);
+            dialog.show(requireFragmentManager(), null);
+        });
+
         final MutableLiveData<ArrayList<DUnit>> selectedUnits = mViewModel.getSelectedUnits();
         selectedUnits.observe(getViewLifecycleOwner(), s -> {
             units = selectedUnits.getValue();
@@ -144,16 +152,11 @@ public class ScannerFragmentNew extends Fragment {
 
         ArrayList<String> rightList = mViewModel.getSerialStatesList().getValue();
         if (mViewModel.getIsRepair().getValue()) rightList = mViewModel.getRepairStatesList().getValue();
-
-//        ArrayList<String> rightList = new ArrayList<>();
-//        rightList.add("Какое-то событие");
-//        rightList.add("Что-то там...");
-//        rightList.add("Что-то там ещё...");
-
         Log.e(TAG, "** stateList.size() = "+rightList.size());
-
         SelectStateDialog dialog = new SelectStateDialog(getActivity(), mViewModel, rightList);
         dialog.show();
+
+
     }
 
     private void initialiseDetectorsAndSources() {

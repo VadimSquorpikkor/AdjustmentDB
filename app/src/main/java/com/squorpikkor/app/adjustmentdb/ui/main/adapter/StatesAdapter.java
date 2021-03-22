@@ -14,6 +14,7 @@ import com.squorpikkor.app.adjustmentdb.R;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+/**Адаптер для списка всех статусов для выбранного конкретного устройства. Показывает дату, время и сам статус*/
 public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesViewHolder> {
 
     private final ArrayList<DState> states;

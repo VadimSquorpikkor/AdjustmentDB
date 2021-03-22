@@ -13,11 +13,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
-import com.squorpikkor.app.adjustmentdb.ui.main.adapter.DialogStatesAdapterNew;
+import com.squorpikkor.app.adjustmentdb.ui.main.adapter.DialogStatesAdapter;
 
 import java.util.ArrayList;
 
@@ -32,9 +33,10 @@ public class SelectStateDialog extends Dialog {
     private TextView cancelButton;
     private TextView okButton;
     private ListView listViewState;
-    DialogStatesAdapterNew sourceAdapter;
+    DialogStatesAdapter sourceAdapter;
     EditText selectedEditState;
     DUnit unit;
+//    private AlertDialog dialog;
 
     public SelectStateDialog(@NonNull Activity context, MainViewModel mViewModel, ArrayList<String> stateList) {
         super(context);
@@ -53,6 +55,9 @@ public class SelectStateDialog extends Dialog {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_select_states);
 
+//        dialog = new AlertDialog.Builder(context).create();
+//        Window window = dialog.getWindow();
+//        if (window != null) window.setBackgroundDrawableResource(R.drawable.main_gradient);
         //recyclerViewStates = findViewById(R.id.recycler_states);
         cancelButton = findViewById(R.id.textViewInnerSerial);
         okButton = findViewById(R.id.textViewInnerSerialValue);
@@ -79,7 +84,7 @@ public class SelectStateDialog extends Dialog {
         listViewState = findViewById(R.id.recycler_states);
 
         // создаем адаптер
-        sourceAdapter = new DialogStatesAdapterNew(context,
+        sourceAdapter = new DialogStatesAdapter(context,
                 R.layout.dialog_state_item_new, this.stateList);
         listViewState.setAdapter(sourceAdapter);
 

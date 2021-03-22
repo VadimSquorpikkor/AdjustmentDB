@@ -107,22 +107,28 @@ public class MainViewModel extends ViewModel {
         dbh.addDevTypeListener(DEV_TYPES_TABLE, devTypeList);
     }
 
-    /**Слушатель для таблицы названий статусов серийных приборов*/
+    /**Слушатель для таблицы названий статусов серийных приборов
+     * db -> serial_states -> <name> -> name:*/
     void addSerialStateTableListener() {
         dbh.addStringArrayListener(SERIAL_STATES_TABLE, serialStatesList, NAME);
     }
 
-    /**Слушатель для таблицы названий статусов ремонтных приборов*/
+    /**Слушатель для таблицы названий статусов ремонтных приборов
+     * db -> repair_states -> <name> -> name:*/
     void addRepairStateTableListener() {
         Log.e(TAG, "addRepairStateTableListener: ");
         dbh.addStringArrayListener(REPAIR_STATES_TABLE, repairStatesList, NAME);
     }
 
+    /**Добавить слушателя для списка статусов для выбранного ремонтного устройства
+     * db -> repairs -> r_0005 -> states -> <name> -> date:+state: */
     public void addSelectedRepairUnitStatesListListener(String id) {
         String name = "r_"+ id;
         dbh.addSelectedUnitListener(REPAIRS_TABLE, name, TABLE_INNER_STATES, unitStatesList);
     }
 
+    /**Добавить слушателя для списка статусов для выбранного серийного устройства
+     * units -> name_1234 -> states -> <name> -> date:+state: */
     public void addSelectedSerialUnitStatesListListener(String name, String innerSerial) {
         String name_db = name+"_"+innerSerial;
         dbh.addSelectedUnitListener(DUNIT_TABLE, name_db, TABLE_INNER_STATES, unitStatesList);

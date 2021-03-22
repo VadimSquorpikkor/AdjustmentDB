@@ -9,7 +9,7 @@
 <!--        android:background="@color/cardview_dark_background"-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/db_info_layout"
-        android:background="#333333"
+        android:background="@color/dark_grey"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="10dp"
@@ -202,6 +202,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="БДКГ-02 12345" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="+"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

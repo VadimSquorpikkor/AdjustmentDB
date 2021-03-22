@@ -1,65 +1,47 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.adapter;
 
-import android.util.Log;
+import android.annotation.SuppressLint;
+import android.content.Context;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+
 import com.squorpikkor.app.adjustmentdb.R;
-import java.util.ArrayList;
 
-import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
+import java.util.List;
 
-public class DialogStatesAdapter extends RecyclerView.Adapter<DialogStatesAdapter.DialogStatesViewHolder>{
+/**Адаптер для списка доступных новых статусов, которые пользователь может добавить через диалог новых статусов*/
+public class DialogStatesAdapter extends ArrayAdapter<String> {
 
-    private ArrayList<String> stateList;
+    private final LayoutInflater inflater;
+    private final int layout;
+    private final List<String> sourceList;
 
-    /**
-     * Конструктор, в котором передаем ArrayList для RecyclerView
-     */
-    public DialogStatesAdapter(ArrayList<String> states) {
-        this.stateList = states;
-        Log.e(TAG, "**** stateList.size() = "+stateList.size());
+    public DialogStatesAdapter(Context context, int resource, List<String> sourceList) {
+        super(context, resource, sourceList);
+        this.sourceList = sourceList;
+        this.layout = resource;
+        this.inflater = LayoutInflater.from(context);
     }
 
-    /**
-     * Присваиваем xml лэйаут к итему RecyclerView
-     */
+    @SuppressLint({"SetTextI18n", "DefaultLocale"})
     @NonNull
-    @Override
-    public DialogStatesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.dialog_state_item, parent, false);
-        return new DialogStatesViewHolder(view);
-    }
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
-    @Override
-    public void onBindViewHolder(@NonNull DialogStatesAdapter.DialogStatesViewHolder holder, int position) {
-        String state = stateList.get(position);
-        Log.e(TAG, "onBindViewHolder: "+state+" "+position);
-        holder.tState.setText(state);
-    }
+        @SuppressLint("ViewHolder")
+        View view = inflater.inflate(this.layout, parent, false);
 
-    /**
-     * Просто возвращает кол-во элементов в массиве
-     */
-    @Override
-    public int getItemCount() {
-        return stateList.size();
-    }
+        TextView nameView = view.findViewById(R.id.state);
 
-    static class DialogStatesViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
-        private final TextView tState;
+        String state = sourceList.get(position);
 
-        public DialogStatesViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tState = itemView.findViewById(R.id.state);
-        }
+        nameView.setText(state);
 
-        @Override
-        public void onClick(View view) {
-
-        }
+        return view;
     }
 }
