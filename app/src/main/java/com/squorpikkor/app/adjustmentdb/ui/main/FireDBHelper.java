@@ -164,7 +164,7 @@ class FireDBHelper {
 
     void getStatesFromDB(String table, String documentName, String table2, MutableLiveData<ArrayList<DState>> states) {
         Log.e(TAG, "getStatesFromDB: ");
-        db.collection(table).document(documentName).collection(table2).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        db.collection(table).document(documentName).collection(table2).orderBy("date").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {

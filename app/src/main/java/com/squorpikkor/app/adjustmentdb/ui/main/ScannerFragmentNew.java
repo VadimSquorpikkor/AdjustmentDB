@@ -96,12 +96,6 @@ public class ScannerFragmentNew extends Fragment {
         tSerial = view.findViewById(R.id.textViewSerialValue);
         tId = view.findViewById(R.id.textViewIdValue);
 
-//        tType.setText(EMPTY_VALUE);
-//        tName.setText(EMPTY_VALUE);
-//        tInnerSerial.setText(EMPTY_VALUE);
-//        tSerial.setText(EMPTY_VALUE);
-//        tId.setText(EMPTY_VALUE);
-
         infoLayout = view.findViewById(R.id.db_info_layout);
         recyclerUnitsStates = view.findViewById(R.id.recyclerView);
         addNewStateButton = view.findViewById(R.id.addNewState);
@@ -153,18 +147,18 @@ public class ScannerFragmentNew extends Fragment {
         tType.setText("- - -");
         if (unit.getType().equals(REPAIR_TYPE)) tType.setText("Ремонт");
         if (unit.getType().equals(SERIAL_TYPE)) tType.setText("Серия");
-        tId.setText(unit.getId());
-        tName.setText(unit.getName());
-        tInnerSerial.setText(unit.getInnerSerial());
-        tSerial.setText(unit.getSerial());
+        tId.setText(insertRightValue(unit.getId()));
+        tName.setText(insertRightValue(unit.getName()));
+        tInnerSerial.setText(insertRightValue(unit.getInnerSerial()));
+        tSerial.setText(insertRightValue(unit.getSerial()));
 
-
-        /////////////////mViewModel.setSelectedUnit(unit);//getSelectedUnits().getValue().add(unit);
         if (unit.getType().equals(REPAIR_TYPE)) mViewModel.addSelectedRepairUnitStatesListListener(unit.getId());
         else if (unit.getType().equals(SERIAL_TYPE)) mViewModel.addSelectedSerialUnitStatesListListener(unit.getName(), unit.getInnerSerial());
-//        if (mViewModel.getIsRepair().getValue()) mViewModel.addSelectedRepairUnitStatesListListener(unit.getId());
-//        else mViewModel.addSelectedSerialUnitStatesListListener(unit.getName(), unit.getInnerSerial());
-//        tState.setText(unit.getState());
+    }
+
+    private String insertRightValue(String s) {
+        if (s==null||s.equals("")||s.equals("null")) return EMPTY_VALUE;
+        else return s;
     }
 
     private void openStatesDialog() {
@@ -256,12 +250,10 @@ public class ScannerFragmentNew extends Fragment {
             // беруться из БД (getRepairUnitById), если этого блока в БД нет (новый), то данные для
             // блока берутся из QR-кода
             if (name.equals(REPAIR_UNIT)) {//Если это ремонт
-                //////mViewModel.setIsRepair(true);
                 mViewModel.setSelectedUnit(new DUnit(innerSerial, "", "", "", "", REPAIR_TYPE));
                 mViewModel.getRepairUnitById(innerSerial);
 //todo надо добавить: если данные для юнита получены и включен лэйаут с данными, то камеру нужно выключить (она всё ещё включена под лэйаутом!)
             } else {
-                //////mViewModel.setIsRepair(false);
                 mViewModel.setSelectedUnit(new DUnit("", name, innerSerial, "", "", SERIAL_TYPE));
                 mViewModel.getDUnitByNameAndInnerSerial(name, innerSerial);
             }
