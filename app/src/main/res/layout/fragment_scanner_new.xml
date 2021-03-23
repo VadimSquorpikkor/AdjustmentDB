@@ -28,7 +28,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/db_info_layout"
-            android:text="Серия или ремонт"
             android:textColor="@color/main_orange"
             android:textSize="16sp"/>
 

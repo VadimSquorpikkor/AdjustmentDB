@@ -121,7 +121,7 @@ class FireDBHelper {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     QuerySnapshot querySnapshot = task.getResult();
-                    if (querySnapshot == null) return;
+                    if (querySnapshot == null || querySnapshot.size()==0) return;
                     units.setValue((ArrayList<DUnit>) querySnapshot.toObjects(DUnit.class));
                 } else {
                     Log.e(TAG, "Error - " + task.getException());
@@ -245,7 +245,7 @@ class FireDBHelper {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             QuerySnapshot querySnapshot = task.getResult();
-                            if (querySnapshot == null) return;
+                            if (querySnapshot == null || querySnapshot.size()==0) return;
                             selectedUnits.setValue((ArrayList<DUnit>) querySnapshot.toObjects(DUnit.class));
                         } else {
                             Log.e(TAG, "Error getting documents: ", task.getException());
@@ -265,7 +265,7 @@ class FireDBHelper {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             QuerySnapshot querySnapshot = task.getResult();
-                            if (querySnapshot == null) return;
+                            if (querySnapshot == null || querySnapshot.size()==0) return;
                             selectedUnits.setValue((ArrayList<DUnit>) querySnapshot.toObjects(DUnit.class));
                         } else {
                             Log.e(TAG, "Error getting documents: ", task.getException());

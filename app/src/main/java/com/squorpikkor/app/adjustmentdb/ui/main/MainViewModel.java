@@ -28,6 +28,9 @@ public class MainViewModel extends ViewModel {
     public static final String SERIAL = "serial";
     public static final String NAME = "name";
     public static final String ID = "id";
+
+    public static final String SERIAL_TYPE = "serial_type";
+    public static final String REPAIR_TYPE = "repair_type";
     FireDBHelper dbh;
     private final MutableLiveData<ArrayList<DUnit>> serialUnitsList;
     private final MutableLiveData<ArrayList<DUnit>> repairsUnitsList;
@@ -42,13 +45,9 @@ public class MainViewModel extends ViewModel {
     private final MutableLiveData<ArrayList<DState>> unitStatesList;
 
 
-    private MutableLiveData<Boolean> isRepair;
 
-    private DUnit selectedUnit;
 
-    public DUnit getSelectedUnit() {
-        return selectedUnit;
-    }
+
 
     public MainViewModel() {
         serialUnitsList = new MutableLiveData<>();
@@ -56,8 +55,6 @@ public class MainViewModel extends ViewModel {
         selectedUnits = new MutableLiveData<>();
         selectedRepairUnits = new MutableLiveData<>();
         dbh = new FireDBHelper();
-        isRepair = new MutableLiveData<>();
-        isRepair.setValue(false);
         devTypeList = new MutableLiveData<>();
         serialStatesList = new MutableLiveData<>();
         repairStatesList = new MutableLiveData<>();
@@ -67,15 +64,6 @@ public class MainViewModel extends ViewModel {
         addDevTypeTableListener();
         addSerialStateTableListener();
         addRepairStateTableListener();
-    }
-
-    /**Отслеживание: текущий (отсканированный в данный момент) девайс — это ремонт или серия*/
-    public MutableLiveData<Boolean> getIsRepair() {
-        return isRepair;
-    }
-
-    public void setIsRepair(boolean isRepair) {
-        this.isRepair.setValue(isRepair);
     }
 
     /**Сохраняет DUnit в БД в соответствующую таблицу*/
@@ -163,6 +151,12 @@ public class MainViewModel extends ViewModel {
 
     public MutableLiveData<ArrayList<DUnit>> getSelectedUnits() {
         return selectedUnits;
+    }
+
+    public void setSelectedUnit(DUnit newUnit) {
+        ArrayList<DUnit> units = new ArrayList<>();
+        units.add(newUnit);
+        selectedUnits.setValue(units);
     }
 
     /**Получить список серийных юнитов из БД по их типу и внутреннему серийнику. По-сути в БД такое

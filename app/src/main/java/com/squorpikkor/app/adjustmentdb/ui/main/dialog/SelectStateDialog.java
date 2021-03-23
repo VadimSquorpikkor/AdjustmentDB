@@ -23,6 +23,7 @@ import com.squorpikkor.app.adjustmentdb.ui.main.adapter.DialogStatesAdapter;
 import java.util.ArrayList;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_TYPE;
 
 public class SelectStateDialog extends Dialog {
 
@@ -43,10 +44,12 @@ public class SelectStateDialog extends Dialog {
         this.context = context;
         this.mViewModel = mViewModel;
         this.stateList = stateList;
-        ArrayList<DUnit> units = mViewModel.getSelectedUnits().getValue();
+        ArrayList<DUnit> units = this.mViewModel.getSelectedUnits().getValue();
+//        if (units.size() == 0) this.unit = this.mViewModel.getSelectedUnit();
+//        else this.unit = units.get(0);
         if (units.size() != 0) this.unit = units.get(0);
         else this.unit = new DUnit();
-
+////this.mViewModel.setSelectedUnit(units.get(0));
     }
 
     @Override
@@ -73,8 +76,9 @@ public class SelectStateDialog extends Dialog {
             String innerSerial = unit.getInnerSerial();
             String serial = unit.getSerial();
             String state = selectedEditState.getText().toString();
-            if (mViewModel.getIsRepair().getValue()) mViewModel.saveRepairUnitToDB(new DUnit(id, name, innerSerial, serial, state));
-            else mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state));
+            String type = unit.getType();
+            if (mViewModel.getSelectedUnits().getValue().get(0).getType().equals(REPAIR_TYPE)) mViewModel.saveRepairUnitToDB(new DUnit(id, name, innerSerial, serial, state, type));
+            else mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state, type));
             dismiss();
         });
 

@@ -1,23 +1,27 @@
 package com.squorpikkor.app.adjustmentdb;
 
 public class DUnit {
-    String name; //БДКГ-02
-    String innerSerial; //№12345
-    String serial; //132.002
-    String state; //"На линейке"
-    String id; //"0001"
+
+
+    private String name; //БДКГ-02
+    private String innerSerial; //№12345
+    private String serial; //132.002
+    private String state; //"На линейке"
+    private String id; //"0001"
+    private String type; //"Ремонтный"
 
     /**Конструктор без параметров нужен для работы с Firebase*/
     public DUnit() {
     }
 
 
-    public DUnit(String id, String name, String innerSerial, String serial, String state) {
+    public DUnit(String id, String name, String innerSerial, String serial, String state, String type) {
         this.id = id;
         this.name = name;
         this.innerSerial = innerSerial;
         this.serial = serial;
         this.state = state;
+        this.type = type;
     }
 
     public String getState() {
@@ -58,5 +62,13 @@ public class DUnit {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

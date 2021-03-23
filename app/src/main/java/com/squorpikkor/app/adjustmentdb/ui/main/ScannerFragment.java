@@ -117,8 +117,8 @@ public class ScannerFragment extends Fragment {
             String innerSerial = tInnerSerial.getText().toString();
             String serial = tSerial.getText().toString();
             String state = tState.getText().toString();
-            if (isRepairDev) mViewModel.saveRepairUnitToDB(new DUnit(id, name, innerSerial, serial, state));
-            else mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state));
+            ////////////if (isRepairDev) mViewModel.saveRepairUnitToDB(new DUnit(id, name, innerSerial, serial, state));
+            //////////else mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state));
             if (getFragmentManager() != null) {
                 getFragmentManager().popBackStackImmediate();
             }
@@ -249,7 +249,7 @@ public class ScannerFragment extends Fragment {
             }
         });
 //--------------------------------------------------------------------------------------------------
-        final MutableLiveData<Boolean> isRepairUnit = mViewModel.getIsRepair();
+        /*final MutableLiveData<Boolean> isRepairUnit = mViewModel.getIsRepair();
         isRepairUnit.observe(getViewLifecycleOwner(), isRepair -> {
             if (isRepair) {
                 isRepairDev = true;
@@ -264,7 +264,7 @@ public class ScannerFragment extends Fragment {
                 repairStateSpinner.setVisibility(View.GONE);
                 stateSpinner.setVisibility(View.VISIBLE);
             }
-        });
+        });*/
 
         return view;
     }
@@ -347,13 +347,13 @@ public class ScannerFragment extends Fragment {
             String name = ar[0];
             String innerSerial = ar[1];
             if (name.equals(REPAIR_UNIT)) {//Если это ремонт
-                mViewModel.setIsRepair(true);
+                ////////////////mViewModel.setIsRepair(true);
                 tId.setText(innerSerial);
                 sendButton.setEnabled(true);
                 sendButton.setText("Добавить в БД (ремонт)");
                 mViewModel.getRepairUnitById(innerSerial);
             } else {
-                mViewModel.setIsRepair(false);
+                ///////////////////mViewModel.setIsRepair(false);
                 tName.setText(name);//Если это серия
                 tInnerSerial.setText(innerSerial);
                 sendButton.setEnabled(true);
