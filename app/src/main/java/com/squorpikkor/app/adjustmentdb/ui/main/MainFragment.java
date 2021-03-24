@@ -23,6 +23,7 @@ import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.DRepairUnitAdapter;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.DSerialUnitAdapter;
+import com.squorpikkor.app.adjustmentdb.ui.main.scanner.ScannerFragmentNew;
 
 import java.util.ArrayList;
 

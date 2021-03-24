@@ -44,11 +44,6 @@ public class MainViewModel extends ViewModel {
 
     private final MutableLiveData<ArrayList<DState>> unitStatesList;
 
-
-
-
-
-
     public MainViewModel() {
         serialUnitsList = new MutableLiveData<>();
         repairsUnitsList = new MutableLiveData<>();
@@ -163,7 +158,7 @@ public class MainViewModel extends ViewModel {
      *  устройство должно быть всегда в одном экземпляре. То, что функция возвращает список,
      *  сделано для проверки на дублирование. Пока в таком случае просто пишется в консоль
      *  предупреждение*/
-    void getDUnitByNameAndInnerSerial(String name, String innerSerial) {
+    public void getDUnitByNameAndInnerSerial(String name, String innerSerial) {
         dbh.readFromDBByTwoParameters(DUNIT_TABLE, NAME, name, INNER_SERIAL, innerSerial, selectedUnits);
         String name_db = name+"_"+innerSerial;
         dbh.getStatesFromDB(DUNIT_TABLE, name_db, TABLE_INNER_STATES, unitStatesList);
@@ -172,12 +167,12 @@ public class MainViewModel extends ViewModel {
     }
 
     /**Получить список ремонтных юнитов из БД по их типу и серийному номеру*/
-    void getRepairUnitByNameAndSerial(String name, String serial) {
+    public void getRepairUnitByNameAndSerial(String name, String serial) {
         dbh.readFromDBByTwoParameters(REPAIRS_TABLE, NAME, name, SERIAL, serial, selectedRepairUnits);
     }
 
     /**Получить список ремонтных юнитов из БД по их индификационному номеру*/
-    void getRepairUnitById(String id) {
+    public void getRepairUnitById(String id) {
 //        dbh.readFromDBByParameter(REPAIRS_TABLE, ID, id, selectedRepairUnits);
         dbh.readFromDBByParameter(REPAIRS_TABLE, ID, id, selectedUnits);// пока selectedUnits — всё равно всё выводится в одни и те же поля фрагмента
         String name = "r_"+ id;

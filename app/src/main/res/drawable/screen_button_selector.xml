@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Селектор для кнопок: серый градиент, при нажатии — подсвечивается-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/angled_gradient" android:state_pressed="false"/>
+    <item android:drawable="@drawable/square_corners_accent" android:state_pressed="true"/>
+</selector>
