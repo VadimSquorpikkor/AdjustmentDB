@@ -2,12 +2,15 @@ package com.squorpikkor.app.adjustmentdb.ui.main.scanner;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -24,8 +27,11 @@ import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Objects;
 
+import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.ui.main.scanner.Encrypter.decodeMe;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_TYPE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_TYPE;
@@ -42,9 +48,16 @@ class Scanner {
     private final View view;
     private SurfaceView surfaceView;
     private TextView txtBarcodeValue;
+    private TextView foundCount;
+    private SwitchCompat switchCompat;
     private FloatingActionButton addNewStateButton;
     private ConstraintLayout infoLayout;
+    private Button nextButton;
     private final MainViewModel mViewModel;
+
+    private HashSet<String> dataSet;
+    private ArrayList<DUnit> unitList;
+
 
     Scanner(FragmentActivity activity, View view, MainViewModel mViewModel) {
         this.activity = activity;
@@ -60,6 +73,16 @@ class Scanner {
         addNewStateButton = view.findViewById(R.id.addNewState);
         txtBarcodeValue.setVisibility(View.GONE);
         infoLayout.setVisibility(View.GONE);
+        switchCompat = view.findViewById(R.id.switch_auto);
+        dataSet = new HashSet<>();
+        unitList = new ArrayList<>();
+        foundCount = view.findViewById(R.id.found_count);
+        nextButton = view.findViewById(R.id.button_next);
+
+
+        /*nextButton.setOnClickListener(v -> {
+            doNext();
+        });*/
     }
 
     public void initialiseDetectorsAndSources() {
@@ -111,41 +134,78 @@ class Scanner {
                 if (barcodes.size() != 0) {
                     txtBarcodeValue.post(() -> {
                         intentData = barcodes.valueAt(0).displayValue;
-                        workingWithBarCode(intentData);
-                        cameraSource.stop();
+                        if (switchCompat.isChecked()) {
+                            if (!dataSet.contains(intentData)){
+                                dataSet.add(intentData);
+                                Log.e(TAG, "♦ "+intentData);
+                                addUnitToCollection(getDUnitFromString(intentData));
+                            }
+                        } else {
+                            saveUnit(getDUnitFromString(intentData));
+                            cameraSource.stop();
+                        }
                     });
                 }
             }
         });
     }
 
-    private void workingWithBarCode(String intentData) {
-        intentData = decodeMe(intentData);
-        txtBarcodeValue.setText(intentData);
-        txtBarcodeValue.setVisibility(View.VISIBLE);
+    /*private void doNext() {
+        infoLayout.setVisibility(View.VISIBLE);
+        mViewModel.getFoundUnitsList().setValue(unitList);
+        Log.e(TAG, "saveFoundUnits: SIZE - "+mViewModel.getFoundUnitsList().getValue().size());
+    }*/
 
-        String[] ar = intentData.split(SPLIT_SYMBOL);
+    String temp = "";
+
+    private void addUnitToCollection(DUnit unit) {
+        if (unit!=null){
+            unitList.add(unit);
+            foundCount.setText(String.valueOf(unitList.size()));
+            if (unitList.size()!=0) nextButton.setVisibility(View.VISIBLE);
+            if (unit.isRepairUnit()) Log.e(TAG, unit.getId());
+            else Log.e(TAG, unit.getName()+" "+unit.getInnerSerial());
+
+            mViewModel.getFoundUnitsList().setValue(unitList);
+
+        }
+    }
+
+    private void saveUnit(DUnit unit) {
+        if (unit != null) {
+            addNewStateButton.setVisibility(View.VISIBLE);
+            infoLayout.setVisibility(View.VISIBLE);
+            //Смысл в том, что если отсканированный блок есть в БД, то данные для этого блока
+            // беруться из БД (getRepairUnitById), если этого блока в БД нет (новый), то данные для
+            // блока берутся из QR-кода
+            if (unit.isRepairUnit()) {//Если это ремонт
+                mViewModel.setSelectedUnit(unit);
+                mViewModel.getRepairUnitById(unit.getId());
+                //todo надо добавить: если данные для юнита получены и включен лэйаут с данными, то камеру нужно выключить (она всё ещё включена под лэйаутом!)
+            } else {
+                mViewModel.setSelectedUnit(unit);
+                mViewModel.getDUnitByNameAndInnerSerial(unit.getName(), unit.getInnerSerial());
+            }
+        }
+    }
+
+    private DUnit getDUnitFromString(String s) {
+        s = decodeMe(s);
+        txtBarcodeValue.setText(s);
+        txtBarcodeValue.setVisibility(View.VISIBLE);
+        String[] ar = s.split(SPLIT_SYMBOL);
         if (ar.length == 2) {
             //Для серии: имя+внутренний_серийный (БДКГ-02 1234)
             //Для ремонта: "Ремонт"+id (Ремонт 0001)
             String name = ar[0];
             String innerSerial = ar[1];
-            //addToBDButton.setVisibility(View.VISIBLE);
-            addNewStateButton.setVisibility(View.VISIBLE);
-            infoLayout.setVisibility(View.VISIBLE);
 
-            //Смысл в том, что если отсканированный блок есть в БД, то данные для этого блока
-            // беруться из БД (getRepairUnitById), если этого блока в БД нет (новый), то данные для
-            // блока берутся из QR-кода
-            if (name.equals(REPAIR_UNIT)) {//Если это ремонт
-                mViewModel.setSelectedUnit(new DUnit(innerSerial, "", "", "", "", REPAIR_TYPE));
-                mViewModel.getRepairUnitById(innerSerial);
-                //todo надо добавить: если данные для юнита получены и включен лэйаут с данными, то камеру нужно выключить (она всё ещё включена под лэйаутом!)
-            } else {
-                mViewModel.setSelectedUnit(new DUnit("", name, innerSerial, "", "", SERIAL_TYPE));
-                mViewModel.getDUnitByNameAndInnerSerial(name, innerSerial);
-            }
-        }
+            // Если это ремонт:
+            if (name.equals(REPAIR_UNIT)) return new DUnit(innerSerial, "", "", "", "", REPAIR_TYPE);
+            // Если это серия:
+            else return new DUnit("", name, innerSerial, "", "", SERIAL_TYPE);
+        // Если строка некорректная, возвращаю null
+        } else return null;
     }
 
     public void cameraSourceRelease() {

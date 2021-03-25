@@ -77,7 +77,7 @@ public class SelectStateDialog extends Dialog {
             String serial = unit.getSerial();
             String state = selectedEditState.getText().toString();
             String type = unit.getType();
-            if (mViewModel.getSelectedUnits().getValue().get(0).getType().equals(REPAIR_TYPE)) mViewModel.saveRepairUnitToDB(new DUnit(id, name, innerSerial, serial, state, type));
+            if (mViewModel.getSelectedUnits().getValue().get(0).isRepairUnit()) mViewModel.saveRepairUnitToDB(new DUnit(id, name, innerSerial, serial, state, type));
             else mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state, type));
             dismiss();
         });

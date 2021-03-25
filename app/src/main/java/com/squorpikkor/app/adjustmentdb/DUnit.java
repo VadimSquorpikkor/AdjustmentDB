@@ -1,5 +1,8 @@
 package com.squorpikkor.app.adjustmentdb;
 
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_TYPE;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_TYPE;
+
 public class DUnit {
 
 
@@ -22,6 +25,14 @@ public class DUnit {
         this.serial = serial;
         this.state = state;
         this.type = type;
+    }
+
+    public boolean isRepairUnit() {
+        return type.equals(REPAIR_TYPE);
+    }
+
+    public boolean isSerialUnit() {
+        return type.equals(SERIAL_TYPE);
     }
 
     public String getState() {

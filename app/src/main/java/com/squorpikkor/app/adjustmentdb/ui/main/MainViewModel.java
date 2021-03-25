@@ -44,6 +44,8 @@ public class MainViewModel extends ViewModel {
 
     private final MutableLiveData<ArrayList<DState>> unitStatesList;
 
+    private final MutableLiveData<ArrayList<DUnit>> foundUnitsList;
+
     public MainViewModel() {
         serialUnitsList = new MutableLiveData<>();
         repairsUnitsList = new MutableLiveData<>();
@@ -54,6 +56,7 @@ public class MainViewModel extends ViewModel {
         serialStatesList = new MutableLiveData<>();
         repairStatesList = new MutableLiveData<>();
         unitStatesList = new MutableLiveData<>();
+        foundUnitsList = new MutableLiveData<>();
         addDUnitTableListener();
         addRepairUnitTableListener();
         addDevTypeTableListener();
@@ -148,6 +151,11 @@ public class MainViewModel extends ViewModel {
         return selectedUnits;
     }
 
+    public MutableLiveData<ArrayList<DUnit>> getFoundUnitsList() {
+        return foundUnitsList;
+    }
+
+    //todo переделать в getSelectedUnits.setValue(...) ???
     public void setSelectedUnit(DUnit newUnit) {
         ArrayList<DUnit> units = new ArrayList<>();
         units.add(newUnit);
