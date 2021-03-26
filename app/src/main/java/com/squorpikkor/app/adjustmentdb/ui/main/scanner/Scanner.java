@@ -2,6 +2,7 @@ package com.squorpikkor.app.adjustmentdb.ui.main.scanner;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
@@ -58,7 +59,6 @@ class Scanner {
     private HashSet<String> dataSet;
     private ArrayList<DUnit> unitList;
 
-
     Scanner(FragmentActivity activity, View view, MainViewModel mViewModel) {
         this.activity = activity;
         this.view = view;
@@ -78,7 +78,6 @@ class Scanner {
         unitList = new ArrayList<>();
         foundCount = view.findViewById(R.id.found_count);
         nextButton = view.findViewById(R.id.button_next);
-
 
         /*nextButton.setOnClickListener(v -> {
             doNext();
@@ -123,6 +122,7 @@ class Scanner {
 
 
         barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
+
             @Override
             public void release() {
                 //Toast.makeText(getContext(), "To prevent memory leaks barcode scanner has been stopped", Toast.LENGTH_SHORT).show();
@@ -131,18 +131,35 @@ class Scanner {
             @Override
             public void receiveDetections(@NotNull Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> barcodes = detections.getDetectedItems();
+
+//                final MediaPlayer mp = MediaPlayer.create(activity, R.raw.fast_beep);
+                /*MediaPlayer mp = MediaPlayer.create(activity, R.raw.fast_beep);
+                 mp.setLooping(false);
+                 mp.setOnSeekCompleteListener(mp1 -> {
+                     mp.stop();
+                     mp.release();
+                 });*/
+
                 if (barcodes.size() != 0) {
                     txtBarcodeValue.post(() -> {
                         intentData = barcodes.valueAt(0).displayValue;
                         if (switchCompat.isChecked()) {
-                            if (!dataSet.contains(intentData)){
-                                dataSet.add(intentData);
-                                Log.e(TAG, "♦ "+intentData);
-                                addUnitToCollection(getDUnitFromString(intentData));
+                            for (int i = 0; i < barcodes.size(); i++) {
+                                intentData = barcodes.valueAt(i).displayValue;
+                                if (!dataSet.contains(intentData)){
+                                    dataSet.add(intentData);
+//                                    mp.start();
+                                    MediaPlayer.create(activity, R.raw.fast_beep).start();
+                                    Log.e(TAG, "♦ "+intentData);
+                                    addUnitToCollection(getDUnitFromString(intentData));
+                                }
                             }
                         } else {
+                            intentData = barcodes.valueAt(0).displayValue;
                             saveUnit(getDUnitFromString(intentData));
                             cameraSource.stop();
+                            MediaPlayer.create(activity, R.raw.fast_beep).start();
+//                            mp.start();
                         }
                     });
                 }
@@ -155,8 +172,6 @@ class Scanner {
         mViewModel.getFoundUnitsList().setValue(unitList);
         Log.e(TAG, "saveFoundUnits: SIZE - "+mViewModel.getFoundUnitsList().getValue().size());
     }*/
-
-    String temp = "";
 
     private void addUnitToCollection(DUnit unit) {
         if (unit!=null){
