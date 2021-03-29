@@ -215,10 +215,11 @@ class Scanner {
             String name = ar[0];
             String innerSerial = ar[1];
 
+
             // Если это ремонт:
-            if (name.equals(REPAIR_UNIT)) return new DUnit(innerSerial, "", "", "", "", REPAIR_TYPE);
+            if (name.equals(REPAIR_UNIT)) return new DUnit(innerSerial, "", "", "", "", "", REPAIR_TYPE);
             // Если это серия:
-            else return new DUnit("", name, innerSerial, "", "", SERIAL_TYPE);
+            else return new DUnit("", name, innerSerial, "", "", "", SERIAL_TYPE);
         // Если строка некорректная, возвращаю null
         } else return null;
     }

@@ -33,7 +33,7 @@ public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesView
     @NonNull
     @Override
     public StatesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.state_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_state, parent, false);
         return new StatesViewHolder(view);
     }
 

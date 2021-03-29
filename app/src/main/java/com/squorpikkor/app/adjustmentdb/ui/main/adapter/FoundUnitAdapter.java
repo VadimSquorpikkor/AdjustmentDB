@@ -25,7 +25,7 @@ public class FoundUnitAdapter extends RecyclerView.Adapter<FoundUnitAdapter.Foun
     @NonNull
     @Override
     public FoundViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.found_dunit_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_found_dunit, parent, false);
         return new FoundViewHolder(view);
     }
 

@@ -68,7 +68,8 @@ class FireDBHelper {
         if (!unit.getState().equals("")) {
             db.collection(table)
                     .document(documentName)
-                    .collection("states").document().set(new DState(new Date(), unit.getState()))
+//                    .collection("states").document().set(unit.getState())
+                    .collection("states").document().set(new DState(new Date(), unit.getState(), unit.getDescription()))
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -203,6 +204,21 @@ class FireDBHelper {
         });
     }
 
+    void getStringArrayFromDB(String table, String document, String table2, MutableLiveData<ArrayList<String>> mList, String fieldName) {
+        Log.e(TAG, "getStringArrayFromDB: ");
+        db.collection(table).document(document).collection(table2).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                ArrayList<String> list = new ArrayList<>();
+                for (DocumentSnapshot document : task.getResult()) {
+                    list.add(document.get(fieldName).toString());
+                    /////mList.getValue().add(document.get(fieldName).toString());
+                }
+                mList.setValue(list);
+            }
+        });
+    }
+
     void addSelectedUnitListener(String table, String documentName, String table2, MutableLiveData<ArrayList<DState>> unitStatesList) {
         db.collection(table).document(documentName).collection(table2).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -234,6 +250,15 @@ class FireDBHelper {
         });
     }
 
+    void addStringArrayListener(String table, String document, String table2, MutableLiveData<ArrayList<String>> mList, String fieldName) {
+        db.collection(table).document(document).collection(table2).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
+                //getStringFromDB(table, s);
+                getStringArrayFromDB(table, document, table2, mList, fieldName);
+            }
+        });
+    }
 
     //todo paramValue переделать в Object. С другой стороны — это пока не важно, у меня и так пока все параметры String
     void readFromDBByParameter(String table, String paramName, String paramValue, MutableLiveData<ArrayList<DUnit>> selectedUnits) {

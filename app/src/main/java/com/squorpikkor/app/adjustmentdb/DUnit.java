@@ -9,22 +9,24 @@ public class DUnit {
     private String name; //БДКГ-02
     private String innerSerial; //№12345
     private String serial; //132.002
-    private String state; //"На линейке"
     private String id; //"0001"
     private String type; //"Ремонтный"
+    private String state; //"На линейке"
+    private String description;
 
     /**Конструктор без параметров нужен для работы с Firebase*/
     public DUnit() {
     }
 
 
-    public DUnit(String id, String name, String innerSerial, String serial, String state, String type) {
+    public DUnit(String id, String name, String innerSerial, String serial, String state, String description, String type) {
         this.id = id;
         this.name = name;
         this.innerSerial = innerSerial;
         this.serial = serial;
-        this.state = state;
         this.type = type;
+        this.state = state;
+        this.description = description;
     }
 
     public boolean isRepairUnit() {
@@ -81,5 +83,13 @@ public class DUnit {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

@@ -3,12 +3,19 @@ package com.squorpikkor.app.adjustmentdb;
 import java.util.Date;
 
 public class DState {
-    Date date;
-    String state;
+    private Date date;
+    private String state;
+    private String description;
 
     public DState(Date date, String state) {
         this.date = date;
         this.state = state;
+    }
+
+    public DState(Date date, String state, String description) {
+        this.date = date;
+        this.state = state;
+        this.description = description;
     }
 
     public DState() {
@@ -28,5 +35,13 @@ public class DState {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

@@ -19,12 +19,10 @@ import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.FoundUnitAdapter;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.StatesAdapter;
-import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialog;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialogNew;
+import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialogNewDesign;
 import java.util.ArrayList;
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_TYPE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_TYPE;
 
 public class ScannerFragmentNew extends Fragment {
 
@@ -80,7 +78,7 @@ public class ScannerFragmentNew extends Fragment {
         addNewStateButton.setOnClickListener(view1 -> openStatesDialog());
 
         view.findViewById(R.id.button).setOnClickListener(view1 -> {
-            SelectStateDialogNew dialog = new SelectStateDialogNew();
+            SelectStateDialogNewDesign dialog = new SelectStateDialogNewDesign();
             dialog.setCancelable(false);
 //            dialog.setTargetFragment(getTargetFragment(), REQUEST_CODE_KEYWORD_DIALOG);
             dialog.show(requireFragmentManager(), null);
@@ -143,9 +141,10 @@ public class ScannerFragmentNew extends Fragment {
 
     private void openStatesDialog() {
         //Загружается тот список, тип прибора который загружен — ремонт или серия
-        ArrayList<String> rightList = mViewModel.getSerialStatesList().getValue();
+        ArrayList<String> rightList;
         if (mViewModel.getSelectedUnits().getValue().get(0).isRepairUnit()) rightList = mViewModel.getRepairStatesList().getValue();
-        SelectStateDialog dialog = new SelectStateDialog(getActivity(), mViewModel, rightList);
+        else rightList = mViewModel.getSerialStatesList().getValue();
+        SelectStateDialogNew dialog = new SelectStateDialogNew(getActivity(), mViewModel, rightList);
         dialog.show();
     }
 

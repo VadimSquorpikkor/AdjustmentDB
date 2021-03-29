@@ -26,7 +26,7 @@ public class DRepairUnitAdapter extends RecyclerView.Adapter<DRepairUnitAdapter.
     @NonNull
     @Override
     public DRepairUnitAdapter.DUnitViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.runit_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_runit, parent, false);
         return new DRepairUnitAdapter.DUnitViewHolder(view);
     }
 

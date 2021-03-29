@@ -20,6 +20,7 @@ public class MainViewModel extends ViewModel {
     public static final String REPAIRS_TABLE = "repairs";
     public static final String DEV_TYPES_TABLE = "dev_types";
     public static final String TABLE_INNER_STATES = "states";
+    public static final String TABLE_PROFILES = "profiles";
 
     public static final String REPAIR_STATES_TABLE = "repair_states";
     public static final String SERIAL_STATES_TABLE = "serial_states";
@@ -57,6 +58,8 @@ public class MainViewModel extends ViewModel {
         repairStatesList = new MutableLiveData<>();
         unitStatesList = new MutableLiveData<>();
         foundUnitsList = new MutableLiveData<>();
+        initProfile();
+        setSelectedProfile(Profile.РЕГУЛИРОВКА);//todo пока захардкодил, потом будет выбираться и/или браться из SharedPref
         addDUnitTableListener();
         addRepairUnitTableListener();
         addDevTypeTableListener();
@@ -64,12 +67,38 @@ public class MainViewModel extends ViewModel {
         addRepairStateTableListener();
     }
 
-    /**Сохраняет DUnit в БД в соответствующую таблицу*/
+    void initProfile() {
+        Profile.РЕГУЛИРОВКА.setData("Регулировка", "adjustment_states");
+        Profile.ГРАДУИРОВКА.setData("Градуировка", "graduation_states");
+        Profile.СБОРКА.setData("Сборка", "assembly_states");
+        Profile.МОНТАЖ.setData("Монтаж", "soldering_states");
+        Profile.ПРИЁМКА.setData("Приёмка", "take_to_repair_states");
+    }
+
+    Profile selectedProfile;
+
+    public Profile getSelectedProfile() {
+        return selectedProfile;
+    }
+
+    /**Выбрать профиль (сборка, регулировка...). При смене профиля обновляем лисенеры для имен
+     * статусов, так как статусы уже другие*/
+    public void setSelectedProfile(Profile selectedProfile) {
+        this.selectedProfile = selectedProfile;
+        addSerialStateTableListener();
+        addRepairStateTableListener();
+    }
+
+    /**
+     * Сохраняет DUnit в БД в соответствующую таблицу
+     */
     public void saveDUnitToDB(DUnit unit) {
         dbh.addElementToDB(unit, DUNIT_TABLE);
     }
 
-    /**Сохраняет ремонтный DUnit в БД в соответствующую таблицу*/
+    /**
+     * Сохраняет ремонтный DUnit в БД в соответствующую таблицу
+     */
     public void saveRepairUnitToDB(DUnit unit) {
         dbh.addElementToDB(unit, REPAIRS_TABLE);
     }
@@ -78,59 +107,92 @@ public class MainViewModel extends ViewModel {
         dbh.getElementFromDB(DUNIT_TABLE, serialUnitsList);
     }
 
-    /**Слушатель для таблицы серийных приборов*/
+
+//----- LISTENERS ----------------------------------------------------------------------------------
+
+    /**
+     * Слушатель для таблицы серийных приборов
+     */
     void addDUnitTableListener() {
         dbh.addDBListener(DUNIT_TABLE, serialUnitsList);
     }
 
-    /**Слушатель для таблицы ремонтных приборов*/
+    /**
+     * Слушатель для таблицы ремонтных приборов
+     */
     void addRepairUnitTableListener() {
         dbh.addDBListener(REPAIRS_TABLE, repairsUnitsList);
     }
 
-    /**Слушатель для таблицы имен приборов*/
+    /**
+     * Слушатель для таблицы имен приборов
+     */
     void addDevTypeTableListener() {
         dbh.addDevTypeListener(DEV_TYPES_TABLE, devTypeList);
     }
 
-    /**Слушатель для таблицы названий статусов серийных приборов
-     * db -> serial_states -> <name> -> name:*/
+    /**
+     * Слушатель для таблицы названий статусов серийных приборов
+     * db -> serial_states -> <name> -> name:
+     * Имя таблицы из которой будет браться список профилей выбирается в зависимости от выбранного профиля
+     *
+     * Если выбран профиль МОНТАЖ или СБОРКА или ГРАДУИРОВКА, то в serialStatesList загружаем данные из таблицы REPAIR_STATES_TABLE (а не SERIAL_STATES_TABLE)
+     * Для монтажа для серии нет отдельной таблицы (и серия и ремонт — одинаковые статусы), поэтому нет смысла хранить в БД два одинаковых списка,
+     * хранится один и загружается один и тот же в оба списка
+     */
     void addSerialStateTableListener() {
-        dbh.addStringArrayListener(SERIAL_STATES_TABLE, serialStatesList, NAME);
+        if (    getSelectedProfile()==Profile.МОНТАЖ ||
+                getSelectedProfile()==Profile.ГРАДУИРОВКА ||
+                getSelectedProfile()==Profile.СБОРКА) dbh.addStringArrayListener(TABLE_PROFILES, getSelectedProfile().getDocumentName(), REPAIR_STATES_TABLE, serialStatesList, NAME);
+        dbh.addStringArrayListener(TABLE_PROFILES, getSelectedProfile().getDocumentName(), SERIAL_STATES_TABLE, serialStatesList, NAME);
     }
 
-    /**Слушатель для таблицы названий статусов ремонтных приборов
-     * db -> repair_states -> <name> -> name:*/
+    /**
+     * Слушатель для таблицы названий статусов ремонтных приборов
+     * db -> repair_states -> <name> -> name:
+     */
     void addRepairStateTableListener() {
         Log.e(TAG, "addRepairStateTableListener: ");
-        dbh.addStringArrayListener(REPAIR_STATES_TABLE, repairStatesList, NAME);
+        dbh.addStringArrayListener(TABLE_PROFILES, getSelectedProfile().getDocumentName(), REPAIR_STATES_TABLE, repairStatesList, NAME);
     }
 
-    /**Добавить слушателя для списка статусов для выбранного ремонтного устройства
-     * db -> repairs -> r_0005 -> states -> <name> -> date:+state: */
+    /**
+     * Добавить слушателя для списка статусов для выбранного ремонтного устройства
+     * db -> repairs -> r_0005 -> states -> <name> -> date:+state:
+     */
     public void addSelectedRepairUnitStatesListListener(String id) {
-        String name = "r_"+ id;
+        String name = "r_" + id;
         dbh.addSelectedUnitListener(REPAIRS_TABLE, name, TABLE_INNER_STATES, unitStatesList);
     }
 
-    /**Добавить слушателя для списка статусов для выбранного серийного устройства
-     * units -> name_1234 -> states -> <name> -> date:+state: */
+    /**
+     * Добавить слушателя для списка статусов для выбранного серийного устройства
+     * units -> name_1234 -> states -> <name> -> date:+state:
+     */
     public void addSelectedSerialUnitStatesListListener(String name, String innerSerial) {
-        String name_db = name+"_"+innerSerial;
+        String name_db = name + "_" + innerSerial;
         dbh.addSelectedUnitListener(DUNIT_TABLE, name_db, TABLE_INNER_STATES, unitStatesList);
     }
 
-    /**Список названий статусов серийных приборов*/
+//--------------------------------------------------------------------------------------------------
+
+    /**
+     * Список названий статусов серийных приборов
+     */
     public MutableLiveData<ArrayList<String>> getSerialStatesList() {
         return serialStatesList;
     }
 
-    /**Список названий статусов ремонтных приборов*/
+    /**
+     * Список названий статусов ремонтных приборов
+     */
     public MutableLiveData<ArrayList<String>> getRepairStatesList() {
         return repairStatesList;
     }
 
-    /**Список имен (названий) приборов*/
+    /**
+     * Список имен (названий) приборов
+     */
     public MutableLiveData<ArrayList<DevType>> getDevTypeList() {
         return devTypeList;
     }
@@ -162,28 +224,34 @@ public class MainViewModel extends ViewModel {
         selectedUnits.setValue(units);
     }
 
-    /**Получить список серийных юнитов из БД по их типу и внутреннему серийнику. По-сути в БД такое
-     *  устройство должно быть всегда в одном экземпляре. То, что функция возвращает список,
-     *  сделано для проверки на дублирование. Пока в таком случае просто пишется в консоль
-     *  предупреждение*/
+    /**
+     * Получить список серийных юнитов из БД по их типу и внутреннему серийнику. По-сути в БД такое
+     * устройство должно быть всегда в одном экземпляре. То, что функция возвращает список,
+     * сделано для проверки на дублирование. Пока в таком случае просто пишется в консоль
+     * предупреждение
+     */
     public void getDUnitByNameAndInnerSerial(String name, String innerSerial) {
         dbh.readFromDBByTwoParameters(DUNIT_TABLE, NAME, name, INNER_SERIAL, innerSerial, selectedUnits);
-        String name_db = name+"_"+innerSerial;
+        String name_db = name + "_" + innerSerial;
         dbh.getStatesFromDB(DUNIT_TABLE, name_db, TABLE_INNER_STATES, unitStatesList);
 //        selectedUnit.setName(name);
 //        selectedUnit.setInnerSerial(innerSerial);
     }
 
-    /**Получить список ремонтных юнитов из БД по их типу и серийному номеру*/
+    /**
+     * Получить список ремонтных юнитов из БД по их типу и серийному номеру
+     */
     public void getRepairUnitByNameAndSerial(String name, String serial) {
         dbh.readFromDBByTwoParameters(REPAIRS_TABLE, NAME, name, SERIAL, serial, selectedRepairUnits);
     }
 
-    /**Получить список ремонтных юнитов из БД по их индификационному номеру*/
+    /**
+     * Получить список ремонтных юнитов из БД по их индификационному номеру
+     */
     public void getRepairUnitById(String id) {
 //        dbh.readFromDBByParameter(REPAIRS_TABLE, ID, id, selectedRepairUnits);
         dbh.readFromDBByParameter(REPAIRS_TABLE, ID, id, selectedUnits);// пока selectedUnits — всё равно всё выводится в одни и те же поля фрагмента
-        String name = "r_"+ id;
+        String name = "r_" + id;
         dbh.getStatesFromDB(REPAIRS_TABLE, name, TABLE_INNER_STATES, unitStatesList);//Список статусов для текущего юнита
 //        selectedUnit.setId(id);
     }

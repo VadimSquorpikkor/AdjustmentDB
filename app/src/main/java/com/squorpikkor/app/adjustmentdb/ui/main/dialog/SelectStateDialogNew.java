@@ -1,98 +1,99 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.dialog;
 
-import android.annotation.SuppressLint;
-import android.app.Application;
+import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.MutableLiveData;
 
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
+import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.DialogStatesAdapter;
-
 import java.util.ArrayList;
 
-public class SelectStateDialogNew extends DialogFragment {
+import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 
-    private Context mContext;
-    private AlertDialog dialog;
-    private View view;
-    private int address;
-
-
+public class SelectStateDialogNew extends Dialog {
+    private MainViewModel mViewModel;
+    private Activity context;
     private ArrayList<String> stateList;
     private TextView cancelButton;
     private TextView okButton;
-    private ListView listViewState;
-    DialogStatesAdapter sourceAdapter;
-    EditText selectedEditState;
-    DUnit unit;
+    private EditText description;
+    private DUnit unit;
+    private Spinner spinner;
 
-    public static SelectStateDialogNew newInstance() {
-        return new SelectStateDialogNew();
+    public SelectStateDialogNew(@NonNull Activity context, MainViewModel mViewModel, ArrayList<String> stateList) {
+        super(context);
+        this.context = context;
+        this.mViewModel = mViewModel;
+        this.stateList = stateList;
+        ArrayList<DUnit> units = this.mViewModel.getSelectedUnits().getValue();
+        if (units.size() != 0) this.unit = units.get(0);
+        else this.unit = new DUnit();
     }
 
     @Override
-    public void onAttach(Context context) {
-        mContext = context;
-        super.onAttach(context);
-    }
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.dialog_select_states_new);
 
-    @SuppressLint("InflateParams")
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        dialog = new AlertDialog.Builder(mContext).create();
-        //set background for the dialog
-        Window window = dialog.getWindow();
-        if (window != null) window.setBackgroundDrawableResource(R.drawable.main_gradient);
-        view = requireActivity().getLayoutInflater()
-                .inflate(R.layout.dialog_select_states_new, null);
+        cancelButton = findViewById(R.id.textViewInnerSerial);
+        okButton = findViewById(R.id.textViewInnerSerialValue);
+        description = findViewById(R.id.description);
+        spinner = (Spinner) findViewById(R.id.state_spinner);
 
-        //EditText gain = view.findViewById(R.id.gain_code);
+        cancelButton.setOnClickListener(view -> {
+            dismiss();
+        });
 
-        dialog.setView(view, 0, 0, 0, 0);
-
-//        ArrayList<DUnit> units = CommunicationService.dUnits;
-//        GainCodeAdapter adapter = new GainCodeAdapter(mContext, R.layout.dialog_gain_code_item, units);
-//        ListView lvItems = view.findViewById(R.id.lv_items);
-//        lvItems.setAdapter(adapter);
-
-
-
-//        view.findViewById(R.id.button_cancel).setOnClickListener(v -> dismiss());
-//        view.findViewById(R.id.button_ok).setOnClickListener(v -> setGainCode());
-//        lvItems.setOnItemClickListener((parent, view, position, id) -> {
-//            address = units.get(position).getPosition();
-//            gain.setText(String.valueOf(units.get(position).getGainCode()));
-//            selectedNum.setImageResource(getImage(address));
-
-//            for (int i = 0; i < lvItems.getChildCount(); i++) {
-//                if (position == i && lvItems.getChildCount() > 1)
-//                    lvItems.getChildAt(i).setBackgroundColor(Color.DKGRAY);
-//                else lvItems.getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
-//            }
-//        });
-        return dialog;
-    }
+        okButton.setOnClickListener(view -> {
+            String id = unit.getId();
+            String name = unit.getName();
+            String innerSerial = unit.getInnerSerial();
+            String serial = unit.getSerial();
+            String state = spinner.getSelectedItem().toString();//selectedEditState.getText().toString();
+            String desc = description.getText().toString();
+            String type = unit.getType();
+            if (mViewModel.getSelectedUnits().getValue().get(0).isRepairUnit()) mViewModel.saveRepairUnitToDB(new DUnit(id, name, innerSerial, serial, state, desc, type));
+            else mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state, desc, type));
+            dismiss();
+        });
 
 
-    void setGainCode() {
+        Log.e(TAG, "*** stateList.size() = "+stateList.size());
+
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<String> repairStateAdapter = new ArrayAdapter<String>(context,
+                android.R.layout.simple_spinner_item,  stateList);
+        // Specify the layout to use when the list of choices appears
+        repairStateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(repairStateAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                tState.setText(parent.getItemAtPosition(position).toString());
+//                if (position == 0) tState.setText("");
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
     }
 

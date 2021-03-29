@@ -26,7 +26,7 @@ public class DSerialUnitAdapter extends RecyclerView.Adapter<DSerialUnitAdapter.
     @NonNull
     @Override
     public DUnitViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.dunit_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_dunit, parent, false);
         return new DUnitViewHolder(view);
     }
 
