@@ -352,14 +352,14 @@ public class ScannerFragment extends Fragment {
                 tId.setText(innerSerial);
                 sendButton.setEnabled(true);
                 sendButton.setText("Добавить в БД (ремонт)");
-                mViewModel.getRepairUnitById(innerSerial);
+                ////////////////////////////mViewModel.getRepairUnitById(innerSerial);
             } else {
                 ///////////////////mViewModel.setIsRepair(false);
                 tName.setText(name);//Если это серия
                 tInnerSerial.setText(innerSerial);
                 sendButton.setEnabled(true);
                 sendButton.setText("Добавить в БД");
-                mViewModel.getDUnitByNameAndInnerSerial(name, innerSerial);
+                ///////////////////////////mViewModel.getDUnitByNameAndInnerSerial(name, innerSerial);
             }
         }
     }

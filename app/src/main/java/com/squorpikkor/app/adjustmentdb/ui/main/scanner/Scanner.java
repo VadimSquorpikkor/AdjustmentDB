@@ -193,14 +193,8 @@ class Scanner {
             //Смысл в том, что если отсканированный блок есть в БД, то данные для этого блока
             // беруться из БД (getRepairUnitById), если этого блока в БД нет (новый), то данные для
             // блока берутся из QR-кода
-            if (unit.isRepairUnit()) {//Если это ремонт
-                mViewModel.setSelectedUnit(unit);
-                mViewModel.getRepairUnitById(unit.getId());
-                //todo надо добавить: если данные для юнита получены и включен лэйаут с данными, то камеру нужно выключить (она всё ещё включена под лэйаутом!)
-            } else {
-                mViewModel.setSelectedUnit(unit);
-                mViewModel.getDUnitByNameAndInnerSerial(unit.getName(), unit.getInnerSerial());
-            }
+            mViewModel.updateSelectedUnit(unit);
+            mViewModel.getThisUnitFromDB(unit);
         }
     }
 
@@ -210,16 +204,23 @@ class Scanner {
         txtBarcodeValue.setVisibility(View.VISIBLE);
         String[] ar = s.split(SPLIT_SYMBOL);
         if (ar.length == 2) {
-            //Для серии: имя+внутренний_серийный (БДКГ-02 1234)
-            //Для ремонта: "Ремонт"+id (Ремонт 0001)
+            //Для серии: имя+внутренний_серийный (БДКГ-02 1234), id = БДКГ-02_1234
+            //Для ремонта: "Ремонт"+id (Ремонт 0001), id = r_0005
             String name = ar[0];
             String innerSerial = ar[1];
-
+            String id;
 
             // Если это ремонт:
-            if (name.equals(REPAIR_UNIT)) return new DUnit(innerSerial, "", "", "", "", "", REPAIR_TYPE);
+            if (name.equals(REPAIR_UNIT)){
+                id = "r_"+ar[1];
+                return new DUnit(id, "", "", "", "", "", REPAIR_TYPE);
+            }
             // Если это серия:
-            else return new DUnit("", name, innerSerial, "", "", "", SERIAL_TYPE);
+            else{
+                id = name+"_"+innerSerial;
+                return new DUnit(id, name, innerSerial, "", "", "", SERIAL_TYPE);
+            }
+
         // Если строка некорректная, возвращаю null
         } else return null;
     }

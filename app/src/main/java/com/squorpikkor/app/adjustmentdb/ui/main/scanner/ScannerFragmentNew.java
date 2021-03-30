@@ -130,8 +130,10 @@ public class ScannerFragmentNew extends Fragment {
         tInnerSerial.setText(insertRightValue(unit.getInnerSerial()));
         tSerial.setText(insertRightValue(unit.getSerial()));
 
-        if (unit.isRepairUnit()) mViewModel.addSelectedRepairUnitStatesListListener(unit.getId());
-        else if (unit.isSerialUnit()) mViewModel.addSelectedSerialUnitStatesListListener(unit.getName(), unit.getInnerSerial());
+        mViewModel.addSelectedUnitStatesListListener(unit);
+
+//        if (unit.isRepairUnit()) mViewModel.addSelectedRepairUnitStatesListListener(unit.getId());
+//        else if (unit.isSerialUnit()) mViewModel.addSelectedSerialUnitStatesListListener(unit.getName(), unit.getInnerSerial());
     }
 
     private String insertRightValue(String s) {

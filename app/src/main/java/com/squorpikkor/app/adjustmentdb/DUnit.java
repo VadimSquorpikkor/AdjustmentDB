@@ -6,10 +6,10 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_TYPE
 public class DUnit {
 
 
+    private String id; //"0001"
     private String name; //БДКГ-02
     private String innerSerial; //№12345
     private String serial; //132.002
-    private String id; //"0001"
     private String type; //"Ремонтный"
     private String state; //"На линейке"
     private String description;

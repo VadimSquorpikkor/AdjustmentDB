@@ -66,8 +66,7 @@ public class SelectStateDialogNew extends Dialog {
             String state = spinner.getSelectedItem().toString();//selectedEditState.getText().toString();
             String desc = description.getText().toString();
             String type = unit.getType();
-            if (mViewModel.getSelectedUnits().getValue().get(0).isRepairUnit()) mViewModel.saveRepairUnitToDB(new DUnit(id, name, innerSerial, serial, state, desc, type));
-            else mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state, desc, type));
+            mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state, desc, type));
             dismiss();
         });
 
@@ -76,12 +75,12 @@ public class SelectStateDialogNew extends Dialog {
 
 
         // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<String> repairStateAdapter = new ArrayAdapter<String>(context,
+        ArrayAdapter<String> stateAdapter = new ArrayAdapter<String>(context,
                 android.R.layout.simple_spinner_item,  stateList);
         // Specify the layout to use when the list of choices appears
-        repairStateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        stateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
-        spinner.setAdapter(repairStateAdapter);
+        spinner.setAdapter(stateAdapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
