@@ -1,6 +1,6 @@
 package com.squorpikkor.app.adjustmentdb.ui.main;
 
-enum Profile {
+public enum Profile {
     РЕГУЛИРОВКА,
     СБОРКА,
     МОНТАЖ,
@@ -9,18 +9,18 @@ enum Profile {
 
     private String name;
 
-    private String documentName;
+    private String location;
 
-    public String getDocumentName() {
-        return documentName;
+    public String getLocation() {
+        return location;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setData(String name, String tableName) {
+    public void setData(String name, String location) {
         this.name = name;
-        this.documentName = tableName;
+        this.location = location;
     }
 }

@@ -11,17 +11,35 @@ import java.util.Date;
 
 public class MainViewModel extends ViewModel {
 
-    public static final String SERIALS_TABLE = "serials";
-    public static final String REPAIRS_TABLE = "repairs";
+//------- Коллекции (таблицы) ----------------------------------------------------------------------
+    /**Коллекция имен для устройств*/
+    public static final String TABLE_DEV_TYPES = "dev_types";
+    /**Коллекция профилей: имя статуса, локация, тип (ремонт/серия)*/
     public static final String TABLE_PROFILES = "profiles";
+    /**Коллекция ремонтных устройств*/
+    public static final String TABLE_REPAIRS = "repairs";
+    /**Коллекция серийных устройств*/
+    public static final String TABLE_SERIALS = "serials";
+    /**Коллекция всех статусов*/
     public static final String TABLE_ALL_STATES = "states";
-    public static final String DEV_TYPES_TABLE = "dev_types";
+//--------------------------------------------------------------------------------------------------
 
-    public static final String REPAIR_STATES_TABLE = "repair_states";
-    public static final String SERIAL_STATES_TABLE = "serial_states";
+    public static final String PROFILE_ADJUSTMENT = "adjustment";
+    public static final String PROFILE_ASSEMBLY = "assembly";
+    public static final String PROFILE_GRADUATION = "graduation";
+    public static final String PROFILE_SOLDERING = "soldering";
+    public static final String PROFILE_REPAIR_AREA = "repair_area";
+//--------------------------------------------------------------------------------------------------
+    public static final String PROFILE_LOCATION = "location";
+    public static final String PROFILE_NAME = "name";
+    public static final String PROFILE_TYPE = "type";
+    public static final String PROF_TYPE_ANY = "any";
+    public static final String PROF_TYPE_REPAIR = "repair";
+    public static final String PROF_TYPE_SERIAL = "serial";
+
+
 
     public static final String ID = "id";
-    public static final String NAME = "name";
     public static final String UNIT_ID = "unit_id";
     public static final String DATE = "date";
     public static final String STATE = "state";
@@ -62,11 +80,11 @@ public class MainViewModel extends ViewModel {
     }
 
     void initProfile() {
-        Profile.РЕГУЛИРОВКА.setData("Регулировка", "adjustment_states");
-        Profile.ГРАДУИРОВКА.setData("Градуировка", "graduation_states");
-        Profile.СБОРКА.setData("Сборка", "assembly_states");
-        Profile.МОНТАЖ.setData("Монтаж", "soldering_states");
-        Profile.ПРИЁМКА.setData("Приёмка", "take_to_repair_states");
+        Profile.РЕГУЛИРОВКА.setData("Регулировка", PROFILE_ADJUSTMENT);
+        Profile.ГРАДУИРОВКА.setData("Градуировка", PROFILE_GRADUATION);
+        Profile.СБОРКА.setData("Сборка", PROFILE_ASSEMBLY);
+        Profile.МОНТАЖ.setData("Монтаж", PROFILE_SOLDERING);
+        Profile.ПРИЁМКА.setData("Приёмка", PROFILE_REPAIR_AREA);
     }
 
     Profile selectedProfile;
@@ -87,8 +105,8 @@ public class MainViewModel extends ViewModel {
      * Сохраняет DUnit в БД в соответствующую таблицу
      */
     public void saveDUnitToDB(DUnit unit) {
-        if (unit.isSerialUnit()) dbh.addUnitToDB(unit, SERIALS_TABLE, unit.getId());
-        if (unit.isRepairUnit()) dbh.addUnitToDB(unit, REPAIRS_TABLE, unit.getId());
+        if (unit.isSerialUnit()) dbh.addUnitToDB(unit, TABLE_SERIALS, unit.getId());
+        if (unit.isRepairUnit()) dbh.addUnitToDB(unit, TABLE_REPAIRS, unit.getId());
         // В коллекцию статусов текущего устройства добавляем статус: описание+дата (добавляем
         // коллекцию в коллекцию). Если поля статуса оставить пустым, то статус не будет добавлне
         // (нужно, наример, если необходимо просто добавить серийный номер, никакого статуса в этом
@@ -111,52 +129,34 @@ public class MainViewModel extends ViewModel {
 
 //----- LISTENERS ----------------------------------------------------------------------------------
 
-    /**
-     * Слушатель для таблицы серийных приборов
-     */
+    /** Слушатель для таблицы серийных приборов*/
     void addDUnitTableListener() {
-        dbh.addDBListener(SERIALS_TABLE, serialUnitsList);
+        dbh.addDBListener(TABLE_SERIALS, serialUnitsList);
     }
 
-    /**
-     * Слушатель для таблицы ремонтных приборов
-     */
+    /** Слушатель для таблицы ремонтных приборов*/
     void addRepairUnitTableListener() {
-        dbh.addDBListener(REPAIRS_TABLE, repairsUnitsList);
+        dbh.addDBListener(TABLE_REPAIRS, repairsUnitsList);
     }
 
-    /**
-     * Слушатель для таблицы имен приборов
-     */
+    /** Слушатель для таблицы имен приборов*/
     void addDevTypeTableListener() {
-        dbh.addDevTypeListener(DEV_TYPES_TABLE, devTypeList);
+        dbh.addDevTypeListener(TABLE_DEV_TYPES, devTypeList);
     }
 
-    /**
-     * Слушатель для таблицы названий статусов серийных приборов
-     * db -> serial_states -> <name> -> name:
-     * Имя таблицы из которой будет браться список профилей выбирается в зависимости от выбранного профиля
-     *
-     * Если выбран профиль МОНТАЖ или СБОРКА или ГРАДУИРОВКА, то в serialStatesList загружаем данные из таблицы REPAIR_STATES_TABLE (а не SERIAL_STATES_TABLE)
-     * Для монтажа для серии нет отдельной таблицы (и серия и ремонт — одинаковые статусы), поэтому нет смысла хранить в БД два одинаковых списка,
-     * хранится один и загружается один и тот же в оба списка
-     */
+    /** Слушатель для таблицы названий статусов серийных приборов. При событии, serialStatesList
+     * получает список серийных статусов или статусов общих для обоих типов. В текущей локации*/
     void addSerialStateNamesListener() {
-        if (    getSelectedProfile()==Profile.МОНТАЖ ||
-                getSelectedProfile()==Profile.ГРАДУИРОВКА ||
-                getSelectedProfile()==Profile.СБОРКА) dbh.addStringArrayListener(TABLE_PROFILES, getSelectedProfile().getDocumentName(), REPAIR_STATES_TABLE, serialStatesList, NAME);
-        dbh.addStringArrayListener(TABLE_PROFILES, getSelectedProfile().getDocumentName(), SERIAL_STATES_TABLE, serialStatesList, NAME);
+        dbh.getListOfStates(getSelectedProfile().getLocation(), PROF_TYPE_SERIAL, serialStatesList);
     }
 
-    /**
-     * Слушатель для таблицы названий статусов ремонтных приборов
-     * db -> repair_states -> <name> -> name:
-     */
+    /** Слушатель для таблицы названий статусов ремонтных приборов. При событии, repairStatesList
+     * получает список ремонтных статусов или статусов общих для обоих типов. В текущей локации*/
     void addRepairStateNamesListener() {
-        dbh.addStringArrayListener(TABLE_PROFILES, getSelectedProfile().getDocumentName(), REPAIR_STATES_TABLE, repairStatesList, NAME);
+        dbh.getListOfStates(getSelectedProfile().getLocation(), PROF_TYPE_REPAIR, repairStatesList);
     }
 
-    /**Слушает изменения в коллекции статусов и при новом событии загружает статусы для выбранного
+    /** Слушает изменения в коллекции статусов и при новом событии загружает статусы для выбранного
      * юнита (т.е. только те, которые принадлежат этому юниту)*/
     public void addSelectedUnitStatesListListener(DUnit unit) {
         dbh.addSelectedUnitListener(unit.getId(), unitStatesList);
@@ -218,8 +218,8 @@ public class MainViewModel extends ViewModel {
      * предупреждение
      */
     public void getThisUnitFromDB(DUnit unit) {
-        if (unit.isSerialUnit()) dbh.getUnitById(SERIALS_TABLE, unit.getId(), selectedUnits);
-        if (unit.isRepairUnit()) dbh.getUnitById(REPAIRS_TABLE, unit.getId(), selectedUnits);
+        if (unit.isSerialUnit()) dbh.getUnitById(TABLE_SERIALS, unit.getId(), selectedUnits);
+        if (unit.isRepairUnit()) dbh.getUnitById(TABLE_REPAIRS, unit.getId(), selectedUnits);
         dbh.getStatesFromDB(unit.getId(), unitStatesList);
     }
 

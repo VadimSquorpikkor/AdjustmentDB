@@ -209,16 +209,17 @@ class Scanner {
             String name = ar[0];
             String innerSerial = ar[1];
             String id;
+            String location = mViewModel.getSelectedProfile().getLocation();
 
             // Если это ремонт:
             if (name.equals(REPAIR_UNIT)){
                 id = "r_"+ar[1];
-                return new DUnit(id, "", "", "", "", "", REPAIR_TYPE);
+                return new DUnit(id, "", "", "", "", "", REPAIR_TYPE, location);
             }
             // Если это серия:
             else{
                 id = name+"_"+innerSerial;
-                return new DUnit(id, name, innerSerial, "", "", "", SERIAL_TYPE);
+                return new DUnit(id, name, innerSerial, "", "", "", SERIAL_TYPE, location);
             }
 
         // Если строка некорректная, возвращаю null

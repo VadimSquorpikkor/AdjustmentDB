@@ -66,13 +66,11 @@ public class SelectStateDialogNew extends Dialog {
             String state = spinner.getSelectedItem().toString();//selectedEditState.getText().toString();
             String desc = description.getText().toString();
             String type = unit.getType();
-            mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state, desc, type));
+            String location = mViewModel.getSelectedProfile().getLocation();
+            Log.e(TAG, "♦♦♦ Dialog onCreate: " + location);
+            mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state, desc, type, location));
             dismiss();
         });
-
-
-        Log.e(TAG, "*** stateList.size() = "+stateList.size());
-
 
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<String> stateAdapter = new ArrayAdapter<String>(context,

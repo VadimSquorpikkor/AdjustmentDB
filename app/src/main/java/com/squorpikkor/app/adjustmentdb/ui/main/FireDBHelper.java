@@ -12,12 +12,18 @@ import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.DevType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DATE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ID;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.PROFILE_LOCATION;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.PROFILE_NAME;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.PROFILE_TYPE;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.PROF_TYPE_ANY;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_ALL_STATES;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_PROFILES;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_ID;
 
 class FireDBHelper {
@@ -119,7 +125,7 @@ class FireDBHelper {
                 /////mList.getValue().add(document.get(fieldName).toString());
             }
             mList.setValue(list);
-        });
+        }).addOnFailureListener(e -> Log.e(TAG, "onFailure: "+e));
     }
 
     /**Слушатель для новых событий у выбранного юнита. Слушает всю коллекцию статусов и при новом
@@ -190,6 +196,49 @@ class FireDBHelper {
                         Log.e(TAG, "Error getting documents: ", task.getException());
                     }
                 });
+    }
+
+
+
+    /**
+     *
+     * @param table
+     * @param mList
+     * @param param1
+     * @param value1
+     * @param param2
+     * @param value2
+     * @param fieldName это то поле, значение которого будет считываться в возвращаемый ArrayList<String>
+     */
+    void getStringArrayByParam(String table, MutableLiveData<ArrayList<String>> mList, String param1, String value1, String param2, String value2, String fieldName) {
+        db.collection(table)
+                .whereEqualTo(param1, "value1")
+                .whereEqualTo(param2, value2)
+                .get().addOnCompleteListener(task -> {
+            ArrayList<String> list = new ArrayList<>();
+            for (DocumentSnapshot document : task.getResult()) {
+                list.add(document.get(fieldName).toString());
+            }
+            mList.setValue(list);
+        });
+    }
+
+
+    /**Загружает список статусов по типу (серия/ремонт) и локации (регулировка/монтаж...). Так как
+     * есть статусы, которые одинаковые и для ремонта и для серии (у этих статусов тип "any"), то
+     * при выборе статусов ищется тип выбранный в параметре метода (ремонт или серия) ИЛИ тип "any"
+     * (т.е. при любом выбранном типе ВСЕГДА будут добавляться в выборку типы "any" в выбранной локации)*/
+    void getListOfStates(String location, String type, MutableLiveData<ArrayList<String>> mList) {
+        db.collection(TABLE_PROFILES)
+                .whereEqualTo(PROFILE_LOCATION, location)
+                .whereIn(PROFILE_TYPE, Arrays.asList(PROF_TYPE_ANY, type))
+                .get().addOnCompleteListener(task -> {
+            ArrayList<String> list = new ArrayList<>();
+            for (DocumentSnapshot document : task.getResult()) {
+                list.add(document.get(PROFILE_NAME).toString());//todo если буду делать локализацию, то здесь надо будет вставлять что-то типа if(lang.isEng)name = "name_eng". В БД будет дополнительное поле "name_eng", оно будет выбираться вместо "name". И всё, весь остальной код уже будет работать. Это конечно касается только имени статуса, для других сделать аналогично
+            }
+            mList.setValue(list);
+        });
     }
 
 }
