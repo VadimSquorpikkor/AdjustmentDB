@@ -1,13 +1,21 @@
 package com.squorpikkor.app.adjustmentdb.ui.main;
 
+import android.util.Log;
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.firebase.ui.auth.AuthUI;
 import com.squorpikkor.app.adjustmentdb.BuildConfig;
 import com.squorpikkor.app.adjustmentdb.DState;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.DevType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+
+import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 
 public class MainViewModel extends ViewModel {
 
@@ -22,13 +30,9 @@ public class MainViewModel extends ViewModel {
     public static final String TABLE_SERIALS = "serials";
     /**Коллекция всех статусов*/
     public static final String TABLE_ALL_STATES = "states";
-//--------------------------------------------------------------------------------------------------
 
-    public static final String PROFILE_ADJUSTMENT = "adjustment";
-    public static final String PROFILE_ASSEMBLY = "assembly";
-    public static final String PROFILE_GRADUATION = "graduation";
-    public static final String PROFILE_SOLDERING = "soldering";
-    public static final String PROFILE_REPAIR_AREA = "repair_area";
+    public static final String TABLE_USERS = "users";
+    public static final String TABLE_LOCATIONS = "locations";
 //--------------------------------------------------------------------------------------------------
     public static final String PROFILE_LOCATION = "location";
     public static final String PROFILE_NAME = "name";
@@ -37,12 +41,16 @@ public class MainViewModel extends ViewModel {
     public static final String PROF_TYPE_REPAIR = "repair";
     public static final String PROF_TYPE_SERIAL = "serial";
 
-
+    public static final String EMPTY_PROFILE_NAME = "empty_profile_name";
+    public static final String EMPTY_LOCATION_NAME = "empty_location_name";
 
     public static final String ID = "id";
+    public static final String NAME = "name";
     public static final String UNIT_ID = "unit_id";
     public static final String DATE = "date";
     public static final String STATE = "state";
+    public static final String EMAIL = "email";
+    public static final String PROFILE = "profile";
 
     public static final String SERIAL_TYPE = "serial_type";
     public static final String REPAIR_TYPE = "repair_type";
@@ -60,7 +68,11 @@ public class MainViewModel extends ViewModel {
 
     private final MutableLiveData<ArrayList<DUnit>> foundUnitsList;
 
+    private final MutableLiveData<String> profileName;
+    private final MutableLiveData<String> locationName;
+
     public MainViewModel() {
+        Log.e(TAG, "****************MainViewModel: ");
         serialUnitsList = new MutableLiveData<>();
         repairsUnitsList = new MutableLiveData<>();
         selectedUnits = new MutableLiveData<>();
@@ -70,33 +82,17 @@ public class MainViewModel extends ViewModel {
         repairStatesList = new MutableLiveData<>();
         unitStatesList = new MutableLiveData<>();
         foundUnitsList = new MutableLiveData<>();
-        initProfile();
-        setSelectedProfile(Profile.РЕГУЛИРОВКА);//todo пока захардкодил, потом будет выбираться и/или браться из SharedPref
+        profileName = new MutableLiveData<>();
+        locationName = new MutableLiveData<>();
         addDUnitTableListener();
         addRepairUnitTableListener();
         addDevTypeTableListener();
-        addSerialStateNamesListener();
-        addRepairStateNamesListener();
-    }
-
-    void initProfile() {
-        Profile.РЕГУЛИРОВКА.setData("Регулировка", PROFILE_ADJUSTMENT);
-        Profile.ГРАДУИРОВКА.setData("Градуировка", PROFILE_GRADUATION);
-        Profile.СБОРКА.setData("Сборка", PROFILE_ASSEMBLY);
-        Profile.МОНТАЖ.setData("Монтаж", PROFILE_SOLDERING);
-        Profile.ПРИЁМКА.setData("Приёмка", PROFILE_REPAIR_AREA);
-    }
-
-    Profile selectedProfile;
-
-    public Profile getSelectedProfile() {
-        return selectedProfile;
     }
 
     /**Выбрать профиль (сборка, регулировка...). При смене профиля обновляем лисенеры для имен
      * статусов, так как статусы уже другие*/
-    public void setSelectedProfile(Profile selectedProfile) {
-        this.selectedProfile = selectedProfile;
+    public void setSelectedProfile(String profName) {
+        getNameFromDB(profName);
         addSerialStateNamesListener();
         addRepairStateNamesListener();
     }
@@ -115,17 +111,12 @@ public class MainViewModel extends ViewModel {
             Date date = new Date();
             String state = unit.getState();
             String description = unit.getDescription();
-            String location = getSelectedProfile().getName();
+            String location = getProfileName().getValue();
             String unit_id = unit.getId();
             DState dState = new DState(date, state, description, location, unit_id);
             dbh.addStateToDB(dState, TABLE_ALL_STATES);
         }
     }
-
-//    void getDUnitFromBD() {
-//        dbh.getElementFromDB(SERIALS_TABLE, serialUnitsList);
-//    }
-
 
 //----- LISTENERS ----------------------------------------------------------------------------------
 
@@ -147,13 +138,13 @@ public class MainViewModel extends ViewModel {
     /** Слушатель для таблицы названий статусов серийных приборов. При событии, serialStatesList
      * получает список серийных статусов или статусов общих для обоих типов. В текущей локации*/
     void addSerialStateNamesListener() {
-        dbh.getListOfStates(getSelectedProfile().getLocation(), PROF_TYPE_SERIAL, serialStatesList);
+        dbh.getListOfStates(getProfileName().getValue(), PROF_TYPE_SERIAL, serialStatesList);
     }
 
     /** Слушатель для таблицы названий статусов ремонтных приборов. При событии, repairStatesList
      * получает список ремонтных статусов или статусов общих для обоих типов. В текущей локации*/
     void addRepairStateNamesListener() {
-        dbh.getListOfStates(getSelectedProfile().getLocation(), PROF_TYPE_REPAIR, repairStatesList);
+        dbh.getListOfStates(getProfileName().getValue(), PROF_TYPE_REPAIR, repairStatesList);
     }
 
     /** Слушает изменения в коллекции статусов и при новом событии загружает статусы для выбранного
@@ -175,6 +166,8 @@ public class MainViewModel extends ViewModel {
      * Список названий статусов ремонтных приборов
      */
     public MutableLiveData<ArrayList<String>> getRepairStatesList() {
+        if (repairStatesList.getValue()!=null)Log.e(TAG, "♣♣♣ getRepairStatesList: "+repairStatesList.getValue().size());
+        else Log.e(TAG, "♣♣♣ NULL!!!!!!!!!! ");
         return repairStatesList;
     }
 
@@ -226,4 +219,23 @@ public class MainViewModel extends ViewModel {
     public String getVersion() {
         return BuildConfig.VERSION_NAME;
     }
+
+    public MutableLiveData<String> getProfileName() {
+        return profileName;
+    }
+
+    public MutableLiveData<String> getLocationName() {
+        return locationName;
+    }
+
+    /**По названию почты получаем из БД профиль (если такой есть). Если такого eMail в БД нет, то
+     * будет предложено создать нового юзера с текущим eMail и выбранным из списка профилем*/
+    public void getProfileByEMail(String email) {
+        dbh.getStringValueByParam(TABLE_USERS, EMAIL, email, PROFILE, profileName, EMPTY_PROFILE_NAME);
+    }
+
+    private void getNameFromDB(String profileName) {
+        dbh.getStringValueByParam(TABLE_LOCATIONS, ID, profileName, NAME, locationName, EMPTY_LOCATION_NAME);
+    }
+
 }

@@ -36,6 +36,7 @@ public class ScannerFragmentNew extends Fragment {
     private TextView tInnerSerial;
     private TextView tSerial;
     private TextView tId;
+    private TextView tLocation;
     private RecyclerView recyclerUnitsStates;
     private RecyclerView recyclerFoundUnits;
 
@@ -44,6 +45,7 @@ public class ScannerFragmentNew extends Fragment {
     private ArrayList<DState> states;
 
     private Scanner scanner;
+    private String location;//todo надо как observe Mutable, иначе может значение не успеть подгрузиться
 
     public static final String EMPTY_VALUE = "- - -";
 
@@ -55,7 +57,7 @@ public class ScannerFragmentNew extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_scanner_new, container, false);
-        mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        mViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
 
         units = new ArrayList<>();
         states = new ArrayList<>();
@@ -66,6 +68,7 @@ public class ScannerFragmentNew extends Fragment {
         tInnerSerial = view.findViewById(R.id.textViewInnerSerialValue);
         tSerial = view.findViewById(R.id.textViewSerialValue);
         tId = view.findViewById(R.id.textViewIdValue);
+        tLocation = view.findViewById(R.id.textLocationValue);
         recyclerUnitsStates = view.findViewById(R.id.recyclerView);
         recyclerFoundUnits = view.findViewById(R.id.recyclerViewFound);
         nextButton = view.findViewById(R.id.button_next);
@@ -117,6 +120,8 @@ public class ScannerFragmentNew extends Fragment {
         //todo сканнер нужно будет размещать в viewModel
         scanner = new Scanner(getActivity(), view, mViewModel);
 
+        location = mViewModel.getLocationName().getValue();
+
         return view;
     }
 
@@ -129,11 +134,9 @@ public class ScannerFragmentNew extends Fragment {
         tName.setText(insertRightValue(unit.getName()));
         tInnerSerial.setText(insertRightValue(unit.getInnerSerial()));
         tSerial.setText(insertRightValue(unit.getSerial()));
+        tLocation.setText(location);
 
         mViewModel.addSelectedUnitStatesListListener(unit);
-
-//        if (unit.isRepairUnit()) mViewModel.addSelectedRepairUnitStatesListListener(unit.getId());
-//        else if (unit.isSerialUnit()) mViewModel.addSelectedSerialUnitStatesListListener(unit.getName(), unit.getInnerSerial());
     }
 
     private String insertRightValue(String s) {
@@ -146,6 +149,7 @@ public class ScannerFragmentNew extends Fragment {
         ArrayList<String> rightList;
         if (mViewModel.getSelectedUnits().getValue().get(0).isRepairUnit()) rightList = mViewModel.getRepairStatesList().getValue();
         else rightList = mViewModel.getSerialStatesList().getValue();
+
         SelectStateDialogNew dialog = new SelectStateDialogNew(getActivity(), mViewModel, rightList);
         dialog.show();
     }

@@ -14,11 +14,11 @@ public class DUnit {
     private String state; //"На линейке"
     private String description;
     private String location;
+    private String responsible; //Фамилия ответственного
 
     /**Конструктор без параметров нужен для работы с Firebase*/
     public DUnit() {
     }
-
 
     public DUnit(String id, String name, String innerSerial, String serial, String state, String description, String type, String location) {
         this.id = id;
@@ -101,5 +101,13 @@ public class DUnit {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getResponsible() {
+        return responsible;
+    }
+
+    public void setResponsible(String responsible) {
+        this.responsible = responsible;
     }
 }

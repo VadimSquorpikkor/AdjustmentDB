@@ -198,8 +198,6 @@ class FireDBHelper {
                 });
     }
 
-
-
     /**
      *
      * @param table
@@ -223,18 +221,43 @@ class FireDBHelper {
         });
     }
 
+    /**
+     * Поиск по БД по параметру документа и запись результата поиска в Mutable<String>
+     * @param table коллекция, по которой будет произведен поиск
+     * @param byParamName имя параметра (поля), по которому ведется поиск
+     * @param byValueName значение параметра, по которому ведется поиск
+     * @param valueToGet имя поля в найденном документе, значение которого будет записано в результат
+     * @param outPutString в эту переменную будет записан найденное значение
+     * @param stringIfNull если ничего не найдено, это будет записано в outPutString
+     */
+    void getStringValueByParam(String table, String byParamName, String byValueName, String valueToGet, MutableLiveData<String> outPutString, String stringIfNull) {
+        db.collection(table)
+                .whereEqualTo(byParamName, byValueName)
+                .get().addOnCompleteListener(task -> {
+            ArrayList<String> list = new ArrayList<>();
+            for (DocumentSnapshot document : task.getResult()) {
+                list.add(document.get(valueToGet).toString());
+            }
+            if (list.size()==0) outPutString.setValue(stringIfNull);
+            else outPutString.setValue(list.get(0));
+        });
+    }
 
     /**Загружает список статусов по типу (серия/ремонт) и локации (регулировка/монтаж...). Так как
      * есть статусы, которые одинаковые и для ремонта и для серии (у этих статусов тип "any"), то
      * при выборе статусов ищется тип выбранный в параметре метода (ремонт или серия) ИЛИ тип "any"
      * (т.е. при любом выбранном типе ВСЕГДА будут добавляться в выборку типы "any" в выбранной локации)*/
     void getListOfStates(String location, String type, MutableLiveData<ArrayList<String>> mList) {
+        Log.e(TAG, "♦♦♦ getListOfStates: "+location);
         db.collection(TABLE_PROFILES)
                 .whereEqualTo(PROFILE_LOCATION, location)
                 .whereIn(PROFILE_TYPE, Arrays.asList(PROF_TYPE_ANY, type))
                 .get().addOnCompleteListener(task -> {
             ArrayList<String> list = new ArrayList<>();
+            int count = 0;
             for (DocumentSnapshot document : task.getResult()) {
+                Log.e(TAG, "getListOfStates: "+count);
+                count++;
                 list.add(document.get(PROFILE_NAME).toString());//todo если буду делать локализацию, то здесь надо будет вставлять что-то типа if(lang.isEng)name = "name_eng". В БД будет дополнительное поле "name_eng", оно будет выбираться вместо "name". И всё, весь остальной код уже будет работать. Это конечно касается только имени статуса, для других сделать аналогично
             }
             mList.setValue(list);

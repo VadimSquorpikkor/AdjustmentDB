@@ -9,28 +9,22 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
-import androidx.lifecycle.MutableLiveData;
-
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
-import com.squorpikkor.app.adjustmentdb.ui.main.adapter.DialogStatesAdapter;
 import java.util.ArrayList;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 
 public class SelectStateDialogNew extends Dialog {
-    private MainViewModel mViewModel;
-    private Activity context;
-    private ArrayList<String> stateList;
-    private TextView cancelButton;
-    private TextView okButton;
+    private final MainViewModel mViewModel;
+    private final Activity context;
+    private final ArrayList<String> stateList;
     private EditText description;
-    private DUnit unit;
+    private final DUnit unit;
     private Spinner spinner;
 
     public SelectStateDialogNew(@NonNull Activity context, MainViewModel mViewModel, ArrayList<String> stateList) {
@@ -49,8 +43,8 @@ public class SelectStateDialogNew extends Dialog {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_select_states_new);
 
-        cancelButton = findViewById(R.id.textViewInnerSerial);
-        okButton = findViewById(R.id.textViewInnerSerialValue);
+        TextView cancelButton = findViewById(R.id.textViewInnerSerial);
+        TextView okButton = findViewById(R.id.textViewInnerSerialValue);
         description = findViewById(R.id.description);
         spinner = (Spinner) findViewById(R.id.state_spinner);
 
@@ -66,8 +60,7 @@ public class SelectStateDialogNew extends Dialog {
             String state = spinner.getSelectedItem().toString();//selectedEditState.getText().toString();
             String desc = description.getText().toString();
             String type = unit.getType();
-            String location = mViewModel.getSelectedProfile().getLocation();
-            Log.e(TAG, "♦♦♦ Dialog onCreate: " + location);
+            String location = mViewModel.getProfileName().getValue();
             mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state, desc, type, location));
             dismiss();
         });
