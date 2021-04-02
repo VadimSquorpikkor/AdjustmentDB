@@ -40,6 +40,14 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_PROFI
 
 public class MainFragment extends Fragment {
 
+    //todo ВАЖНО!!! Убрать загрузку ВСЕХ серийных и ремонтных юнитов. Это только лишний расход
+    // операций на чтение (на Firebase ограничение 50К/день). Сделать поиск по параметрам. Если
+    // нужно будет найти устройство, пользователь воспользуется фильтром, если пользователю нужно
+    // просто отсканировать код, то ему список устройств вобще не нужен
+
+    //todo возможность добавлять НОВЫЕ устройства без добавления статуса? НЕ НУЖНО? Даже у новых
+    // устройств всегда должен быть статус с датой, когда они пришли в работу ("Принят в ремонт")
+
     private static final int RC_SIGN_IN = 1;
     RecyclerView recyclerViewSerialUnits;
     RecyclerView recyclerViewRepairUnits;
@@ -65,22 +73,6 @@ public class MainFragment extends Fragment {
         textLocation = view.findViewById(R.id.location);
         mViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
 
-        // Choose authentication providers
-        List<AuthUI.IdpConfig> providers = Arrays.asList(
-//                new AuthUI.IdpConfig.EmailBuilder().build(),
-//                new AuthUI.IdpConfig.PhoneBuilder().build(),
-                new AuthUI.IdpConfig.GoogleBuilder().build());
-//                new AuthUI.IdpConfig.FacebookBuilder().build(),
-//                new AuthUI.IdpConfig.TwitterBuilder().build());
-
-        // Create and launch sign-in intent
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .build(),
-                RC_SIGN_IN);
-        
         serialUnits = new ArrayList<>();
         repairUnits = new ArrayList<>();
 
@@ -112,8 +104,6 @@ public class MainFragment extends Fragment {
             }
 
         });
-
-
 
         final MutableLiveData<String> locationName = mViewModel.getLocationName();
         locationName.observe(getViewLifecycleOwner(), s -> {
@@ -178,6 +168,8 @@ public class MainFragment extends Fragment {
 
         ((TextView)view.findViewById(R.id.versionText)).setText(mViewModel.getVersion());
 
+        signIn();//todo перенести в mainActivity
+
         return view;
     }
 
@@ -195,6 +187,31 @@ public class MainFragment extends Fragment {
         recyclerViewRepairUnits.setVisibility(View.VISIBLE);
     }
 
+    //todo зачем нужна такая аутентификация? просто проверять по адресу аккаунту через
+    // getProfileByEMail, пользователь не зарегистрированный в системе (не добавленный в БД) всё
+    // равно не получит профиля, а значит статусов, а значит не сможет добавить данные в БД
+    private void signIn() {
+        if (mViewModel.getFirebaseUser() == null) {
+            // Choose authentication providers
+            List<AuthUI.IdpConfig> providers = Arrays.asList(
+//                new AuthUI.IdpConfig.EmailBuilder().build(),
+//                new AuthUI.IdpConfig.PhoneBuilder().build(),
+                    new AuthUI.IdpConfig.GoogleBuilder().build());
+//                new AuthUI.IdpConfig.FacebookBuilder().build(),
+//                new AuthUI.IdpConfig.TwitterBuilder().build());
+
+            // Create and launch sign-in intent
+            startActivityForResult(
+                    AuthUI.getInstance()
+                            .createSignInIntentBuilder()
+                            .setAvailableProviders(providers)
+                            .build(),
+                    RC_SIGN_IN);
+        } else {
+            textEmail.setText(mViewModel.getFirebaseUser().getEmail());
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -208,6 +225,7 @@ public class MainFragment extends Fragment {
                 if (user!=null && user.getEmail()!=null){
                     textEmail.setText(user.getEmail());
                     mViewModel.getProfileByEMail(user.getEmail());
+                    mViewModel.setFirebaseUser(user);
                 }
             } else {
                 // Sign in failed. If response is null the user canceled the

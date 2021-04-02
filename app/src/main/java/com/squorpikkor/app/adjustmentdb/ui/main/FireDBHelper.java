@@ -38,6 +38,7 @@ class FireDBHelper {
      * Добавляет документ в БД. Если документ не существует, он будет создан. Если документ существует,
      * его содержимое будет перезаписано вновь предоставленными данными
      */
+    //todo переделать на update, если документ существует
     void addUnitToDB(DUnit unit, String table, String documentName) {
         //В коллекцию устройств добавляем/обновляем устройство
         db.collection(table)
@@ -45,7 +46,6 @@ class FireDBHelper {
                 .set(unit)
                 .addOnSuccessListener(aVoid -> Log.e(TAG, "DocumentSnapshot successfully written!"))
                 .addOnFailureListener(e -> Log.e(TAG, "Error writing document", e));
-
     }
 
     /**
@@ -71,7 +71,7 @@ class FireDBHelper {
      */
     //todo тип второго параметра может быть другим, чтобы не делать перегруженный метод надо сделать
     // универсальный параметр (например MutableLiveData<ArrayList<T>> или аналог)
-    void getElementFromDB(String table, MutableLiveData<ArrayList<DUnit>> units) {
+    void getUnitFromDB(String table, MutableLiveData<ArrayList<DUnit>> units) {
         db.collection(table).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 QuerySnapshot querySnapshot = task.getResult();
@@ -92,7 +92,7 @@ class FireDBHelper {
      * иначе, когда элементов будет много, будет долго, да и трафик лишний
      */
     void addDBListener(String table, MutableLiveData<ArrayList<DUnit>> units) {
-        db.collection(table).addSnapshotListener((queryDocumentSnapshots, error) -> getElementFromDB(table, units));
+        db.collection(table).addSnapshotListener((queryDocumentSnapshots, error) -> getUnitFromDB(table, units));
     }
 
     void getDevTypeFromDB(String table, MutableLiveData<ArrayList<DevType>> dev) {
@@ -210,7 +210,7 @@ class FireDBHelper {
      */
     void getStringArrayByParam(String table, MutableLiveData<ArrayList<String>> mList, String param1, String value1, String param2, String value2, String fieldName) {
         db.collection(table)
-                .whereEqualTo(param1, "value1")
+                .whereEqualTo(param1, value1)
                 .whereEqualTo(param2, value2)
                 .get().addOnCompleteListener(task -> {
             ArrayList<String> list = new ArrayList<>();

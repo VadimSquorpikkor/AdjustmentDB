@@ -5,15 +5,13 @@ import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.auth.FirebaseUser;
 import com.squorpikkor.app.adjustmentdb.BuildConfig;
 import com.squorpikkor.app.adjustmentdb.DState;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.DevType;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 
@@ -30,8 +28,9 @@ public class MainViewModel extends ViewModel {
     public static final String TABLE_SERIALS = "serials";
     /**Коллекция всех статусов*/
     public static final String TABLE_ALL_STATES = "states";
-
+    /**Коллекция пользователей. Email + профиль*/
     public static final String TABLE_USERS = "users";
+    /**Коллекция названий локаций: id+name ("adjustment"+"Регулировка")*/
     public static final String TABLE_LOCATIONS = "locations";
 //--------------------------------------------------------------------------------------------------
     public static final String PROFILE_LOCATION = "location";
@@ -54,7 +53,8 @@ public class MainViewModel extends ViewModel {
 
     public static final String SERIAL_TYPE = "serial_type";
     public static final String REPAIR_TYPE = "repair_type";
-    FireDBHelper dbh;
+
+    private final FireDBHelper dbh;
     private final MutableLiveData<ArrayList<DUnit>> serialUnitsList;
     private final MutableLiveData<ArrayList<DUnit>> repairsUnitsList;
     private final MutableLiveData<ArrayList<DUnit>> selectedUnits;
@@ -71,8 +71,9 @@ public class MainViewModel extends ViewModel {
     private final MutableLiveData<String> profileName;
     private final MutableLiveData<String> locationName;
 
+    private FirebaseUser user;
+
     public MainViewModel() {
-        Log.e(TAG, "****************MainViewModel: ");
         serialUnitsList = new MutableLiveData<>();
         repairsUnitsList = new MutableLiveData<>();
         selectedUnits = new MutableLiveData<>();
@@ -97,9 +98,7 @@ public class MainViewModel extends ViewModel {
         addRepairStateNamesListener();
     }
 
-    /**
-     * Сохраняет DUnit в БД в соответствующую таблицу
-     */
+    /** Сохраняет DUnit в БД в соответствующую таблицу*/
     public void saveDUnitToDB(DUnit unit) {
         if (unit.isSerialUnit()) dbh.addUnitToDB(unit, TABLE_SERIALS, unit.getId());
         if (unit.isRepairUnit()) dbh.addUnitToDB(unit, TABLE_REPAIRS, unit.getId());
@@ -238,4 +237,11 @@ public class MainViewModel extends ViewModel {
         dbh.getStringValueByParam(TABLE_LOCATIONS, ID, profileName, NAME, locationName, EMPTY_LOCATION_NAME);
     }
 
+    public FirebaseUser getFirebaseUser() {
+        return user;
+    }
+
+    public void setFirebaseUser(FirebaseUser user) {
+        this.user = user;
+    }
 }

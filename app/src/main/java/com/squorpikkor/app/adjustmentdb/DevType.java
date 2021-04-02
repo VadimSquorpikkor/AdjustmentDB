@@ -1,6 +1,6 @@
 package com.squorpikkor.app.adjustmentdb;
 
-public class DevType {
+public class DevType {//todo не нужный класс, имена устройства надо загружать как MutableLiveData<String>, как имена профилей или локаций
     String name;//AT3509
     String type;//Индивидуальный
 
