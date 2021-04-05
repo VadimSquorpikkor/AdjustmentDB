@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -37,7 +36,7 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.scanner.Encrypter.decodeM
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_TYPE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_TYPE;
 
-class Scanner {
+public class Scanner {
 
     private CameraSource cameraSource;
     private static final int REQUEST_CAMERA_PERMISSION = 201;
@@ -50,7 +49,6 @@ class Scanner {
     private SurfaceView surfaceView;
     private TextView txtBarcodeValue;
     private TextView foundCount;
-    private SwitchCompat switchCompat;
     private FloatingActionButton addNewStateButton;
     private ConstraintLayout infoLayout;
     private Button nextButton;
@@ -58,30 +56,40 @@ class Scanner {
 
     private HashSet<String> dataSet;
     private ArrayList<DUnit> unitList;
+    private boolean isMultiScan;
 
-    Scanner(FragmentActivity activity, View view, MainViewModel mViewModel) {
+    public Scanner(FragmentActivity activity, View view, MainViewModel mViewModel, boolean isMultiScan) {
         this.activity = activity;
         this.view = view;
         this.mViewModel = mViewModel;
-        init();
+        this.isMultiScan = isMultiScan;
+
+        txtBarcodeValue = view.findViewById(R.id.txtBarcodeValue);
+        txtBarcodeValue.setVisibility(View.GONE);
+        if (!isMultiScan) {
+            this.surfaceView = view.findViewById(R.id.surfaceViewS);
+            this.surfaceView.setVisibility(View.INVISIBLE);
+            init();
+        } else {
+            this.surfaceView = view.findViewById(R.id.surfaceViewM);
+            this.surfaceView.setVisibility(View.INVISIBLE);
+            nextButton = view.findViewById(R.id.button_next);
+            nextButton.setVisibility(View.GONE);
+            dataSet = new HashSet<>();
+            unitList = new ArrayList<>();
+            foundCount = view.findViewById(R.id.found_count);
+        }
     }
 
-    private void init() {
-        surfaceView = view.findViewById(R.id.surfaceView);
-        txtBarcodeValue = view.findViewById(R.id.txtBarcodeValue);
+    void init() {
         infoLayout = view.findViewById(R.id.db_info_layout);
         addNewStateButton = view.findViewById(R.id.addNewState);
-        txtBarcodeValue.setVisibility(View.GONE);
         infoLayout.setVisibility(View.GONE);
-        switchCompat = view.findViewById(R.id.switch_auto);
-        dataSet = new HashSet<>();
-        unitList = new ArrayList<>();
-        foundCount = view.findViewById(R.id.found_count);
-        nextButton = view.findViewById(R.id.button_next);
+    }
 
-        /*nextButton.setOnClickListener(v -> {
-            doNext();
-        });*/
+    public void setSurfaceVisible(boolean state) {
+        if (state) surfaceView.setVisibility(View.VISIBLE);
+        else surfaceView.setVisibility(View.INVISIBLE);
     }
 
     public void initialiseDetectorsAndSources() {
@@ -94,6 +102,8 @@ class Scanner {
                 .setAutoFocusEnabled(true) //you should add this feature
                 .build();
 
+        surfaceView.setVisibility(View.VISIBLE);
+
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
@@ -104,8 +114,7 @@ class Scanner {
                         ActivityCompat.requestPermissions(activity, new
                                 String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
                     }
-
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -114,7 +123,6 @@ class Scanner {
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             }
 
-            @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
                 cameraSource.stop();
             }
@@ -143,7 +151,7 @@ class Scanner {
                 if (barcodes.size() != 0) {
                     txtBarcodeValue.post(() -> {
                         intentData = barcodes.valueAt(0).displayValue;
-                        if (switchCompat.isChecked()) {
+                        if (isMultiScan) {
                             for (int i = 0; i < barcodes.size(); i++) {
                                 intentData = barcodes.valueAt(i).displayValue;
                                 if (!dataSet.contains(intentData)){
@@ -167,12 +175,6 @@ class Scanner {
         });
     }
 
-    /*private void doNext() {
-        infoLayout.setVisibility(View.VISIBLE);
-        mViewModel.getFoundUnitsList().setValue(unitList);
-        Log.e(TAG, "saveFoundUnits: SIZE - "+mViewModel.getFoundUnitsList().getValue().size());
-    }*/
-
     private void addUnitToCollection(DUnit unit) {
         if (unit!=null){
             unitList.add(unit);
@@ -190,6 +192,7 @@ class Scanner {
         if (unit != null) {
             addNewStateButton.setVisibility(View.VISIBLE);
             infoLayout.setVisibility(View.VISIBLE);
+//            surfaceView.setVisibility(View.INVISIBLE);
             //Смысл в том, что если отсканированный блок есть в БД, то данные для этого блока
             // беруться из БД (getRepairUnitById), если этого блока в БД нет (новый), то данные для
             // блока берутся из QR-кода
@@ -227,6 +230,6 @@ class Scanner {
     }
 
     public void cameraSourceRelease() {
-        cameraSource.release();
+        if (cameraSource!=null) cameraSource.release();
     }
 }

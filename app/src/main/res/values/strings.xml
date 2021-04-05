@@ -2,4 +2,11 @@
     <string name="app_name">AdjustmentDB</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_main_temp">MainActivityTemp</string>
+    <string name="tab_text_1">Single scan</string>
+    <string name="tab_text_2">Search in DB</string>
+    <string name="tab_text_3">Multi scan</string>
+<!--    <string name="tab_text_1">Одиночное\nсканирование</string>-->
+<!--    <string name="tab_text_2">Поиск\nустройства</string>-->
+<!--    <string name="tab_text_3">Множественное\nсканирование</string>-->
 </resources>
