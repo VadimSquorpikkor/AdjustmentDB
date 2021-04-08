@@ -14,7 +14,7 @@ public class DUnit {
     private String state; //"На линейке"
     private String description;
     private String location;
-    private String responsible; //Фамилия ответственного
+    private String employee; //Фамилия ответственного
 
     /**Конструктор без параметров нужен для работы с Firebase*/
     public DUnit() {
@@ -103,11 +103,11 @@ public class DUnit {
         this.location = location;
     }
 
-    public String getResponsible() {
-        return responsible;
+    public String getEmployee() {
+        return employee;
     }
 
-    public void setResponsible(String responsible) {
-        this.responsible = responsible;
+    public void setEmployee(String employee) {
+        this.employee = employee;
     }
 }

@@ -7,7 +7,6 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.firebase.ui.auth.AuthUI;
@@ -20,8 +19,6 @@ import com.squorpikkor.app.adjustmentdb.ui.main.ui.main.SectionsPagerAdapter;
 
 import java.util.Arrays;
 import java.util.List;
-
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_PROFILE_NAME;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,13 +46,9 @@ public class MainActivity extends AppCompatActivity {
 
         location = findViewById(R.id.location);
 
-        final MutableLiveData<String> profileName = mViewModel.getProfileName();
+        final MutableLiveData<String> profileName = mViewModel.getLocation_id();
         profileName.observe(this, s -> {
             if (profileName.getValue() != null) {
-                if (profileName.getValue().equals(EMPTY_PROFILE_NAME))
-                    Log.e(TAG, "♦♦♦ EMPTY_PROFILE_NAME");//todo может и без иф, просто присваивать. А может и с иф
-                else Log.e(TAG, "♦♦♦ profileName = " + profileName.getValue());
-
                 mViewModel.setSelectedProfile(profileName.getValue());
             }
 
@@ -114,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if (user != null && user.getEmail() != null) {
                     //todo//textEmail.setText(user.getEmail());
-                    mViewModel.getProfileByEMail(user.getEmail());
+                    mViewModel.getLocationIdByEMail(user.getEmail());
                     mViewModel.setFirebaseUser(user);
                 }
             } else {

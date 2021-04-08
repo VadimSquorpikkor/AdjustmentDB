@@ -36,7 +36,7 @@ import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_PROFILE_NAME;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_LOCATION_ID;
 
 public class MainFragment extends Fragment {
 
@@ -94,10 +94,10 @@ public class MainFragment extends Fragment {
             recyclerViewRepairUnits.setAdapter(unitsAdapter);
         });
 
-        final MutableLiveData<String> profileName = mViewModel.getProfileName();
+        final MutableLiveData<String> profileName = mViewModel.getLocation_id();
         profileName.observe(getViewLifecycleOwner(), s -> {
             if (profileName.getValue() != null) {
-                if (profileName.getValue().equals(EMPTY_PROFILE_NAME)) Log.e(TAG, "♦♦♦ EMPTY_PROFILE_NAME");//todo может и без иф, просто присваивать. А может и с иф
+                if (profileName.getValue().equals(EMPTY_LOCATION_ID)) Log.e(TAG, "♦♦♦ EMPTY_PROFILE_NAME");//todo может и без иф, просто присваивать. А может и с иф
                 else Log.e(TAG, "♦♦♦ profileName = "+profileName.getValue());
 
                 mViewModel.setSelectedProfile(profileName.getValue());
@@ -224,7 +224,7 @@ public class MainFragment extends Fragment {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if (user!=null && user.getEmail()!=null){
                     textEmail.setText(user.getEmail());
-                    mViewModel.getProfileByEMail(user.getEmail());
+                    mViewModel.getLocationIdByEMail(user.getEmail());
                     mViewModel.setFirebaseUser(user);
                 }
             } else {

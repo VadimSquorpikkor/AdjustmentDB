@@ -7,68 +7,98 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.squorpikkor.app.adjustmentdb.BuildConfig;
-import com.squorpikkor.app.adjustmentdb.DState;
+import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
-import com.squorpikkor.app.adjustmentdb.DevType;
+
 import java.util.ArrayList;
 import java.util.Date;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 
+    /**
+     * Локация — это название местонахождения устройства: участок регулировки, сборки и т.д.
+     * У каждого участка свой набор возможных статусов: у регулировки есть диагностика, настройка и другие,
+     * при этом пользователь не может назначить для устройства статус, которого нет у текущей локации.
+     * При этом для каждого из типов (серия или ремонт) может быть свой набор статусов, а может и не быть:
+     * так, например, для участка монтажа и для серии, и для ремонта один и тот же доступный статус —
+     * монтаж. У участка ремонта же вообще нет типа "серия" (он вообще не занимается серийными приборами)
+     *
+     * Статус — это как называется то, что могут делать с устройством: Диагностика, Сборка, Монтаж и т.д.
+     * Могут быть двух типов: Серия и Ремонт. Также для каждого статуса есть своя локация.
+     *
+     * Событие (Event) — единица истории устройства. Вся история есть список событий, в каждом из которых
+     * хранится
+     *
+     *
+     * */
 public class MainViewModel extends ViewModel {
-
-//------- Коллекции (таблицы) ----------------------------------------------------------------------
-    /**Коллекция имен для устройств*/
-    public static final String TABLE_DEV_TYPES = "dev_types";
-    /**Коллекция профилей: имя статуса, локация, тип (ремонт/серия)*/
-    public static final String TABLE_PROFILES = "profiles";
-    /**Коллекция ремонтных устройств*/
-    public static final String TABLE_REPAIRS = "repairs";
-    /**Коллекция серийных устройств*/
-    public static final String TABLE_SERIALS = "serials";
-    /**Коллекция всех статусов*/
-    public static final String TABLE_ALL_STATES = "states";
-    /**Коллекция пользователей. Email + профиль*/
-    public static final String TABLE_USERS = "users";
-    /**Коллекция названий локаций: id+name ("adjustment"+"Регулировка")*/
-    public static final String TABLE_LOCATIONS = "locations";
 //--------------------------------------------------------------------------------------------------
-    public static final String PROFILE_LOCATION = "location";
-    public static final String PROFILE_NAME = "name";
-    public static final String PROFILE_TYPE = "type";
-    public static final String PROF_TYPE_ANY = "any";
-    public static final String PROF_TYPE_REPAIR = "repair";
-    public static final String PROF_TYPE_SERIAL = "serial";
+    //Новые стринги для новой БД:
+    public static final String TABLE_UNITS = "units";
+    public static final String UNIT_DESCRIPTION = "description";
+    public static final String UNIT_DEVICE = "device_id"; //todo возможно в имени стринга и не нужен "_ID", только в значении
+    public static final String UNIT_EMPLOYEE = "employee_id";
+    public static final String UNIT_ID = "id";
+    public static final String UNIT_INNER_SERIAL = "inner_serial";
+    public static final String UNIT_LOCATION = "location_id";
+    public static final String UNIT_SERIAL = "serial";
+    public static final String UNIT_STATE = "state_id";
+    public static final String UNIT_TYPE = "type_id";//todo по-хорошему нужна коллекция тайпов. Пока обойдусь
 
-    public static final String EMPTY_PROFILE_NAME = "empty_profile_name";
-    public static final String EMPTY_LOCATION_NAME = "empty_location_name";
+    public static final String TABLE_STATES = "states"; //в прошлом profile
+    public static final String STATE_LOCATION = "location_id";
+    public static final String STATE_NAME = "name";
+    public static final String STATE_TYPE = "type_id";
 
-    public static final String ID = "id";
-    public static final String NAME = "name";
-    public static final String UNIT_ID = "unit_id";
-    public static final String DATE = "date";
-    public static final String STATE = "state";
-    public static final String EMAIL = "email";
-    public static final String PROFILE = "profile";
+    public static final String TABLE_EVENTS = "events"; //в прошлом states
+    public static final String EVENT_DATE = "date";
+    public static final String EVENT_DESCRIPTION = "description";
+    public static final String EVENT_LOCATION = "location_id";
+    public static final String EVENT_STATE = "state_id";
+    public static final String EVENT_UNIT = "unit_id";
 
+    public static final String TABLE_EMPLOYEES = "employees"; //в прошлом users
+    public static final String EMPLOYEE_EMAIL = "email"; //email нельзя использовать в качестве id, так как у пользователя может поменяться email, и тогда при необходимости выбрать устройства пользователя нужно будет искать и по старому email и по новому
+    public static final String EMPLOYEE_ID = "id";
+    public static final String EMPLOYEE_LOCATION = "location_id";
+    public static final String EMPLOYEE_NAME = "name";
+
+    public static final String TABLE_LOCATIONS = "locations";
+    public static final String LOCATION_ID = "id";
+    public static final String LOCATION_NAME = "name";
+
+    public static final String TABLE_DEVICES = "locations";
+    public static final String DEVICE_ID = "id";
+    public static final String DEVICE_NAME = "name";
+    public static final String DEVICE_TYPE = "type";
+
+    public static final String TYPE_ANY = "any_type";
+    public static final String TYPE_REPAIR = "repair_type";
+    public static final String TYPE_SERIAL = "serial_type";
+
+
+
+    public static final String EMPTY_LOCATION_ID = "empty_location_id";
+    public static final String EMPTY_LOCATION_NAME = "Локация не найдена";
+//--------------------------------------------------------------------------------------------------
     public static final String SERIAL_TYPE = "serial_type";
     public static final String REPAIR_TYPE = "repair_type";
 
     private final FireDBHelper dbh;
     private final MutableLiveData<ArrayList<DUnit>> serialUnitsList;
     private final MutableLiveData<ArrayList<DUnit>> repairsUnitsList;
-    private final MutableLiveData<ArrayList<DUnit>> selectedUnits;
+    private final MutableLiveData<DUnit> selectedUnit;
 
-    private final MutableLiveData<ArrayList<DevType>> devTypeList;
+    private final MutableLiveData<ArrayList<String>> devicesList;
 
     private final MutableLiveData<ArrayList<String>> serialStatesList;
     private final MutableLiveData<ArrayList<String>> repairStatesList;
 
-    private final MutableLiveData<ArrayList<DState>> unitStatesList;
+    private final MutableLiveData<ArrayList<DEvent>> unitStatesList;
 
     private final MutableLiveData<ArrayList<DUnit>> foundUnitsList;
 
-    private final MutableLiveData<String> profileName;
+    private final MutableLiveData<String> location_id;
     private final MutableLiveData<String> locationName;
 
     private FirebaseUser user;
@@ -76,32 +106,30 @@ public class MainViewModel extends ViewModel {
     public MainViewModel() {
         serialUnitsList = new MutableLiveData<>();
         repairsUnitsList = new MutableLiveData<>();
-        selectedUnits = new MutableLiveData<>();
+        selectedUnit = new MutableLiveData<>();
         dbh = new FireDBHelper();
-        devTypeList = new MutableLiveData<>();
+        devicesList = new MutableLiveData<>();
         serialStatesList = new MutableLiveData<>();
         repairStatesList = new MutableLiveData<>();
         unitStatesList = new MutableLiveData<>();
         foundUnitsList = new MutableLiveData<>();
-        profileName = new MutableLiveData<>();
+        location_id = new MutableLiveData<>();
         locationName = new MutableLiveData<>();
-        addDUnitTableListener();
-        addRepairUnitTableListener();
         addDevTypeTableListener();
     }
 
     /**Выбрать профиль (сборка, регулировка...). При смене профиля обновляем лисенеры для имен
      * статусов, так как статусы уже другие*/
+    //todo не совсем верно, здесь выбираем не профиль(раньше профиль == локация), а список доступных статусов, или список доступных профилей(в новом понимании, дурацкое название)
     public void setSelectedProfile(String profName) {
-        getNameFromDB(profName);
+        getLocationNameByLocationId(profName);
         addSerialStateNamesListener();
         addRepairStateNamesListener();
     }
 
     /** Сохраняет DUnit в БД в соответствующую таблицу*/
     public void saveDUnitToDB(DUnit unit) {
-        if (unit.isSerialUnit()) dbh.addUnitToDB(unit, TABLE_SERIALS, unit.getId());
-        if (unit.isRepairUnit()) dbh.addUnitToDB(unit, TABLE_REPAIRS, unit.getId());
+        dbh.addUnitToDB(unit);
         // В коллекцию статусов текущего устройства добавляем статус: описание+дата (добавляем
         // коллекцию в коллекцию). Если поля статуса оставить пустым, то статус не будет добавлне
         // (нужно, наример, если необходимо просто добавить серийный номер, никакого статуса в этом
@@ -110,40 +138,30 @@ public class MainViewModel extends ViewModel {
             Date date = new Date();
             String state = unit.getState();
             String description = unit.getDescription();
-            String location = getProfileName().getValue();
             String unit_id = unit.getId();
-            DState dState = new DState(date, state, description, location, unit_id);
-            dbh.addStateToDB(dState, TABLE_ALL_STATES);
+            String location_id = getLocation_id().getValue();
+            dbh.addEventToDB(date, state, description, unit_id, location_id);
         }
     }
 
 //----- LISTENERS ----------------------------------------------------------------------------------
 
-    /** Слушатель для таблицы серийных приборов*/
-    void addDUnitTableListener() {
-        dbh.addDBListener(TABLE_SERIALS, serialUnitsList);
-    }
-
-    /** Слушатель для таблицы ремонтных приборов*/
-    void addRepairUnitTableListener() {
-        dbh.addDBListener(TABLE_REPAIRS, repairsUnitsList);
-    }
-
     /** Слушатель для таблицы имен приборов*/
     void addDevTypeTableListener() {
-        dbh.addDevTypeListener(TABLE_DEV_TYPES, devTypeList);
+        //dbh.addDevTypeListener(devicesList);
+        dbh.addStringArrayListener(TABLE_DEVICES, devicesList, DEVICE_NAME);
     }
 
     /** Слушатель для таблицы названий статусов серийных приборов. При событии, serialStatesList
      * получает список серийных статусов или статусов общих для обоих типов. В текущей локации*/
     void addSerialStateNamesListener() {
-        dbh.getListOfStates(getProfileName().getValue(), PROF_TYPE_SERIAL, serialStatesList);
+        dbh.getListOfStates(getLocation_id().getValue(), TYPE_SERIAL, serialStatesList);
     }
 
     /** Слушатель для таблицы названий статусов ремонтных приборов. При событии, repairStatesList
      * получает список ремонтных статусов или статусов общих для обоих типов. В текущей локации*/
     void addRepairStateNamesListener() {
-        dbh.getListOfStates(getProfileName().getValue(), PROF_TYPE_REPAIR, repairStatesList);
+        dbh.getListOfStates(getLocation_id().getValue(), TYPE_REPAIR, repairStatesList);
     }
 
     /** Слушает изменения в коллекции статусов и при новом событии загружает статусы для выбранного
@@ -173,15 +191,15 @@ public class MainViewModel extends ViewModel {
     /**
      * Список имен (названий) приборов
      */
-    public MutableLiveData<ArrayList<DevType>> getDevTypeList() {
-        return devTypeList;
+    public MutableLiveData<ArrayList<String>> getDevicesList() {
+        return devicesList;
     }
 
     public MutableLiveData<ArrayList<DUnit>> getSerialUnitsList() {
         return serialUnitsList;
     }
 
-    public MutableLiveData<ArrayList<DState>> getUnitStatesList() {
+    public MutableLiveData<ArrayList<DEvent>> getUnitStatesList() {
         return unitStatesList;
     }
 
@@ -189,8 +207,8 @@ public class MainViewModel extends ViewModel {
         return repairsUnitsList;
     }
 
-    public MutableLiveData<ArrayList<DUnit>> getSelectedUnits() {
-        return selectedUnits;
+    public MutableLiveData<DUnit> getSelectedUnit() {
+        return selectedUnit;
     }
 
     public MutableLiveData<ArrayList<DUnit>> getFoundUnitsList() {
@@ -198,9 +216,7 @@ public class MainViewModel extends ViewModel {
     }
 
     public void updateSelectedUnit(DUnit newUnit) {
-        ArrayList<DUnit> units = new ArrayList<>();
-        units.add(newUnit);
-        selectedUnits.setValue(units);
+        selectedUnit.setValue(newUnit);
     }
 
     /**
@@ -210,31 +226,29 @@ public class MainViewModel extends ViewModel {
      * предупреждение
      */
     public void getThisUnitFromDB(DUnit unit) {
-        if (unit.isSerialUnit()) dbh.getUnitById(TABLE_SERIALS, unit.getId(), selectedUnits);
-        if (unit.isRepairUnit()) dbh.getUnitById(TABLE_REPAIRS, unit.getId(), selectedUnits);
-        dbh.getStatesFromDB(unit.getId(), unitStatesList);
+        dbh.getUnitById(unit.getId(), selectedUnit);
+        dbh.getEventsFromDB(unit.getId(), unitStatesList);
     }
 
     public String getVersion() {
         return BuildConfig.VERSION_NAME;
     }
 
-    public MutableLiveData<String> getProfileName() {
-        return profileName;
+    public MutableLiveData<String> getLocation_id() {
+        return location_id;
     }
 
     public MutableLiveData<String> getLocationName() {
         return locationName;
     }
 
-    /**По названию почты получаем из БД профиль (если такой есть). Если такого eMail в БД нет, то
-     * будет предложено создать нового юзера с текущим eMail и выбранным из списка профилем*/
-    public void getProfileByEMail(String email) {
-        dbh.getStringValueByParam(TABLE_USERS, EMAIL, email, PROFILE, profileName, EMPTY_PROFILE_NAME);
+    public void getLocationIdByEMail(String email) {
+        dbh.getStringValueByParam(TABLE_EMPLOYEES, EMPLOYEE_EMAIL, email, EMPLOYEE_LOCATION, location_id, EMPTY_LOCATION_ID);
     }
 
-    private void getNameFromDB(String profileName) {
-        dbh.getStringValueByParam(TABLE_LOCATIONS, ID, profileName, NAME, locationName, EMPTY_LOCATION_NAME);
+    /***/
+    private void getLocationNameByLocationId(String location_id) {
+        dbh.getStringValueByParam(TABLE_LOCATIONS, LOCATION_ID, location_id, LOCATION_NAME, locationName, EMPTY_LOCATION_NAME);
     }
 
     public FirebaseUser getFirebaseUser() {

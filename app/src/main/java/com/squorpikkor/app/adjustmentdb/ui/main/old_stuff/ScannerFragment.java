@@ -28,7 +28,6 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.squorpikkor.app.adjustmentdb.DUnit;
-import com.squorpikkor.app.adjustmentdb.DevType;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 
@@ -36,7 +35,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
 
 import static com.squorpikkor.app.adjustmentdb.ui.main.scanner.Encrypter.decodeMe;
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
@@ -70,7 +68,7 @@ public class ScannerFragment extends Fragment {
     private static final String REPAIR_UNIT = "Ремонт";
     private static final String NO_SELECTION = "- не выбрано -";
 
-    ArrayList<DevType> devTypeList;
+    ArrayList<String> devicesList;
     ArrayList<String> devSpinnerList;
 
     ArrayList<String> serialStateSpinnerList;
@@ -80,7 +78,7 @@ public class ScannerFragment extends Fragment {
     // отдает всё, чтоона нашла по данному серийнику и это всё она отдает. Забота ScannerFragment'a
     // решать, что с этим всем делать, если нашлось несколько, то можно предупредить пользователя,
     // что есть несколько устройств в базе с одинаковым именем
-    ArrayList<DUnit> units;
+    DUnit unit;
 
 
     public static ScannerFragment newInstance() {
@@ -136,16 +134,15 @@ public class ScannerFragment extends Fragment {
         });
 
 
-        units = new ArrayList<>();
+//        units = new ArrayList<>();
 
-        final MutableLiveData<ArrayList<DUnit>> selectedUnits = mViewModel.getSelectedUnits();
+        final MutableLiveData<DUnit> selectedUnits = mViewModel.getSelectedUnit();
         selectedUnits.observe(getViewLifecycleOwner(), s -> {
-           units = selectedUnits.getValue();
-           if (units==null)return;
-           if (units.size()>1) Log.e(TAG, "* Есть несколько устройств с таким серийником!!!");
-           if (units.size() != 0) insertDataToFields(units.get(0));
-           if (isRepairDev) sendButton.setText("Отправить данные в БД (ремонт)");
-           else sendButton.setText("Отправить данные в БД");
+           if (selectedUnits.getValue()!=null) insertDataToFields(unit);
+//           if (units.size()>1) Log.e(TAG, "* Есть несколько устройств с таким серийником!!!");
+//           if (units.size() != 0) insertDataToFields(units.get(0));
+//           if (isRepairDev) sendButton.setText("Отправить данные в БД (ремонт)");
+//           else sendButton.setText("Отправить данные в БД");
         });
 
 
@@ -235,15 +232,15 @@ public class ScannerFragment extends Fragment {
             }
         });
 
-        final MutableLiveData<ArrayList<DevType>> devTypes = mViewModel.getDevTypeList();
-        devTypes.observe(getViewLifecycleOwner(), s -> {
-            this.devTypeList = devTypes.getValue();
+        final MutableLiveData<ArrayList<String>> devices = mViewModel.getDevicesList();
+        devices.observe(getViewLifecycleOwner(), s -> {
+            this.devicesList = devices.getValue();
             devSpinnerList.clear();
             devSpinnerList.add(NO_SELECTION);
-            if (this.devTypeList != null){
-                Log.e(TAG, "onCreateView: " + this.devTypeList.size());
-                for (int i = 0; i < this.devTypeList.size(); i++) {
-                    devSpinnerList.add(devTypeList.get(i).getName());
+            if (this.devicesList != null){
+                Log.e(TAG, "onCreateView: " + this.devicesList.size());
+                for (int i = 0; i < this.devicesList.size(); i++) {
+                    devSpinnerList.add(devicesList.get(i));
                 }
 
                 devSpinner.setAdapter(devAdapter);
@@ -280,7 +277,7 @@ public class ScannerFragment extends Fragment {
 
     private void initialiseDetectorsAndSources() {
         //Toast.makeText(getContext(), "Barcode scanner started", Toast.LENGTH_SHORT).show();
-        BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(Objects.requireNonNull(getActivity()))
+        BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(requireActivity())
                 .setBarcodeFormats(Barcode.ALL_FORMATS)
                 .build();
 
@@ -293,7 +290,7 @@ public class ScannerFragment extends Fragment {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
                 try {
-                    if (ActivityCompat.checkSelfPermission(Objects.requireNonNull(getActivity()), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                         cameraSource.start(surfaceView.getHolder());
                     } else {
                         ActivityCompat.requestPermissions(getActivity(), new

@@ -26,7 +26,6 @@ import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
@@ -212,7 +211,7 @@ public class Scanner {
             String name = ar[0];
             String innerSerial = ar[1];
             String id;
-            String location = mViewModel.getProfileName().getValue();
+            String location = mViewModel.getLocation_id().getValue();
 
             // Если это ремонт:
             if (name.equals(REPAIR_UNIT)){

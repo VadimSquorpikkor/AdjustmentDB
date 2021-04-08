@@ -14,14 +14,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.squorpikkor.app.adjustmentdb.DState;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.DialogStatesAdapter;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 
@@ -44,11 +42,12 @@ public class SelectStateDialog extends Dialog {
         this.context = context;
         this.mViewModel = mViewModel;
         this.stateList = stateList;
-        ArrayList<DUnit> units = this.mViewModel.getSelectedUnits().getValue();
+        this.unit = this.mViewModel.getSelectedUnit().getValue();
 //        if (units.size() == 0) this.unit = this.mViewModel.getSelectedUnit();
 //        else this.unit = units.get(0);
-        if (units.size() != 0) this.unit = units.get(0);
-        else this.unit = new DUnit();
+//        if (units.size() != 0) this.unit = units.get(0);
+//        else this.unit = new DUnit();
+        if (this.unit==null)this.unit=new DUnit();
 ////this.mViewModel.setSelectedUnit(units.get(0));
     }
 

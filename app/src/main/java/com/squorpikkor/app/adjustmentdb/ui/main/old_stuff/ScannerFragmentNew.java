@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.squorpikkor.app.adjustmentdb.DState;
+import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
@@ -41,9 +41,9 @@ public class ScannerFragmentNew extends Fragment {
     private RecyclerView recyclerUnitsStates;
     private RecyclerView recyclerFoundUnits;
 
-    private ArrayList<DUnit> units;
+    private DUnit unit;
     private ArrayList<DUnit> foundUnitsList;
-    private ArrayList<DState> states;
+    private ArrayList<DEvent> states;
 
     private ScannerOld scanner;
     private String location;//todo надо как observe Mutable, иначе может значение не успеть подгрузиться
@@ -60,7 +60,7 @@ public class ScannerFragmentNew extends Fragment {
         View view = inflater.inflate(R.layout.fragment_scanner_new, container, false);
         mViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
 
-        units = new ArrayList<>();
+//        units = new ArrayList<>();
         states = new ArrayList<>();
 
         addToBDButton = view.findViewById(R.id.buttonAddToBD);
@@ -88,18 +88,20 @@ public class ScannerFragmentNew extends Fragment {
             dialog.show(requireFragmentManager(), null);
         });
 
-        final MutableLiveData<ArrayList<DUnit>> selectedUnits = mViewModel.getSelectedUnits();
-        selectedUnits.observe(getViewLifecycleOwner(), s -> {
-            units = selectedUnits.getValue();
-            if (units==null)return;
-            if (units.size()>1) Log.e(TAG, "* Есть несколько устройств с таким серийником!!!");
-            if (units.size() != 0) insertDataToFields(units.get(0));
+        final MutableLiveData<DUnit> selectedUnit = mViewModel.getSelectedUnit();
+        selectedUnit.observe(getViewLifecycleOwner(), s -> {
+            unit = selectedUnit.getValue();
+            if (unit!=null)insertDataToFields(unit);
+//                unit = selectedUnit.getValue();
+//            if (units==null)return;
+//            if (units.size()>1) Log.e(TAG, "* Есть несколько устройств с таким серийником!!!");
+//            if (units.size() != 0) insertDataToFields(units.get(0));
             ////////////////if (mViewModel.getIsRepair().getValue()) addToBDButton.setText("Отправить данные в БД (ремонт)");
-            else addToBDButton.setText("Отправить данные в БД");
+//            else addToBDButton.setText("Отправить данные в БД");
         });
 
         //Отслеживает список статусов (время + текст) текущего устройства/
-        final MutableLiveData<ArrayList<DState>> statesForUnit = mViewModel.getUnitStatesList();
+        final MutableLiveData<ArrayList<DEvent>> statesForUnit = mViewModel.getUnitStatesList();
         statesForUnit.observe(getViewLifecycleOwner(), s -> {
             Log.e(TAG, "onCreateView: список статусов mViewModel.getUnitStatesList");
             this.states = statesForUnit.getValue();
@@ -148,7 +150,7 @@ public class ScannerFragmentNew extends Fragment {
     private void openStatesDialog() {
         //Загружается тот список, тип прибора который загружен — ремонт или серия
         ArrayList<String> rightList;
-        if (mViewModel.getSelectedUnits().getValue().get(0).isRepairUnit()) rightList = mViewModel.getRepairStatesList().getValue();
+        if (mViewModel.getSelectedUnit().getValue().isRepairUnit()) rightList = mViewModel.getRepairStatesList().getValue();
         else rightList = mViewModel.getSerialStatesList().getValue();
 
         SelectStateDialogNew dialog = new SelectStateDialogNew(getActivity(), mViewModel, rightList);

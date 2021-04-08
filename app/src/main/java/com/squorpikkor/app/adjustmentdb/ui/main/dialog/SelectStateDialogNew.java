@@ -3,7 +3,6 @@ package com.squorpikkor.app.adjustmentdb.ui.main.dialog;
 import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -16,8 +15,6 @@ import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import java.util.ArrayList;
-
-import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 
 public class SelectStateDialogNew extends Dialog {
     private final MainViewModel mViewModel;
@@ -32,9 +29,9 @@ public class SelectStateDialogNew extends Dialog {
         this.context = context;
         this.mViewModel = mViewModel;
         this.stateList = stateList;
-        ArrayList<DUnit> units = this.mViewModel.getSelectedUnits().getValue();
-        if (units.size() != 0) this.unit = units.get(0);
-        else this.unit = new DUnit();
+        this.unit = this.mViewModel.getSelectedUnit().getValue();
+//        if (units.size() != 0) this.unit = units.get(0);
+//        else this.unit = new DUnit();
     }
 
     @Override
@@ -57,10 +54,11 @@ public class SelectStateDialogNew extends Dialog {
             String name = unit.getName();
             String innerSerial = unit.getInnerSerial();
             String serial = unit.getSerial();
-            String state = spinner.getSelectedItem().toString();//selectedEditState.getText().toString();
+            String state = "";
+            if (spinner.getSelectedItem()!=null) state = spinner.getSelectedItem().toString();
             String desc = description.getText().toString();
             String type = unit.getType();
-            String location = mViewModel.getProfileName().getValue();
+            String location = mViewModel.getLocation_id().getValue();
             mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state, desc, type, location));
             dismiss();
         });

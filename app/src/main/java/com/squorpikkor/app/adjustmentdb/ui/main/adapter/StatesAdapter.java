@@ -8,7 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.squorpikkor.app.adjustmentdb.DState;
+import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.R;
 
 import java.text.SimpleDateFormat;
@@ -17,13 +17,13 @@ import java.util.ArrayList;
 /**Адаптер для списка всех статусов для выбранного конкретного устройства. Показывает дату, время и сам статус*/
 public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesViewHolder> {
 
-    private final ArrayList<DState> states;
+    private final ArrayList<DEvent> states;
     private final String DATE_PATTERN = "dd.MM.yyyy HH:mm";
 
     /**
      * Конструктор, в котором передаем ArrayList для RecyclerView
      */
-    public StatesAdapter(ArrayList<DState> states) {
+    public StatesAdapter(ArrayList<DEvent> states) {
         this.states = states;
     }
 
@@ -39,7 +39,7 @@ public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesView
 
     @Override
     public void onBindViewHolder(@NonNull StatesAdapter.StatesViewHolder holder, int position) {
-        DState state = states.get(position);
+        DEvent state = states.get(position);
         holder.tDate.setText(getRightDate(state.getDate().getTime()));
         holder.tState.setText(state.getState());
     }

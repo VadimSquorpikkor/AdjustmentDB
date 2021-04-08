@@ -233,7 +233,7 @@ public class ScannerOld {
             String name = ar[0];
             String innerSerial = ar[1];
             String id;
-            String location = mViewModel.getProfileName().getValue();
+            String location = mViewModel.getLocation_id().getValue();
 
             // Если это ремонт:
             if (name.equals(REPAIR_UNIT)){

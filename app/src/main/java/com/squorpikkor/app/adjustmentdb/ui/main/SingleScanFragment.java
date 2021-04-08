@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.squorpikkor.app.adjustmentdb.DState;
+import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.StatesAdapter;
@@ -33,7 +33,7 @@ public class SingleScanFragment extends Fragment {
     private RecyclerView recyclerUnitsStates;
 
     private ArrayList<DUnit> units;
-    private ArrayList<DState> states;
+    private ArrayList<DEvent> states;
 
     private Scanner scannerSingle;
     private String location;//todo надо как observe Mutable, иначе может значение не успеть подгрузиться
@@ -68,17 +68,18 @@ public class SingleScanFragment extends Fragment {
 
         addNewStateButton.setOnClickListener(view1 -> openStatesDialog());
 
-        final MutableLiveData<ArrayList<DUnit>> selectedUnits = mViewModel.getSelectedUnits();
+        final MutableLiveData<DUnit> selectedUnits = mViewModel.getSelectedUnit();
         selectedUnits.observe(getViewLifecycleOwner(), s -> {
-            units = selectedUnits.getValue();
-            if (units==null)return;
-            if (units.size()>1) Log.e(TAG, "* Есть несколько устройств с таким серийником!!!");
-            if (units.size() != 0) insertDataToFields(units.get(0));
-            else Log.e(TAG, "* Можно Отправить данные в БД");
+            DUnit unit = selectedUnits.getValue();
+            if (unit!=null) insertDataToFields(unit);
+//            if (units==null)return;
+//            if (units.size()>1) Log.e(TAG, "* Есть несколько устройств с таким серийником!!!");
+//            if (units.size() != 0) insertDataToFields(units.get(0));
+//            else Log.e(TAG, "* Можно Отправить данные в БД");
         });
 
         //Отслеживает список статусов (время + текст) текущего устройства/
-        final MutableLiveData<ArrayList<DState>> statesForUnit = mViewModel.getUnitStatesList();
+        final MutableLiveData<ArrayList<DEvent>> statesForUnit = mViewModel.getUnitStatesList();
         statesForUnit.observe(getViewLifecycleOwner(), s -> {
             Log.e(TAG, "onCreateView: список статусов mViewModel.getUnitStatesList");
             this.states = statesForUnit.getValue();
@@ -96,6 +97,7 @@ public class SingleScanFragment extends Fragment {
     }
 
     private void insertDataToFields(DUnit unit) {
+        Log.e(TAG, "insertDataToFields: "+unit.getId());
         //todo это всё должно браться из viewModel
         tType.setText("- - -");
         if (unit.isRepairUnit()) tType.setText("Ремонт");
@@ -117,7 +119,7 @@ public class SingleScanFragment extends Fragment {
     private void openStatesDialog() {
         //Загружается тот список, тип прибора который загружен — ремонт или серия
         ArrayList<String> rightList;
-        if (mViewModel.getSelectedUnits().getValue().get(0).isRepairUnit()) rightList = mViewModel.getRepairStatesList().getValue();
+        if (mViewModel.getSelectedUnit().getValue().isRepairUnit()) rightList = mViewModel.getRepairStatesList().getValue();
         else rightList = mViewModel.getSerialStatesList().getValue();
 
         SelectStateDialogNew dialog = new SelectStateDialogNew(getActivity(), mViewModel, rightList);

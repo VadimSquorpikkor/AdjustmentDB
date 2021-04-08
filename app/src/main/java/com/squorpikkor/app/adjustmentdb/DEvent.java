@@ -2,19 +2,19 @@ package com.squorpikkor.app.adjustmentdb;
 
 import java.util.Date;
 
-public class DState {
+public class DEvent {
     private Date date;
     private String state;
     private String description;
     private String location;
     private String unit_id;
 
-    public DState(Date date, String state) {
+    public DEvent(Date date, String state) {
         this.date = date;
         this.state = state;
     }
 
-    public DState(Date date, String state, String description, String location, String unit_id) {
+    public DEvent(Date date, String state, String description, String location, String unit_id) {
         this.date = date;
         this.state = state;
         this.description = description;
@@ -22,7 +22,7 @@ public class DState {
         this.unit_id = unit_id;
     }
 
-    public DState() {
+    public DEvent() {
     }
 
     public Date getDate() {

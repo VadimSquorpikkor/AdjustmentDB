@@ -7,24 +7,37 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.squorpikkor.app.adjustmentdb.DState;
+import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
-import com.squorpikkor.app.adjustmentdb.DevType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DATE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ID;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.PROFILE_LOCATION;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.PROFILE_NAME;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.PROFILE_TYPE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.PROF_TYPE_ANY;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_ALL_STATES;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_PROFILES;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_DATE;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_DESCRIPTION;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_LOCATION;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_STATE;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_UNIT;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_LOCATION;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_NAME;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_TYPE;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_STATES;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TYPE_ANY;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_EVENTS;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_UNITS;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_DESCRIPTION;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_DEVICE;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_EMPLOYEE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_ID;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_INNER_SERIAL;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_LOCATION;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_SERIAL;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_STATE;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_TYPE;
 
 class FireDBHelper {
 
@@ -34,77 +47,104 @@ class FireDBHelper {
         db = FirebaseFirestore.getInstance();
     }
 
-    /**
-     * Добавляет документ в БД. Если документ не существует, он будет создан. Если документ существует,
-     * его содержимое будет перезаписано вновь предоставленными данными
-     */
+    /**Добавляет документ в БД. Если документ не существует, он будет создан. Если документ существует,
+     * его содержимое будет перезаписано вновь предоставленными данными */
     //todo переделать на update, если документ существует
-    void addUnitToDB(DUnit unit, String table, String documentName) {
-        //В коллекцию устройств добавляем/обновляем устройство
-        db.collection(table)
-                .document(documentName)
-                .set(unit)
+    void addUnitToDB(DUnit unit) {
+        Map<String, Object> data = new HashMap<>();
+        data.put(UNIT_DESCRIPTION, unit.getDescription());
+        data.put(UNIT_DEVICE, unit.getName());
+        data.put(UNIT_EMPLOYEE, unit.getEmployee());
+        data.put(UNIT_ID, unit.getId());
+        data.put(UNIT_INNER_SERIAL, unit.getInnerSerial());
+        data.put(UNIT_LOCATION, unit.getLocation());
+        data.put(UNIT_SERIAL, unit.getSerial());
+        data.put(UNIT_STATE, unit.getState());
+        data.put(UNIT_TYPE, unit.getType());
+        db.collection(TABLE_UNITS)
+                .document(unit.getId())
+                .set(data)
                 .addOnSuccessListener(aVoid -> Log.e(TAG, "DocumentSnapshot successfully written!"))
                 .addOnFailureListener(e -> Log.e(TAG, "Error writing document", e));
     }
 
-    /**
-     * Сохранение статуса в таблицу статусов
-     */
-    void addStateToDB(DState dState, String table) {
-        db.collection(table)
+    /**Добавление нового события в БД*/
+    void addEventToDB(Date date, String state, String description, String unit_id, String location_id) {
+        Map<String, Object> data = new HashMap<>();
+        data.put(EVENT_DATE, date);
+        data.put(EVENT_STATE, state);
+        data.put(EVENT_DESCRIPTION, description);
+        data.put(EVENT_UNIT, unit_id);
+        data.put(EVENT_LOCATION, location_id);
+        db.collection(TABLE_EVENTS)
                 .document()
-                .set(dState)
+                .set(data)
                 .addOnSuccessListener(aVoid -> Log.e(TAG, "DocumentSnapshot successfully written!"))
                 .addOnFailureListener(e -> Log.e(TAG, "Error writing document", e));
     }
 
-    /**
-     * Метод загружает элементы из БД (все в текущей таблице). Трюк в том, что метод при получении данных
-     * заносит их в коллекцию объектов, которая является MutableLiveData из ViewModel, ссылка на эту коллекцию
-     * объект класса FireDBHelper получает в конструкторе. Получается, что приложение, получив данные из БД
-     * в облаке сохраняет их в коллекцию, на которую подписан RecyclerView, таким образом изменения в
-     * БД автоматом отображаются в списке RecyclerView
-     * <p>
-     * QuerySnapshot -- это список QueryDocumentSnapshot (список всех "user"-ов в таблице "users" Базы Данных )
-     * QueryDocumentSnapshot -- это объект в БД, один "user", у которого можно будет прочитать свойства
-     */
-    //todo тип второго параметра может быть другим, чтобы не делать перегруженный метод надо сделать
-    // универсальный параметр (например MutableLiveData<ArrayList<T>> или аналог)
-    void getUnitFromDB(String table, MutableLiveData<ArrayList<DUnit>> units) {
-        db.collection(table).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                QuerySnapshot querySnapshot = task.getResult();
-                if (querySnapshot == null || querySnapshot.size() == 0) return;
-                units.setValue((ArrayList<DUnit>) querySnapshot.toObjects(DUnit.class));
-            } else {
-                Log.e(TAG, "Error - " + task.getException());
-            }
+
+    void addStringArrayListener(String table, MutableLiveData<ArrayList<String>> mList, String fieldName) {
+        Log.e(TAG, "addStringArrayListener: ");
+        db.collection(table).addSnapshotListener((queryDocumentSnapshots, error) -> {
+            //getStringFromDB(table, s);
+            getStringArrayFromDB(table, mList, fieldName);
         });
     }
 
-    /**
-     * Слушатель изменений для "user", здесь немного путаница в названиях: здесь объект класса QuerySnapshot (список) называется
-     * queryDocumentSnapshots (как будто это объект класса QueryDocumentSnapshot, на самом деле -- это "user", внимательно смотрим), оставил так, потому что так написано
-     * в оф. документации
-     * Если срабатывает событие, слушатель запускает загрузку ВСЕХ объектов из БД
-     * В будущем нужно будет загружать не все элементы, а только новые элементы в БД (или удалять удаленные из БД)
-     * иначе, когда элементов будет много, будет долго, да и трафик лишний
-     */
-    void addDBListener(String table, MutableLiveData<ArrayList<DUnit>> units) {
-        db.collection(table).addSnapshotListener((queryDocumentSnapshots, error) -> getUnitFromDB(table, units));
+
+    void getUnitById(String id, MutableLiveData<DUnit> selectedUnit) {
+        db.collection(TABLE_UNITS)
+                .whereEqualTo(UNIT_ID, id)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        if (querySnapshot == null || querySnapshot.size() == 0) return;
+//                        selectedUnits.setValue((ArrayList<DUnit>) querySnapshot.toObjects(DUnit.class));
+                        DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
+                        DUnit unit = new DUnit();
+                        unit.setDescription(String.valueOf(documentSnapshot.get(UNIT_DESCRIPTION)));
+                        unit.setName(String.valueOf(documentSnapshot.get(UNIT_DEVICE)));
+                        unit.setEmployee(String.valueOf(documentSnapshot.get(UNIT_EMPLOYEE)));
+                        unit.setId(String.valueOf(documentSnapshot.get(UNIT_ID)));
+                        unit.setInnerSerial(String.valueOf(documentSnapshot.get(UNIT_INNER_SERIAL)));
+                        unit.setLocation(String.valueOf(documentSnapshot.get(UNIT_LOCATION)));
+                        unit.setSerial(String.valueOf(documentSnapshot.get(UNIT_SERIAL)));
+                        unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
+                        unit.setType(String.valueOf(documentSnapshot.get(UNIT_TYPE)));
+                        selectedUnit.setValue(unit);
+
+                    } else {
+                        Log.e(TAG, "Error getting documents: ", task.getException());
+                    }
+                });
     }
 
-    void getDevTypeFromDB(String table, MutableLiveData<ArrayList<DevType>> dev) {
-        db.collection(table).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                QuerySnapshot querySnapshot = task.getResult();
-                if (querySnapshot == null) return;
-                dev.setValue((ArrayList<DevType>) querySnapshot.toObjects(DevType.class));
-            } else {
-                Log.e(TAG, "Error - " + task.getException());
-            }
-        });
+    //этот метод будет заменой getUnitById
+    void getUnitById_EXP(String id, MutableLiveData<DUnit> selectedUnit) {
+        db.collection(TABLE_UNITS)
+                .document(id)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        if (documentSnapshot == null) return;
+                        DUnit unit = new DUnit();
+                        unit.setDescription(String.valueOf(documentSnapshot.get(UNIT_DESCRIPTION)));
+                        unit.setName(String.valueOf(documentSnapshot.get(UNIT_DEVICE)));
+                        unit.setEmployee(String.valueOf(documentSnapshot.get(UNIT_EMPLOYEE)));
+                        unit.setId(String.valueOf(documentSnapshot.get(UNIT_ID)));
+                        unit.setInnerSerial(String.valueOf(documentSnapshot.get(UNIT_INNER_SERIAL)));
+                        unit.setLocation(String.valueOf(documentSnapshot.get(UNIT_LOCATION)));
+                        unit.setSerial(String.valueOf(documentSnapshot.get(UNIT_SERIAL)));
+                        unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
+                        unit.setType(String.valueOf(documentSnapshot.get(UNIT_TYPE)));
+                        selectedUnit.setValue(unit);
+                    } else {
+                        Log.e(TAG, "Error getting documents: ", task.getException());
+                    }
+                });
     }
 
     void getStringArrayFromDB(String table, MutableLiveData<ArrayList<String>> mList, String fieldName) {
@@ -128,74 +168,48 @@ class FireDBHelper {
         }).addOnFailureListener(e -> Log.e(TAG, "onFailure: "+e));
     }
 
-    /**Слушатель для новых событий у выбранного юнита. Слушает всю коллекцию статусов и при новом
-     * событии загружает те статусы у которых "unit_id" равен id выбранного юнита. Другими словами
+    /**Слушатель для новых событий у выбранного юнита. Слушает всю коллекцию событий и при новом
+     * событии загружает те, у которых "unit_id" равен id выбранного юнита. Другими словами
      * обновляет события выбранного юнита, если список событий изменился*/
-    void addSelectedUnitListener(String unit_id, MutableLiveData<ArrayList<DState>> unitStatesList) {
-        db.collection(TABLE_ALL_STATES).addSnapshotListener((queryDocumentSnapshots, error) -> {
-            getStatesFromDB(unit_id, unitStatesList);
+    void addSelectedUnitListener(String unit_id, MutableLiveData<ArrayList<DEvent>> unitStatesList) {
+        db.collection(TABLE_EVENTS).addSnapshotListener((queryDocumentSnapshots, error) -> {
+            getEventsFromDB(unit_id, unitStatesList);
         });
     }
 
     /**Загружает список событий по "unit_id"*/
-    void getStatesFromDB(String unit_id, MutableLiveData<ArrayList<DState>> states) {
-        db.collection(TABLE_ALL_STATES)
-                .whereEqualTo(UNIT_ID, unit_id)
-                .orderBy(DATE)
+    void getEventsFromDB(String unit_id, MutableLiveData<ArrayList<DEvent>> events) {
+        db.collection(TABLE_EVENTS)
+                .whereEqualTo(EVENT_UNIT, unit_id)
+                .orderBy(EVENT_DATE)
                 .get().addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         QuerySnapshot querySnapshot = task.getResult();
                         if (querySnapshot == null) return;
-                        ArrayList<DState> newStates = new ArrayList<>();
+                        ArrayList<DEvent> newEvents = new ArrayList<>();
                         for (QueryDocumentSnapshot q : querySnapshot) {
-                            Timestamp timestamp = (Timestamp) q.get(DATE);
+                            Timestamp timestamp = (Timestamp) q.get(EVENT_DATE);
                             /*Log.e(TAG, "1: "+q.get("date"));
                             Log.e(TAG, "2: "+timestamp.toDate());
                             Log.e(TAG, "2: "+timestamp.toDate());
                             Log.e(TAG, "2: "+getRightDate(timestamp.getSeconds()));
                             Log.e(TAG, "3: "+q.get("state"));*/
-                            newStates.add(new DState(timestamp.toDate(), q.get(STATE).toString()));
+                            newEvents.add(new DEvent(timestamp.toDate(), q.get(EVENT_STATE).toString()));
                         }
-                        states.setValue(newStates);
+                        events.setValue(newEvents);
                     } else {
                         Log.e(TAG, "Error - " + task.getException());
                     }
                 });
     }
 
-    void addDevTypeListener(String table, MutableLiveData<ArrayList<DevType>> dev) {
-        db.collection(table).addSnapshotListener((queryDocumentSnapshots, error) -> getDevTypeFromDB(table, dev));
-    }
 
-    void addStringArrayListener(String table, MutableLiveData<ArrayList<String>> mList, String fieldName) {
-        Log.e(TAG, "addStringArrayListener: ");
-        db.collection(table).addSnapshotListener((queryDocumentSnapshots, error) -> {
-            //getStringFromDB(table, s);
-            getStringArrayFromDB(table, mList, fieldName);
-        });
-    }
 
     void addStringArrayListener(String table, String document, String table2, MutableLiveData<ArrayList<String>> mList, String fieldName) {
         db.collection(table).document(document).collection(table2).addSnapshotListener((queryDocumentSnapshots, error) -> {
             //getStringFromDB(table, s);
             getStringArrayFromDB(table, document, table2, mList, fieldName);
         });
-    }
-
-
-    void getUnitById(String table, String id, MutableLiveData<ArrayList<DUnit>> selectedUnits) {
-        db.collection(table)
-                .whereEqualTo(ID, id)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        QuerySnapshot querySnapshot = task.getResult();
-                        if (querySnapshot == null || querySnapshot.size() == 0) return;
-                        selectedUnits.setValue((ArrayList<DUnit>) querySnapshot.toObjects(DUnit.class));
-                    } else {
-                        Log.e(TAG, "Error getting documents: ", task.getException());
-                    }
-                });
     }
 
     /**
@@ -249,16 +263,16 @@ class FireDBHelper {
      * (т.е. при любом выбранном типе ВСЕГДА будут добавляться в выборку типы "any" в выбранной локации)*/
     void getListOfStates(String location, String type, MutableLiveData<ArrayList<String>> mList) {
         Log.e(TAG, "♦♦♦ getListOfStates: "+location);
-        db.collection(TABLE_PROFILES)
-                .whereEqualTo(PROFILE_LOCATION, location)
-                .whereIn(PROFILE_TYPE, Arrays.asList(PROF_TYPE_ANY, type))
+        db.collection(TABLE_STATES)
+                .whereEqualTo(STATE_LOCATION, location)
+                .whereIn(STATE_TYPE, Arrays.asList(TYPE_ANY, type))
                 .get().addOnCompleteListener(task -> {
             ArrayList<String> list = new ArrayList<>();
             int count = 0;
             for (DocumentSnapshot document : task.getResult()) {
                 Log.e(TAG, "getListOfStates: "+count);
                 count++;
-                list.add(document.get(PROFILE_NAME).toString());//todo если буду делать локализацию, то здесь надо будет вставлять что-то типа if(lang.isEng)name = "name_eng". В БД будет дополнительное поле "name_eng", оно будет выбираться вместо "name". И всё, весь остальной код уже будет работать. Это конечно касается только имени статуса, для других сделать аналогично
+                list.add(document.get(STATE_NAME).toString());//todo если буду делать локализацию, то здесь надо будет вставлять что-то типа if(lang.isEng)name = "name_eng". В БД будет дополнительное поле "name_eng", оно будет выбираться вместо "name". И всё, весь остальной код уже будет работать. Это конечно касается только имени статуса, для других сделать аналогично
             }
             mList.setValue(list);
         });
