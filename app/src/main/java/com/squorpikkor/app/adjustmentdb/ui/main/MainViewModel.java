@@ -12,6 +12,8 @@ import com.squorpikkor.app.adjustmentdb.DUnit;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
+import java.util.TreeMap;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 
@@ -46,6 +48,7 @@ public class MainViewModel extends ViewModel {
     public static final String UNIT_TYPE = "type_id";//todo по-хорошему нужна коллекция тайпов. Пока обойдусь
 
     public static final String TABLE_STATES = "states"; //в прошлом profile
+    public static final String STATE_ID = "id";
     public static final String STATE_LOCATION = "location_id";
     public static final String STATE_NAME = "name";
     public static final String STATE_TYPE = "type_id";
@@ -67,7 +70,7 @@ public class MainViewModel extends ViewModel {
     public static final String LOCATION_ID = "id";
     public static final String LOCATION_NAME = "name";
 
-    public static final String TABLE_DEVICES = "locations";
+    public static final String TABLE_DEVICES = "devices";
     public static final String DEVICE_ID = "id";
     public static final String DEVICE_NAME = "name";
     public static final String DEVICE_TYPE = "type";
@@ -91,8 +94,8 @@ public class MainViewModel extends ViewModel {
 
     private final MutableLiveData<ArrayList<String>> devicesList;
 
-    private final MutableLiveData<ArrayList<String>> serialStatesList;
-    private final MutableLiveData<ArrayList<String>> repairStatesList;
+    private final MutableLiveData<TreeMap<String, String>> serialStatesDictionary;
+    private final MutableLiveData<TreeMap<String, String>> repairStatesDictionary;
 
     private final MutableLiveData<ArrayList<DEvent>> unitStatesList;
 
@@ -109,8 +112,8 @@ public class MainViewModel extends ViewModel {
         selectedUnit = new MutableLiveData<>();
         dbh = new FireDBHelper();
         devicesList = new MutableLiveData<>();
-        serialStatesList = new MutableLiveData<>();
-        repairStatesList = new MutableLiveData<>();
+        serialStatesDictionary = new MutableLiveData<>();
+        repairStatesDictionary = new MutableLiveData<>();
         unitStatesList = new MutableLiveData<>();
         foundUnitsList = new MutableLiveData<>();
         location_id = new MutableLiveData<>();
@@ -155,13 +158,13 @@ public class MainViewModel extends ViewModel {
     /** Слушатель для таблицы названий статусов серийных приборов. При событии, serialStatesList
      * получает список серийных статусов или статусов общих для обоих типов. В текущей локации*/
     void addSerialStateNamesListener() {
-        dbh.getListOfStates(getLocation_id().getValue(), TYPE_SERIAL, serialStatesList);
+        dbh.getListOfStates(getLocation_id().getValue(), TYPE_SERIAL, serialStatesDictionary);
     }
 
     /** Слушатель для таблицы названий статусов ремонтных приборов. При событии, repairStatesList
      * получает список ремонтных статусов или статусов общих для обоих типов. В текущей локации*/
     void addRepairStateNamesListener() {
-        dbh.getListOfStates(getLocation_id().getValue(), TYPE_REPAIR, repairStatesList);
+        dbh.getListOfStates(getLocation_id().getValue(), TYPE_REPAIR, repairStatesDictionary);
     }
 
     /** Слушает изменения в коллекции статусов и при новом событии загружает статусы для выбранного
@@ -175,17 +178,17 @@ public class MainViewModel extends ViewModel {
     /**
      * Список названий статусов серийных приборов
      */
-    public MutableLiveData<ArrayList<String>> getSerialStatesList() {
-        return serialStatesList;
+    public MutableLiveData<TreeMap<String, String>> getSerialStatesDictionary() {
+        return serialStatesDictionary;
     }
 
     /**
      * Список названий статусов ремонтных приборов
      */
-    public MutableLiveData<ArrayList<String>> getRepairStatesList() {
-        if (repairStatesList.getValue()!=null)Log.e(TAG, "♣♣♣ getRepairStatesList: "+repairStatesList.getValue().size());
+    public MutableLiveData<TreeMap<String, String>> getRepairStatesDictionary() {
+        if (repairStatesDictionary.getValue()!=null)Log.e(TAG, "♣♣♣ getRepairStatesList: "+ repairStatesDictionary.getValue().size());
         else Log.e(TAG, "♣♣♣ NULL!!!!!!!!!! ");
-        return repairStatesList;
+        return repairStatesDictionary;
     }
 
     /**

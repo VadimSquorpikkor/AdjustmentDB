@@ -229,6 +229,10 @@ public class Scanner {
     }
 
     public void cameraSourceRelease() {
-        if (cameraSource!=null) cameraSource.release();
+        if (cameraSource!=null){
+            cameraSource.release();
+            cameraSource.stop();
+        }
+
     }
 }

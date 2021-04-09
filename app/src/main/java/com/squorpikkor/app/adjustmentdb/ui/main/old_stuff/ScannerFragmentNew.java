@@ -23,6 +23,9 @@ import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialogNew;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialogNewDesign;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
+
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 
 public class ScannerFragmentNew extends Fragment {
@@ -149,12 +152,21 @@ public class ScannerFragmentNew extends Fragment {
 
     private void openStatesDialog() {
         //Загружается тот список, тип прибора который загружен — ремонт или серия
-        ArrayList<String> rightList;
-        if (mViewModel.getSelectedUnit().getValue().isRepairUnit()) rightList = mViewModel.getRepairStatesList().getValue();
-        else rightList = mViewModel.getSerialStatesList().getValue();
+        TreeMap<String, String> rightList;
+        if (mViewModel.getSelectedUnit().getValue().isRepairUnit()) rightList = mViewModel.getRepairStatesDictionary().getValue();
+        else rightList = mViewModel.getSerialStatesDictionary().getValue();
 
-        SelectStateDialogNew dialog = new SelectStateDialogNew(getActivity(), mViewModel, rightList);
+        SelectStateDialogNew dialog = new SelectStateDialogNew(getActivity(), mViewModel, getValueListFromMap(rightList));
         dialog.show();
+    }
+
+    ArrayList<String> getValueListFromMap(TreeMap<String, String> map) {
+        ArrayList<String> list = new ArrayList<>();
+        for(Map.Entry<String,String> entry : map.entrySet()) {
+            String value = entry.getValue();
+            list.add(value);
+        }
+        return list;
     }
 
     @Override

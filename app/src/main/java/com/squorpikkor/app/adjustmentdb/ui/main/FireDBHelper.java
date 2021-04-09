@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_DATE;
@@ -22,6 +23,7 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_DESCR
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_LOCATION;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_STATE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_UNIT;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_ID;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_LOCATION;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_NAME;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_TYPE;
@@ -261,20 +263,21 @@ class FireDBHelper {
      * есть статусы, которые одинаковые и для ремонта и для серии (у этих статусов тип "any"), то
      * при выборе статусов ищется тип выбранный в параметре метода (ремонт или серия) ИЛИ тип "any"
      * (т.е. при любом выбранном типе ВСЕГДА будут добавляться в выборку типы "any" в выбранной локации)*/
-    void getListOfStates(String location, String type, MutableLiveData<ArrayList<String>> mList) {
+    void getListOfStates(String location, String type, MutableLiveData<TreeMap<String, String>> mList) {
         Log.e(TAG, "♦♦♦ getListOfStates: "+location);
         db.collection(TABLE_STATES)
                 .whereEqualTo(STATE_LOCATION, location)
                 .whereIn(STATE_TYPE, Arrays.asList(TYPE_ANY, type))
                 .get().addOnCompleteListener(task -> {
-            ArrayList<String> list = new ArrayList<>();
+            TreeMap<String, String> map = new TreeMap<>();
             int count = 0;
             for (DocumentSnapshot document : task.getResult()) {
                 Log.e(TAG, "getListOfStates: "+count);
                 count++;
-                list.add(document.get(STATE_NAME).toString());//todo если буду делать локализацию, то здесь надо будет вставлять что-то типа if(lang.isEng)name = "name_eng". В БД будет дополнительное поле "name_eng", оно будет выбираться вместо "name". И всё, весь остальной код уже будет работать. Это конечно касается только имени статуса, для других сделать аналогично
+                map.put(document.get(STATE_NAME).toString(), document.get(STATE_ID).toString());
+                //todo если буду делать локализацию, то здесь надо будет вставлять что-то типа if(lang.isEng)name = "name_eng". В БД будет дополнительное поле "name_eng", оно будет выбираться вместо "name". И всё, весь остальной код уже будет работать. Это конечно касается только имени статуса, для других сделать аналогично
             }
-            mList.setValue(list);
+            mList.setValue(map);
         });
     }
 

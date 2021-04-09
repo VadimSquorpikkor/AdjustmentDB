@@ -169,14 +169,14 @@ public class ScannerFragment extends Fragment {
             }
         });
 
-        MutableLiveData<ArrayList<String>> states = mViewModel.getSerialStatesList();
+        /*MutableLiveData<ArrayList<String>> states = mViewModel.getSerialStatesDictionary();
         states.observe(getViewLifecycleOwner(), s -> {
             Log.e(TAG, "onComplete: "+states.getValue().get(0));
             serialStateSpinnerList.clear();
             serialStateSpinnerList.add(NO_SELECTION);
             serialStateSpinnerList.addAll(states.getValue());
             stateSpinner.setAdapter(serialStateAdapter);
-        });
+        });*/
 //--------------------------------------------------------------------------------------------------
 
         repairStateSpinnerList = new ArrayList<>();
@@ -201,14 +201,14 @@ public class ScannerFragment extends Fragment {
             }
         });
 
-        MutableLiveData<ArrayList<String>> states2 = mViewModel.getRepairStatesList();
+        /*MutableLiveData<ArrayList<String>> states2 = mViewModel.getRepairStatesDictionary();
         states2.observe(getViewLifecycleOwner(), s -> {
             Log.e(TAG, "onComplete: "+states.getValue().get(0));
             repairStateSpinnerList.clear();
             repairStateSpinnerList.add(NO_SELECTION);
             repairStateSpinnerList.addAll(states2.getValue());
             repairStateSpinner.setAdapter(repairStateAdapter);
-        });
+        });*/
 //--------------------------------------------------------------------------------------------------
         devSpinnerList = new ArrayList<>();
         Spinner devSpinner = (Spinner) view.findViewById(R.id.dev_types_spinner);

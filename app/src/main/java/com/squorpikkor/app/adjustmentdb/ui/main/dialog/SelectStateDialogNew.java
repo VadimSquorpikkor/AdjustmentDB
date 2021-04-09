@@ -55,11 +55,14 @@ public class SelectStateDialogNew extends Dialog {
             String innerSerial = unit.getInnerSerial();
             String serial = unit.getSerial();
             String state = "";
+            String state_id = "";
+//            state = spinner.getSelectedItem().toString();
             if (spinner.getSelectedItem()!=null) state = spinner.getSelectedItem().toString();
+            if (unit.isRepairUnit()) state_id = mViewModel.getRepairStatesDictionary().getValue().get(state);
             String desc = description.getText().toString();
             String type = unit.getType();
             String location = mViewModel.getLocation_id().getValue();
-            mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state, desc, type, location));
+            mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state_id, desc, type, location));
             dismiss();
         });
 
