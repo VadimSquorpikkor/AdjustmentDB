@@ -1,30 +1,35 @@
 package com.squorpikkor.app.adjustmentdb.ui.main;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.StatesAdapter;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialogNew;
-import com.squorpikkor.app.adjustmentdb.ui.main.scanner.Scanner;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 
-public class SingleScanFragment extends Fragment {
+public class SingleScanFragmentNew extends Fragment {
 
     private MainViewModel mViewModel;
     private TextView tType;
@@ -34,20 +39,22 @@ public class SingleScanFragment extends Fragment {
     private TextView tId;
     private TextView tLocation;
     private RecyclerView recyclerUnitsStates;
-
-    private ArrayList<DUnit> units;
     private ArrayList<DEvent> states;
-
-    private Scanner scannerSingle;
     private String location;//todo надо как observe Mutable, иначе может значение не успеть подгрузиться
+
+    View view;
+
+    FloatingActionButton addNewStateButton;
+
+    private SurfaceView surfaceView;
+    private TextView txtBarcodeValue;
+    private ConstraintLayout infoLayout;
 
     public static final String EMPTY_VALUE = "- - -";
 
-    public static SingleScanFragment newInstance() {
-        return new SingleScanFragment();
+    public static SingleScanFragmentNew newInstance() {
+        return new SingleScanFragmentNew();
     }
-
-    View view;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,8 +62,11 @@ public class SingleScanFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_single_scan, container, false);
         mViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
 
-        units = new ArrayList<>();
-        states = new ArrayList<>();
+        Toast.makeText(getActivity(), "123123", Toast.LENGTH_SHORT).show();
+
+        addNewStateButton = view.findViewById(R.id.addNewState);
+        addNewStateButton.setVisibility(View.GONE);
+        addNewStateButton.setOnClickListener(view1 -> openStatesDialog());
 
         tType = view.findViewById(R.id.textViewType);
         tName = view.findViewById(R.id.textViewName);
@@ -66,19 +76,14 @@ public class SingleScanFragment extends Fragment {
         tLocation = view.findViewById(R.id.textLocationValue);
         recyclerUnitsStates = view.findViewById(R.id.recyclerView);
 
-        FloatingActionButton addNewStateButton = view.findViewById(R.id.addNewState);
-        addNewStateButton.setVisibility(View.GONE);
-
-        addNewStateButton.setOnClickListener(view1 -> openStatesDialog());
+        surfaceView = view.findViewById(R.id.surfaceViewS);
+        surfaceView.setVisibility(View.INVISIBLE);
 
         final MutableLiveData<DUnit> selectedUnits = mViewModel.getSelectedUnit();
         selectedUnits.observe(getViewLifecycleOwner(), s -> {
             DUnit unit = selectedUnits.getValue();
+//            if (unit!=null) openUnitFragment(unit);
             if (unit!=null) insertDataToFields(unit);
-//            if (units==null)return;
-//            if (units.size()>1) Log.e(TAG, "* Есть несколько устройств с таким серийником!!!");
-//            if (units.size() != 0) insertDataToFields(units.get(0));
-//            else Log.e(TAG, "* Можно Отправить данные в БД");
         });
 
         //Отслеживает список событий (время + текст) текущего устройства/
@@ -92,7 +97,7 @@ public class SingleScanFragment extends Fragment {
             recyclerUnitsStates.setAdapter(statesAdapter);
         });
 
-        scannerSingle = new Scanner(getActivity(), view, mViewModel, false);
+        mViewModel.startSingleScanner(getActivity());
 
         location = mViewModel.getLocationName().getValue();
 
@@ -100,6 +105,10 @@ public class SingleScanFragment extends Fragment {
     }
 
     private void insertDataToFields(DUnit unit) {
+        addNewStateButton.setVisibility(View.VISIBLE);
+        infoLayout.setVisibility(View.VISIBLE);
+        surfaceView.setVisibility(View.INVISIBLE);
+
         Log.e(TAG, "insertDataToFields: "+unit.getId());
         //todo это всё должно браться из viewModel
         tType.setText("- - -");
@@ -117,6 +126,10 @@ public class SingleScanFragment extends Fragment {
     private String insertRightValue(String s) {
         if (s==null||s.equals("")||s.equals("null")) return EMPTY_VALUE;
         else return s;
+    }
+
+    private void openUnitFragment(DUnit unit) {
+
     }
 
     private void openStatesDialog() {
@@ -142,15 +155,14 @@ public class SingleScanFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        scannerSingle.setSurfaceVisible(true);
-        scannerSingle.initialiseDetectorsAndSources();
+        surfaceView.setVisibility(View.VISIBLE);
+        mViewModel.getSingleScanner().initialiseDetectorsAndSources();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        scannerSingle.cameraSourceRelease();
-        scannerSingle.setSurfaceVisible(false);
+        mViewModel.getSingleScanner().cameraSourceRelease();
+        surfaceView.setVisibility(View.GONE);
     }
-
 }

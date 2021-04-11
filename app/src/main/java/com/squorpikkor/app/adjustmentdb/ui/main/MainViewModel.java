@@ -1,23 +1,30 @@
 package com.squorpikkor.app.adjustmentdb.ui.main;
 
+import android.app.Activity;
 import android.util.Log;
+import android.view.View;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.auth.FirebaseUser;
-import com.squorpikkor.app.adjustmentdb.BuildConfig;
 import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
+import com.squorpikkor.app.adjustmentdb.ui.main.scanner.ScannerDataShow;
+import com.squorpikkor.app.adjustmentdb.ui.main.scanner.ScannerNew;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
+import io.grpc.android.BuildConfig;
+import kotlin.Unit;
 
-    /**
+import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
+import static com.squorpikkor.app.adjustmentdb.ui.main.scanner.Encrypter.decodeMe;
+
+/**
      * Локация — это название местонахождения устройства: участок регулировки, сборки и т.д.
      * У каждого участка свой набор возможных статусов: у регулировки есть диагностика, настройка и другие,
      * при этом пользователь не может назначить для устройства статус, которого нет у текущей локации.
@@ -33,7 +40,7 @@ import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
      *
      *
      * */
-public class MainViewModel extends ViewModel {
+public class MainViewModel extends ViewModel implements ScannerDataShow {
 //--------------------------------------------------------------------------------------------------
     //Новые стринги для новой БД:
     public static final String TABLE_UNITS = "units";
@@ -87,6 +94,9 @@ public class MainViewModel extends ViewModel {
     public static final String SERIAL_TYPE = "serial_type";
     public static final String REPAIR_TYPE = "repair_type";
 
+    private static final String SPLIT_SYMBOL = " ";
+    private static final String REPAIR_UNIT = "Ремонт";
+
     private final FireDBHelper dbh;
     private final MutableLiveData<ArrayList<DUnit>> serialUnitsList;
     private final MutableLiveData<ArrayList<DUnit>> repairsUnitsList;
@@ -104,7 +114,13 @@ public class MainViewModel extends ViewModel {
     private final MutableLiveData<String> location_id;
     private final MutableLiveData<String> locationName;
 
+    private final MutableLiveData<String> barcodeText;
+
     private FirebaseUser user;
+
+    private ArrayList<DUnit> unitList;
+    ScannerNew singleScanner;
+    ScannerNew multiScanner;
 
     public MainViewModel() {
         serialUnitsList = new MutableLiveData<>();
@@ -118,7 +134,9 @@ public class MainViewModel extends ViewModel {
         foundUnitsList = new MutableLiveData<>();
         location_id = new MutableLiveData<>();
         locationName = new MutableLiveData<>();
+        barcodeText = new MutableLiveData<>();
         addDevTypeTableListener();
+        unitList = new ArrayList<>();
     }
 
     /**Выбрать профиль (сборка, регулировка...). При смене профиля обновляем лисенеры для имен
@@ -219,6 +237,7 @@ public class MainViewModel extends ViewModel {
     }
 
     public void updateSelectedUnit(DUnit newUnit) {
+//        selectedUnit.postValue(newUnit);
         selectedUnit.setValue(newUnit);
     }
 
@@ -261,4 +280,84 @@ public class MainViewModel extends ViewModel {
     public void setFirebaseUser(FirebaseUser user) {
         this.user = user;
     }
-}
+
+    public MutableLiveData<String> getBarcodeText() {
+        return barcodeText;
+    }
+
+    public void startSingleScanner(Activity activity) {
+        singleScanner = new ScannerNew(activity, false, this);
+    }
+
+    public void startMultiScanner(Activity activity) {
+        multiScanner = new ScannerNew(activity, true, this);
+    }
+
+    @Override
+        public void addUnitToCollection(String s) {
+        DUnit unit = getDUnitFromString(s);
+        if (unit!=null){
+            unitList.add(unit);
+/////            foundCount.setText(String.valueOf(unitList.size()));
+/////            if (unitList.size()!=0) nextButton.setVisibility(View.VISIBLE);
+            if (unit.isRepairUnit()) Log.e(TAG, unit.getId());
+            else Log.e(TAG, unit.getName()+" "+unit.getInnerSerial());
+
+            getFoundUnitsList().setValue(unitList);
+
+        }
+    }
+
+    public ScannerNew getSingleScanner() {
+        return singleScanner;
+    }
+
+    public ScannerNew getMultiScanner() {
+        return multiScanner;
+    }
+
+    @Override
+        public void saveUnit(String s) {
+        DUnit unit = getDUnitFromString(s);
+        if (unit != null) {
+//                addNewStateButton.setVisibility(View.VISIBLE);
+//                infoLayout.setVisibility(View.VISIBLE);
+//            surfaceView.setVisibility(View.INVISIBLE);
+                //Смысл в том, что если отсканированный блок есть в БД, то данные для этого блока
+                // беруться из БД (getRepairUnitById), если этого блока в БД нет (новый), то данные для
+                // блока берутся из QR-кода
+                updateSelectedUnit(unit);
+                getThisUnitFromDB(unit);
+            }
+        }
+
+        @Override
+        public DUnit getDUnitFromString(String s) {
+            s = decodeMe(s);
+            barcodeText.setValue(s);
+            /////txtBarcodeValue.setVisibility(View.VISIBLE);
+            String[] ar = s.split(SPLIT_SYMBOL);
+            if (ar.length == 2) {
+                //Для серии: имя+внутренний_серийный (БДКГ-02 1234), id = БДКГ-02_1234
+                //Для ремонта: "Ремонт"+id (Ремонт 0001), id = r_0005
+                String name = ar[0];
+                String innerSerial = ar[1];
+                String id;
+                String location = getLocation_id().getValue();
+
+                // Если это ремонт:
+                if (name.equals(REPAIR_UNIT)){
+                    id = "r_"+ar[1];
+                    return new DUnit(id, "", "", "", "", "", REPAIR_TYPE, location);
+                }
+                // Если это серия:
+                else{
+                    id = name+"_"+innerSerial;
+                    return new DUnit(id, name, innerSerial, "", "", "", SERIAL_TYPE, location);
+                }
+
+                // Если строка некорректная, возвращаю null
+            } else return null;
+        }
+    }
+

@@ -148,7 +148,7 @@ public class Scanner {
                  });*/
 
                 if (barcodes.size() != 0) {
-                    txtBarcodeValue.post(() -> {
+                    activity.runOnUiThread(() -> {
                         intentData = barcodes.valueAt(0).displayValue;
                         if (isMultiScan) {
                             for (int i = 0; i < barcodes.size(); i++) {
@@ -168,11 +168,16 @@ public class Scanner {
                             MediaPlayer.create(activity, R.raw.fast_beep).start();
 //                            mp.start();
                         }
+
                     });
+                    //txtBarcodeValue.post(() -> {
+                    //});
                 }
             }
         });
     }
+
+
 
     private void addUnitToCollection(DUnit unit) {
         if (unit!=null){
