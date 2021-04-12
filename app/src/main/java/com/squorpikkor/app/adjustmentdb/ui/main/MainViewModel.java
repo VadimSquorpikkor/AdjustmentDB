@@ -1,7 +1,6 @@
 package com.squorpikkor.app.adjustmentdb.ui.main;
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.SurfaceView;
 
 import androidx.lifecycle.MutableLiveData;
@@ -11,16 +10,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.ui.main.scanner.ScannerDataShow;
-import com.squorpikkor.app.adjustmentdb.ui.main.scanner.ScannerNew;
+import com.squorpikkor.app.adjustmentdb.ui.main.scanner.Scanner;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Map;
-import java.util.TreeMap;
 
 import io.grpc.android.BuildConfig;
 
-import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.ui.main.scanner.Encrypter.decodeMe;
 
 /**
@@ -120,8 +116,8 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     private FirebaseUser user;
 
     private final ArrayList<DUnit> unitList;
-    ScannerNew singleScanner;
-    ScannerNew multiScanner;
+    Scanner singleScanner;
+    Scanner multiScanner;
 
     public MainViewModel() {
         serialUnitsList = new MutableLiveData<>();
@@ -295,11 +291,12 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     }
 
     public void startSingleScanner(Activity activity, SurfaceView surfaceView) {
-        singleScanner = new ScannerNew(activity, false, this, surfaceView);
+        //todo ? if(singleScanner==null) ?
+        singleScanner = new Scanner(activity, false, this, surfaceView);
     }
 
     public void startMultiScanner(Activity activity, SurfaceView surfaceView) {
-        multiScanner = new ScannerNew(activity, true, this, surfaceView);
+        multiScanner = new Scanner(activity, true, this, surfaceView);
     }
 
     @Override
@@ -307,21 +304,15 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         DUnit unit = getDUnitFromString(s);
         if (unit!=null){
             unitList.add(unit);
-/////            foundCount.setText(String.valueOf(unitList.size()));
-/////            if (unitList.size()!=0) nextButton.setVisibility(View.VISIBLE);
-            if (unit.isRepairUnit()) Log.e(TAG, unit.getId());
-            else Log.e(TAG, unit.getName()+" "+unit.getInnerSerial());
-
             getFoundUnitsList().setValue(unitList);
-
         }
     }
 
-    public ScannerNew getSingleScanner() {
+    public Scanner getSingleScanner() {
         return singleScanner;
     }
 
-    public ScannerNew getMultiScanner() {
+    public Scanner getMultiScanner() {
         return multiScanner;
     }
 
@@ -329,9 +320,6 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         public void saveUnit(String s) {
         DUnit unit = getDUnitFromString(s);
         if (unit != null) {
-//                addNewStateButton.setVisibility(View.VISIBLE);
-//                infoLayout.setVisibility(View.VISIBLE);
-//            surfaceView.setVisibility(View.INVISIBLE);
                 //Смысл в том, что если отсканированный блок есть в БД, то данные для этого блока
                 // беруться из БД (getRepairUnitById), если этого блока в БД нет (новый), то данные для
                 // блока берутся из QR-кода

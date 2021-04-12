@@ -20,7 +20,6 @@ public class SelectStateDialogNew extends Dialog {
     private final MainViewModel mViewModel;
     private final Activity context;
     private final ArrayList<String> stateList;
-//    private final TreeMap<String, String> stateList;
     private EditText description;
     private final DUnit unit;
     private Spinner spinner;
@@ -31,8 +30,6 @@ public class SelectStateDialogNew extends Dialog {
         this.mViewModel = mViewModel;
         this.stateList = stateList;
         this.unit = this.mViewModel.getSelectedUnit().getValue();
-//        if (units.size() != 0) this.unit = units.get(0);
-//        else this.unit = new DUnit();
     }
 
     @Override
@@ -44,11 +41,9 @@ public class SelectStateDialogNew extends Dialog {
         TextView cancelButton = findViewById(R.id.textViewInnerSerial);
         TextView okButton = findViewById(R.id.textViewInnerSerialValue);
         description = findViewById(R.id.description);
-        spinner = (Spinner) findViewById(R.id.state_spinner);
+        spinner = findViewById(R.id.state_spinner);
 
-        cancelButton.setOnClickListener(view -> {
-            dismiss();
-        });
+        cancelButton.setOnClickListener(view -> dismiss());
 
         okButton.setOnClickListener(view -> {
             String id = unit.getId();
@@ -57,7 +52,6 @@ public class SelectStateDialogNew extends Dialog {
             String serial = unit.getSerial();
             String state = "";
             String state_id = "";
-//            state = spinner.getSelectedItem().toString();
             if (spinner.getSelectedItem()!=null) state = spinner.getSelectedItem().toString();
             int position;
             if (unit.isRepairUnit()){
@@ -77,8 +71,8 @@ public class SelectStateDialogNew extends Dialog {
         });
 
         // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<String> stateAdapter = new ArrayAdapter<String>(context,
-                android.R.layout.simple_spinner_item,  stateList);
+        ArrayAdapter<String> stateAdapter = new ArrayAdapter<>(context,
+                android.R.layout.simple_spinner_item, stateList);
         // Specify the layout to use when the list of choices appears
         stateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner

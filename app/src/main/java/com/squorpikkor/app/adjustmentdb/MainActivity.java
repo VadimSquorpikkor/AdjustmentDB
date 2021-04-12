@@ -15,7 +15,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
-import com.squorpikkor.app.adjustmentdb.ui.main.ui.main.SectionsPagerAdapter;
+import com.squorpikkor.app.adjustmentdb.ui.main.fragment_cradle.SectionsPagerAdapter;
 
 import java.util.Arrays;
 import java.util.List;

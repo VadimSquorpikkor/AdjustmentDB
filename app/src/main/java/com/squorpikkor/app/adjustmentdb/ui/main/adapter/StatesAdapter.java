@@ -18,6 +18,7 @@ import java.util.ArrayList;
 public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesViewHolder> {
 
     private final ArrayList<DEvent> states;
+    @SuppressWarnings("FieldCanBeLocal")
     private final String DATE_PATTERN = "dd.MM.yyyy HH:mm";
 
     /**
