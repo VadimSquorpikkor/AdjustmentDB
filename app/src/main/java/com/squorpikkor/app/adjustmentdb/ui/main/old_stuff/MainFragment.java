@@ -129,7 +129,7 @@ public class MainFragment extends Fragment {
         /**Открываем фрагмент со сканером QR-кода и кнопкой добавления в БД*/
         view.findViewById(R.id.floatingActionButton2).setOnClickListener(v -> {
 
-            Log.e(TAG, "♠♠ !!!createView: "+mViewModel.getRepairStatesDictionary().getValue().size());
+            Log.e(TAG, "♠♠ !!!createView: "+mViewModel.getRepairStateIdList().getValue().size());
 
 
             // Create new fragment and transaction

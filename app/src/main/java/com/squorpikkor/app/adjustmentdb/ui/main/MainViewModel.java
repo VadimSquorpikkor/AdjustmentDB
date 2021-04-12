@@ -2,7 +2,7 @@ package com.squorpikkor.app.adjustmentdb.ui.main;
 
 import android.app.Activity;
 import android.util.Log;
-import android.view.View;
+import android.view.SurfaceView;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import io.grpc.android.BuildConfig;
-import kotlin.Unit;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.ui.main.scanner.Encrypter.decodeMe;
@@ -104,8 +103,10 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
     private final MutableLiveData<ArrayList<String>> devicesList;
 
-    private final MutableLiveData<TreeMap<String, String>> serialStatesDictionary;
-    private final MutableLiveData<TreeMap<String, String>> repairStatesDictionary;
+    private final MutableLiveData<ArrayList<String>> serialStateIdList;
+    private final MutableLiveData<ArrayList<String>> repairStateIdList;
+    private final MutableLiveData<ArrayList<String>> serialStatesNames;
+    private final MutableLiveData<ArrayList<String>> repairStatesNames;
 
     private final MutableLiveData<ArrayList<DEvent>> unitStatesList;
 
@@ -118,7 +119,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
     private FirebaseUser user;
 
-    private ArrayList<DUnit> unitList;
+    private final ArrayList<DUnit> unitList;
     ScannerNew singleScanner;
     ScannerNew multiScanner;
 
@@ -128,8 +129,8 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         selectedUnit = new MutableLiveData<>();
         dbh = new FireDBHelper();
         devicesList = new MutableLiveData<>();
-        serialStatesDictionary = new MutableLiveData<>();
-        repairStatesDictionary = new MutableLiveData<>();
+        serialStateIdList = new MutableLiveData<>();
+        repairStateIdList = new MutableLiveData<>();
         unitStatesList = new MutableLiveData<>();
         foundUnitsList = new MutableLiveData<>();
         location_id = new MutableLiveData<>();
@@ -137,6 +138,8 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         barcodeText = new MutableLiveData<>();
         addDevTypeTableListener();
         unitList = new ArrayList<>();
+        serialStatesNames = new MutableLiveData<>();
+        repairStatesNames = new MutableLiveData<>();
     }
 
     /**Выбрать профиль (сборка, регулировка...). При смене профиля обновляем лисенеры для имен
@@ -176,13 +179,13 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     /** Слушатель для таблицы названий статусов серийных приборов. При событии, serialStatesList
      * получает список серийных статусов или статусов общих для обоих типов. В текущей локации*/
     void addSerialStateNamesListener() {
-        dbh.getListOfStates(getLocation_id().getValue(), TYPE_SERIAL, serialStatesDictionary);
+        dbh.getListOfStates(getLocation_id().getValue(), TYPE_SERIAL, serialStateIdList, serialStatesNames);
     }
 
     /** Слушатель для таблицы названий статусов ремонтных приборов. При событии, repairStatesList
      * получает список ремонтных статусов или статусов общих для обоих типов. В текущей локации*/
     void addRepairStateNamesListener() {
-        dbh.getListOfStates(getLocation_id().getValue(), TYPE_REPAIR, repairStatesDictionary);
+        dbh.getListOfStates(getLocation_id().getValue(), TYPE_REPAIR, repairStateIdList, repairStatesNames);
     }
 
     /** Слушает изменения в коллекции статусов и при новом событии загружает статусы для выбранного
@@ -196,17 +199,23 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     /**
      * Список названий статусов серийных приборов
      */
-    public MutableLiveData<TreeMap<String, String>> getSerialStatesDictionary() {
-        return serialStatesDictionary;
+    public MutableLiveData<ArrayList<String>> getSerialStateIdList() {
+        return serialStateIdList;
     }
 
     /**
      * Список названий статусов ремонтных приборов
      */
-    public MutableLiveData<TreeMap<String, String>> getRepairStatesDictionary() {
-        if (repairStatesDictionary.getValue()!=null)Log.e(TAG, "♣♣♣ getRepairStatesList: "+ repairStatesDictionary.getValue().size());
-        else Log.e(TAG, "♣♣♣ NULL!!!!!!!!!! ");
-        return repairStatesDictionary;
+    public MutableLiveData<ArrayList<String>> getRepairStateIdList() {
+        return repairStateIdList;
+    }
+
+    public MutableLiveData<ArrayList<String>> getSerialStatesNames() {
+        return serialStatesNames;
+    }
+
+    public MutableLiveData<ArrayList<String>> getRepairStatesNames() {
+        return repairStatesNames;
     }
 
     /**
@@ -285,12 +294,12 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         return barcodeText;
     }
 
-    public void startSingleScanner(Activity activity) {
-        singleScanner = new ScannerNew(activity, false, this);
+    public void startSingleScanner(Activity activity, SurfaceView surfaceView) {
+        singleScanner = new ScannerNew(activity, false, this, surfaceView);
     }
 
-    public void startMultiScanner(Activity activity) {
-        multiScanner = new ScannerNew(activity, true, this);
+    public void startMultiScanner(Activity activity, SurfaceView surfaceView) {
+        multiScanner = new ScannerNew(activity, true, this, surfaceView);
     }
 
     @Override

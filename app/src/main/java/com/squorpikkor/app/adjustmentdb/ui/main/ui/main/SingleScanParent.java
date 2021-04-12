@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.squorpikkor.app.adjustmentdb.R;
-import com.squorpikkor.app.adjustmentdb.ui.main.SingleScanFragment;
 import com.squorpikkor.app.adjustmentdb.ui.main.SingleScanFragmentNew;
 
 public class SingleScanParent extends Fragment {

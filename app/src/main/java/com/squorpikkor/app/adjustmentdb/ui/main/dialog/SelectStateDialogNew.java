@@ -20,6 +20,7 @@ public class SelectStateDialogNew extends Dialog {
     private final MainViewModel mViewModel;
     private final Activity context;
     private final ArrayList<String> stateList;
+//    private final TreeMap<String, String> stateList;
     private EditText description;
     private final DUnit unit;
     private Spinner spinner;
@@ -58,7 +59,16 @@ public class SelectStateDialogNew extends Dialog {
             String state_id = "";
 //            state = spinner.getSelectedItem().toString();
             if (spinner.getSelectedItem()!=null) state = spinner.getSelectedItem().toString();
-            if (unit.isRepairUnit()) state_id = mViewModel.getRepairStatesDictionary().getValue().get(state);
+            int position;
+            if (unit.isRepairUnit()){
+                position = mViewModel.getRepairStatesNames().getValue().indexOf(state);
+                state_id = mViewModel.getRepairStateIdList().getValue().get(position);
+            }
+            if (unit.isSerialUnit()){
+                position = mViewModel.getSerialStatesNames().getValue().indexOf(state);
+                state_id = mViewModel.getSerialStateIdList().getValue().get(position);
+            }
+
             String desc = description.getText().toString();
             String type = unit.getType();
             String location = mViewModel.getLocation_id().getValue();

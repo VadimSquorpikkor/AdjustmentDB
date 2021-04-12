@@ -152,11 +152,11 @@ public class ScannerFragmentNew extends Fragment {
 
     private void openStatesDialog() {
         //Загружается тот список, тип прибора который загружен — ремонт или серия
-        TreeMap<String, String> rightList;
-        if (mViewModel.getSelectedUnit().getValue().isRepairUnit()) rightList = mViewModel.getRepairStatesDictionary().getValue();
-        else rightList = mViewModel.getSerialStatesDictionary().getValue();
+        ArrayList<String> rightList;
+        if (mViewModel.getSelectedUnit().getValue().isRepairUnit()) rightList = mViewModel.getRepairStatesNames().getValue();
+        else rightList = mViewModel.getSerialStatesNames().getValue();
 
-        SelectStateDialogNew dialog = new SelectStateDialogNew(getActivity(), mViewModel, getValueListFromMap(rightList));
+        SelectStateDialogNew dialog = new SelectStateDialogNew(getActivity(), mViewModel, rightList);
         dialog.show();
     }
 

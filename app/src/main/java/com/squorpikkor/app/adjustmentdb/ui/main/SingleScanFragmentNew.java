@@ -76,6 +76,13 @@ public class SingleScanFragmentNew extends Fragment {
         tLocation = view.findViewById(R.id.textLocationValue);
         recyclerUnitsStates = view.findViewById(R.id.recyclerView);
 
+        infoLayout = view.findViewById(R.id.db_info_layout);
+        addNewStateButton = view.findViewById(R.id.addNewState);
+        infoLayout.setVisibility(View.GONE);
+
+        txtBarcodeValue = view.findViewById(R.id.txtBarcodeValue);
+        txtBarcodeValue.setVisibility(View.GONE);
+
         surfaceView = view.findViewById(R.id.surfaceViewS);
         surfaceView.setVisibility(View.INVISIBLE);
 
@@ -86,7 +93,7 @@ public class SingleScanFragmentNew extends Fragment {
             if (unit!=null) insertDataToFields(unit);
         });
 
-        //Отслеживает список событий (время + текст) текущего устройства/
+        //Отслеживает список событий (время + текст) текущего устройства
         final MutableLiveData<ArrayList<DEvent>> unitEvents = mViewModel.getUnitStatesList();
         unitEvents.observe(getViewLifecycleOwner(), s -> {
             Log.e(TAG, "onCreateView: список статусов mViewModel.getUnitStatesList");
@@ -97,7 +104,7 @@ public class SingleScanFragmentNew extends Fragment {
             recyclerUnitsStates.setAdapter(statesAdapter);
         });
 
-        mViewModel.startSingleScanner(getActivity());
+        mViewModel.startSingleScanner(getActivity(), surfaceView);
 
         location = mViewModel.getLocationName().getValue();
 
@@ -134,22 +141,12 @@ public class SingleScanFragmentNew extends Fragment {
 
     private void openStatesDialog() {
         //Загружается тот список, тип прибора который загружен — ремонт или серия
-        TreeMap<String, String> rightList;
-        if (mViewModel.getSelectedUnit().getValue().isRepairUnit()) rightList = mViewModel.getRepairStatesDictionary().getValue();
-        else rightList = mViewModel.getSerialStatesDictionary().getValue();
+        ArrayList<String> rightList;
+        if (mViewModel.getSelectedUnit().getValue().isRepairUnit()) rightList = mViewModel.getRepairStatesNames().getValue();
+        else rightList = mViewModel.getSerialStatesNames().getValue();
 
-        SelectStateDialogNew dialog = new SelectStateDialogNew(getActivity(), mViewModel, getValueListFromMap(rightList));
+        SelectStateDialogNew dialog = new SelectStateDialogNew(getActivity(), mViewModel, rightList);
         dialog.show();
-    }
-
-    //(ArrayList<String>) rightList.values()
-    ArrayList<String> getValueListFromMap(TreeMap<String, String> map) {
-        ArrayList<String> list = new ArrayList<>();
-        for(Map.Entry<String,String> entry : map.entrySet()) {
-            String value = entry.getKey();
-            list.add(value);
-        }
-        return list;
     }
 
     @Override

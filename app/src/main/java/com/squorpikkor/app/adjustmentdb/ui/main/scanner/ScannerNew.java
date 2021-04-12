@@ -28,15 +28,17 @@ public class ScannerNew {
     private static final int REQUEST_CAMERA_PERMISSION = 201;
     private final ScannerDataShow scannerDataShow;
 
-    private SurfaceView surfaceView;
+    private final SurfaceView surfaceView;
     private CameraSource cameraSource;
     private String intentData = "";
-    private HashSet<String> dataSet;
+    private final HashSet<String> dataSet;
 
-    public ScannerNew(Activity context, boolean isMultiScan, ScannerDataShow scannerDataShow) {
+    public ScannerNew(Activity context, boolean isMultiScan, ScannerDataShow scannerDataShow, SurfaceView surfaceView) {
         this.context = context;
         this.isMultiScan = isMultiScan;
         this.scannerDataShow = scannerDataShow;
+        this.surfaceView = surfaceView;
+        this.dataSet = new HashSet<>();
     }
 
     public void initialiseDetectorsAndSources() {
@@ -58,7 +60,7 @@ public class ScannerNew {
                     if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                         cameraSource.start(surfaceView.getHolder());
                     } else {
-                        ActivityCompat.requestPermissions((Activity) context, new
+                        ActivityCompat.requestPermissions(context, new
                                 String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
                     }
                 } catch (Exception e) {
@@ -88,15 +90,15 @@ public class ScannerNew {
 
                 if (barcodes.size() != 0) {
                     context.runOnUiThread(() -> {
-                        if (isMultiScan)worksWithBarcodeAnswer(barcodes);
-                        else worksWithMultiBarcodeAnswer(barcodes);
+                        if (isMultiScan)worksWithMultiBarcodeAnswer(barcodes);
+                        else worksWithSingleBarcodeAnswer(barcodes);
                     });
                 }
             }
         });
     }
 
-    void worksWithBarcodeAnswer(SparseArray<Barcode> barcodes) {
+    void worksWithSingleBarcodeAnswer(SparseArray<Barcode> barcodes) {
         intentData = barcodes.valueAt(0).displayValue;
         scannerDataShow.saveUnit(intentData);
         cameraSource.stop();

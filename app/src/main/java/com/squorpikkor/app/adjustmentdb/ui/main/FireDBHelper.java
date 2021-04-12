@@ -263,21 +263,26 @@ class FireDBHelper {
      * есть статусы, которые одинаковые и для ремонта и для серии (у этих статусов тип "any"), то
      * при выборе статусов ищется тип выбранный в параметре метода (ремонт или серия) ИЛИ тип "any"
      * (т.е. при любом выбранном типе ВСЕГДА будут добавляться в выборку типы "any" в выбранной локации)*/
-    void getListOfStates(String location, String type, MutableLiveData<TreeMap<String, String>> mList) {
+    void getListOfStates(String location, String type, MutableLiveData<ArrayList<String>> mStateIsList, MutableLiveData<ArrayList<String>> mNameList) {
         Log.e(TAG, "♦♦♦ getListOfStates: "+location);
         db.collection(TABLE_STATES)
                 .whereEqualTo(STATE_LOCATION, location)
                 .whereIn(STATE_TYPE, Arrays.asList(TYPE_ANY, type))
                 .get().addOnCompleteListener(task -> {
-            TreeMap<String, String> map = new TreeMap<>();
+            ArrayList<String> list1 = new ArrayList<>();
+            ArrayList<String> list2 = new ArrayList<>();
             int count = 0;
             for (DocumentSnapshot document : task.getResult()) {
                 Log.e(TAG, "getListOfStates: "+count);
                 count++;
-                map.put(document.get(STATE_NAME).toString(), document.get(STATE_ID).toString());
+                String name = document.get(STATE_NAME).toString();
+                String state_id = document.get(STATE_ID).toString();
+                list1.add(state_id);
+                list2.add(name);
                 //todo если буду делать локализацию, то здесь надо будет вставлять что-то типа if(lang.isEng)name = "name_eng". В БД будет дополнительное поле "name_eng", оно будет выбираться вместо "name". И всё, весь остальной код уже будет работать. Это конечно касается только имени статуса, для других сделать аналогично
             }
-            mList.setValue(map);
+            mStateIsList.setValue(list1);
+            mNameList.setValue(list2);
         });
     }
 
