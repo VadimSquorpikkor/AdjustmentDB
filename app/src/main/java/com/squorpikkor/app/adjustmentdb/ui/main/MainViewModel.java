@@ -111,6 +111,8 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     private final MutableLiveData<String> location_id;
     private final MutableLiveData<String> locationName;
 
+    private final MutableLiveData<String> email;
+
     private final MutableLiveData<String> barcodeText;
 
     private FirebaseUser user;
@@ -136,13 +138,14 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         unitList = new ArrayList<>();
         serialStatesNames = new MutableLiveData<>();
         repairStatesNames = new MutableLiveData<>();
+        email = new MutableLiveData<>();
     }
 
     /**Выбрать профиль (сборка, регулировка...). При смене профиля обновляем лисенеры для имен
      * статусов, так как статусы уже другие*/
     //todo не совсем верно, здесь выбираем не профиль(раньше профиль == локация), а список доступных статусов, или список доступных профилей(в новом понимании, дурацкое название)
-    public void setSelectedProfile(String profName) {
-        getLocationNameByLocationId(profName);
+    public void setStatesForLocation(String locationId) {
+        getLocationNameByLocationId(locationId);
         addSerialStateNamesListener();
         addRepairStateNamesListener();
     }
@@ -240,6 +243,12 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     public MutableLiveData<ArrayList<DUnit>> getFoundUnitsList() {
         return foundUnitsList;
     }
+
+    public MutableLiveData<String> getEmail() {
+        return email;
+    }
+
+
 
     public void updateSelectedUnit(DUnit newUnit) {
 //        selectedUnit.postValue(newUnit);

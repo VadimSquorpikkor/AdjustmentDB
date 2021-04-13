@@ -3,7 +3,6 @@
     package="com.squorpikkor.app.adjustmentdb">
 
     <uses-permission android:name="android.permission.CAMERA" />
-<!--    <uses-feature android:name="android.hardware.camera" />-->
 
     <application
         android:allowBackup="true"
@@ -12,10 +11,6 @@
         android:roundIcon="@mipmap/logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
-        <!--<activity
-            android:name=".ui.main.MainActivityTemp"
-            android:label="@string/title_activity_main_temp"
-            android:theme="@style/NoActionBar"></activity>-->
         <activity
             android:name=".MainActivity"
             android:icon="@mipmap/logo">

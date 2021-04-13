@@ -1,16 +1,23 @@
 package com.squorpikkor.app.adjustmentdb;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -20,13 +27,20 @@ import com.squorpikkor.app.adjustmentdb.ui.main.fragment_cradle.SectionsPagerAda
 import java.util.Arrays;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+import static com.squorpikkor.app.adjustmentdb.BuildConfig.VERSION_NAME;
+
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     public static final String TAG = "tag";
     MainViewModel mViewModel;
     TextView location;
+    TextView locationText;
+    TextView emailText;
+    TextView version;
     private static final int RC_SIGN_IN = 1;
     TabLayout tabs;
+    DrawerLayout drawer_layout;
+    NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,24 +54,35 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(sectionsPagerAdapter);
         viewPager.setCurrentItem(1);
 
+        drawer_layout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
         tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
         setupTabIcons();
 
         location = findViewById(R.id.location);
 
-        final MutableLiveData<String> profileName = mViewModel.getLocation_id();
-        profileName.observe(this, s -> {
-            if (profileName.getValue() != null) {
-                mViewModel.setSelectedProfile(profileName.getValue());
-            }
+        View headerView = navigationView.getHeaderView(0);
+        version = headerView.findViewById(R.id.version);
+        String appName = getString(R.string.app_name);
+        version.setText(String.format("%s %s", appName, VERSION_NAME));
+        locationText = headerView.findViewById(R.id.location_text);
+        emailText = headerView.findViewById(R.id.email_text);
 
+        final MutableLiveData<String> locationId = mViewModel.getLocation_id();
+        locationId.observe(this, s -> {
+            if (locationId.getValue() != null) {
+                mViewModel.setStatesForLocation(locationId.getValue());
+            }
         });
 
         final MutableLiveData<String> locationName = mViewModel.getLocationName();
         locationName.observe(this, s -> {
             if (locationName.getValue() != null) {
                 location.setText(locationName.getValue());
+                locationText.setText(locationName.getValue());
             }
         });
 
@@ -106,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
                 // Successfully signed in
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if (user != null && user.getEmail() != null) {
-                    //todo//textEmail.setText(user.getEmail());
+                    emailText.setText(user.getEmail());
                     mViewModel.getLocationIdByEMail(user.getEmail());
                     mViewModel.setFirebaseUser(user);
                 }
@@ -117,6 +142,21 @@ public class MainActivity extends AppCompatActivity {
                 // ...
             }
         }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        item.setCheckable(false);
+        int id = item.getItemId();
+        if (id == R.id.first) {
+            Log.e(TAG, "onNavigationItemSelected: FIRST");
+        } else if (id == R.id.second) {
+            Log.e(TAG, "onNavigationItemSelected: SECOND");
+        } else if (id == R.id.third) {
+            Log.e(TAG, "onNavigationItemSelected: THIRD");
+        }
+        drawer_layout.closeDrawer(GravityCompat.START);
+        return true;
     }
 
 }
