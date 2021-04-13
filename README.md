@@ -12,7 +12,7 @@
 
 [Список версий](./VERSION.md)
 
-[Скачать .apk последней версии - 1.27](./AdjustmentDB-v1.27.apk)
+[Скачать .apk последней версии - 1.31](./AdjustmentDB-v1.31.apk)
 
 
 ![alt tag](fon.png)
