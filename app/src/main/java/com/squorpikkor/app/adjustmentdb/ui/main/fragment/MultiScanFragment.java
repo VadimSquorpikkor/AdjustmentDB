@@ -22,6 +22,7 @@ import com.squorpikkor.app.adjustmentdb.ui.main.adapter.FoundUnitAdapter;
 import java.util.ArrayList;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_MULTI;
 
 public class MultiScanFragment extends Fragment {
 
@@ -79,6 +80,7 @@ public class MultiScanFragment extends Fragment {
         super.onResume();
         surfaceView.setVisibility(View.VISIBLE);
         mViewModel.getMultiScanner().initialiseDetectorsAndSources();
+        mViewModel.setBackPressCommand(BACK_PRESS_MULTI);
     }
 
     @Override

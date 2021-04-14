@@ -7,13 +7,14 @@
 
         <item
             android:id="@+id/first"
-            android:icon="@drawable/common_full_open_on_phone"
-            android:title="First" />
+            android:icon="@drawable/fui_ic_anonymous_white_24dp"
+            android:title="Поменять аккаунт"/>
         <item
             android:id="@+id/second"
             android:title="Second" />
         <item
             android:id="@+id/third"
-            android:title="Third" />
+            android:icon="@drawable/ic_baseline_meeting_room_24"
+            android:title="Выйти" />
     </group>
 </menu>

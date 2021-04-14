@@ -23,4 +23,9 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:textSize">11sp</item>
     </style>
+
+    <style name="NavigationDrawerStyle">
+        <item name="android:textSize">11sp</item>
+    </style>
+
 </resources>

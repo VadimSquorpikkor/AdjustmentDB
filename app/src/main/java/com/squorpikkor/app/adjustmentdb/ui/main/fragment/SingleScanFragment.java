@@ -26,6 +26,8 @@ import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialogNew;
 import java.util.ArrayList;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_SINGLE;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_STATES;
 
 public class SingleScanFragment extends Fragment {
 
@@ -94,6 +96,9 @@ public class SingleScanFragment extends Fragment {
             recyclerUnitsStates.setAdapter(statesAdapter);
         });
 
+        final MutableLiveData<Boolean> restartScanning = mViewModel.getRestartScanning();
+        restartScanning.observe(this, this::restartScanning);
+
         mViewModel.startSingleScanner(getActivity(), surfaceView);
 
         location = mViewModel.getLocationName().getValue();
@@ -101,10 +106,22 @@ public class SingleScanFragment extends Fragment {
         return view;
     }
 
+    private void restartScanning(boolean state) {
+        if (state) {
+            states.clear();
+            surfaceView.setVisibility(View.VISIBLE);
+            infoLayout.setVisibility(View.GONE);
+            mViewModel.startSingleScanner(getActivity(), surfaceView);
+            mViewModel.getSingleScanner().initialiseDetectorsAndSources();
+        }
+    }
+
     private void insertDataToFields(DUnit unit) {
         addNewStateButton.setVisibility(View.VISIBLE);
         infoLayout.setVisibility(View.VISIBLE);
         surfaceView.setVisibility(View.INVISIBLE);
+
+        mViewModel.setBackPressCommand(BACK_PRESS_STATES);
 
         Log.e(TAG, "insertDataToFields: "+unit.getId());
         //todo это всё должно браться из viewModel
@@ -144,6 +161,7 @@ public class SingleScanFragment extends Fragment {
         super.onResume();
         surfaceView.setVisibility(View.VISIBLE);
         mViewModel.getSingleScanner().initialiseDetectorsAndSources();
+        mViewModel.setBackPressCommand(BACK_PRESS_SINGLE);
     }
 
     @Override

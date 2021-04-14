@@ -1,6 +1,8 @@
 package com.squorpikkor.app.adjustmentdb.ui.main;
 
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.SurfaceView;
 
 import androidx.lifecycle.MutableLiveData;
@@ -92,6 +94,13 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     private static final String SPLIT_SYMBOL = " ";
     private static final String REPAIR_UNIT = "Ремонт";
 
+//--------------------------------------------------------------------------------------------------
+
+    public static final String BACK_PRESS_SEARCH = "back_press_search";
+    public static final String BACK_PRESS_SINGLE = "back_press_single";
+    public static final String BACK_PRESS_STATES = "back_press_states";
+    public static final String BACK_PRESS_MULTI = "back_press_multi";
+
     private final FireDBHelper dbh;
     private final MutableLiveData<ArrayList<DUnit>> serialUnitsList;
     private final MutableLiveData<ArrayList<DUnit>> repairsUnitsList;
@@ -114,6 +123,10 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     private final MutableLiveData<String> email;
 
     private final MutableLiveData<String> barcodeText;
+    private final MutableLiveData<Drawable> userImage;
+    private final MutableLiveData<Boolean> startExit;
+    private final MutableLiveData<Boolean> goToSearchTab;
+    private final MutableLiveData<Boolean> restartScanning;
 
     private FirebaseUser user;
 
@@ -139,6 +152,10 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         serialStatesNames = new MutableLiveData<>();
         repairStatesNames = new MutableLiveData<>();
         email = new MutableLiveData<>();
+        userImage = new MutableLiveData<>();
+        startExit = new MutableLiveData<>();
+        goToSearchTab = new MutableLiveData<>();
+        restartScanning = new MutableLiveData<>();
     }
 
     /**Выбрать профиль (сборка, регулировка...). При смене профиля обновляем лисенеры для имен
@@ -248,7 +265,44 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         return email;
     }
 
+    public MutableLiveData<Drawable> getUserImage() {
+        return userImage;
+    }
 
+    public void updateUserImage(Drawable img) {
+        userImage.setValue(img);
+    }
+
+    public MutableLiveData<Boolean> getStartExit() {
+        return startExit;
+    }
+
+    public MutableLiveData<Boolean> getGoToSearchTab() {
+        return goToSearchTab;
+    }
+
+    public MutableLiveData<Boolean> getRestartScanning() {
+        return restartScanning;
+    }
+
+    private String backPressCommand;
+
+    public String getBackPressCommand() {
+        return backPressCommand;
+    }
+
+    public void setBackPressCommand(String backPressCommand) {
+        Log.e("TAG", "♦ setBackPressCommand: "+backPressCommand);
+        this.backPressCommand = backPressCommand;
+    }
+
+    public void getBack() {
+        Log.e("TAG", "getBack: " + backPressCommand);
+        if (backPressCommand.equals(BACK_PRESS_SEARCH)) startExit.setValue(true);
+        if (backPressCommand.equals(BACK_PRESS_SINGLE)) goToSearchTab.setValue(true);
+        if (backPressCommand.equals(BACK_PRESS_MULTI)) goToSearchTab.setValue(true);
+        if (backPressCommand.equals(BACK_PRESS_STATES)) restartScanning.setValue(true);
+    }
 
     public void updateSelectedUnit(DUnit newUnit) {
 //        selectedUnit.postValue(newUnit);
@@ -300,7 +354,6 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     }
 
     public void startSingleScanner(Activity activity, SurfaceView surfaceView) {
-        //todo ? if(singleScanner==null) ?
         singleScanner = new Scanner(activity, false, this, surfaceView);
     }
 

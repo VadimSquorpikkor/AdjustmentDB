@@ -70,6 +70,8 @@ public class SelectStateDialogNew extends Dialog {
             dismiss();
         });
 
+
+
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<String> stateAdapter = new ArrayAdapter<>(context,
                 android.R.layout.simple_spinner_item, stateList);
