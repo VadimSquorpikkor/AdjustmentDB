@@ -31,7 +31,7 @@ public class Scanner {
     private final SurfaceView surfaceView;
     private CameraSource cameraSource;
     private String intentData = "";
-    private final HashSet<String> dataSet;
+    private HashSet<String> dataSet;
 
     public Scanner(Activity context, boolean isMultiScan, ScannerDataShow scannerDataShow, SurfaceView surfaceView) {
         this.context = context;
@@ -121,7 +121,11 @@ public class Scanner {
         if (cameraSource!=null){
             cameraSource.release();
             cameraSource.stop();
+            clearFoundedBarcodes();
         }
+    }
 
+    public void clearFoundedBarcodes() {
+        dataSet = new HashSet<>();
     }
 }

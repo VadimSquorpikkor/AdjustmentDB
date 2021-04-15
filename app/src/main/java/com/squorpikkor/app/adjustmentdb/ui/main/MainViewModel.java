@@ -19,6 +19,7 @@ import java.util.Date;
 
 import io.grpc.android.BuildConfig;
 
+import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.ui.main.scanner.Encrypter.decodeMe;
 
 /**
@@ -83,8 +84,6 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     public static final String TYPE_REPAIR = "repair_type";
     public static final String TYPE_SERIAL = "serial_type";
 
-
-
     public static final String EMPTY_LOCATION_ID = "empty_location_id";
     public static final String EMPTY_LOCATION_NAME = "Локация не найдена";
 //--------------------------------------------------------------------------------------------------
@@ -92,13 +91,13 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     public static final String REPAIR_TYPE = "repair_type";
 
     private static final String SPLIT_SYMBOL = " ";
-    private static final String REPAIR_UNIT = "Ремонт";
-
+    public static final String REPAIR_UNIT = "Ремонт";
 //--------------------------------------------------------------------------------------------------
 
     public static final String BACK_PRESS_SEARCH = "back_press_search";
     public static final String BACK_PRESS_SINGLE = "back_press_single";
     public static final String BACK_PRESS_STATES = "back_press_states";
+    public static final String BACK_PRESS_MULTI_STATES = "back_press_multi_states";
     public static final String BACK_PRESS_MULTI = "back_press_multi";
 
     private final FireDBHelper dbh;
@@ -107,30 +106,26 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     private final MutableLiveData<DUnit> selectedUnit;
 
     private final MutableLiveData<ArrayList<String>> devicesList;
-
     private final MutableLiveData<ArrayList<String>> serialStateIdList;
     private final MutableLiveData<ArrayList<String>> repairStateIdList;
     private final MutableLiveData<ArrayList<String>> serialStatesNames;
     private final MutableLiveData<ArrayList<String>> repairStatesNames;
 
     private final MutableLiveData<ArrayList<DEvent>> unitStatesList;
-
     private final MutableLiveData<ArrayList<DUnit>> foundUnitsList;
 
     private final MutableLiveData<String> location_id;
     private final MutableLiveData<String> locationName;
-
     private final MutableLiveData<String> email;
-
     private final MutableLiveData<String> barcodeText;
     private final MutableLiveData<Drawable> userImage;
     private final MutableLiveData<Boolean> startExit;
     private final MutableLiveData<Boolean> goToSearchTab;
     private final MutableLiveData<Boolean> restartScanning;
+    private final MutableLiveData<Boolean> restartMultiScanning;
 
     private FirebaseUser user;
 
-    private final ArrayList<DUnit> unitList;
     Scanner singleScanner;
     Scanner multiScanner;
 
@@ -148,7 +143,6 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         locationName = new MutableLiveData<>();
         barcodeText = new MutableLiveData<>();
         addDevTypeTableListener();
-        unitList = new ArrayList<>();
         serialStatesNames = new MutableLiveData<>();
         repairStatesNames = new MutableLiveData<>();
         email = new MutableLiveData<>();
@@ -156,6 +150,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         startExit = new MutableLiveData<>();
         goToSearchTab = new MutableLiveData<>();
         restartScanning = new MutableLiveData<>();
+        restartMultiScanning = new MutableLiveData<>();
     }
 
     /**Выбрать профиль (сборка, регулировка...). При смене профиля обновляем лисенеры для имен
@@ -285,27 +280,31 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         return restartScanning;
     }
 
-    private String backPressCommand;
-
-    public String getBackPressCommand() {
-        return backPressCommand;
+    public MutableLiveData<Boolean> getRestartMultiScanning() {
+        return restartMultiScanning;
     }
 
+    public void restartMultiScanning() {
+        foundUnitsList.setValue(new ArrayList<>());
+        restartMultiScanning.postValue(true);
+        multiScanner.clearFoundedBarcodes();
+    }
+
+    private String backPressCommand;
+
     public void setBackPressCommand(String backPressCommand) {
-        Log.e("TAG", "♦ setBackPressCommand: "+backPressCommand);
         this.backPressCommand = backPressCommand;
     }
 
     public void getBack() {
-        Log.e("TAG", "getBack: " + backPressCommand);
         if (backPressCommand.equals(BACK_PRESS_SEARCH)) startExit.setValue(true);
         if (backPressCommand.equals(BACK_PRESS_SINGLE)) goToSearchTab.setValue(true);
         if (backPressCommand.equals(BACK_PRESS_MULTI)) goToSearchTab.setValue(true);
         if (backPressCommand.equals(BACK_PRESS_STATES)) restartScanning.setValue(true);
+        if (backPressCommand.equals(BACK_PRESS_MULTI_STATES)) restartMultiScanning();
     }
 
     public void updateSelectedUnit(DUnit newUnit) {
-//        selectedUnit.postValue(newUnit);
         selectedUnit.setValue(newUnit);
     }
 
@@ -358,15 +357,26 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     }
 
     public void startMultiScanner(Activity activity, SurfaceView surfaceView) {
+        Log.e(TAG, "******************************startMultiScanner: ");
+        /*if (multiScanner==null)*/
         multiScanner = new Scanner(activity, true, this, surfaceView);
+    }
+
+    /**Распознанный мультисканером юнит был помещене в коллекцию. Метод получает этот юнит и
+     * проверяет наличие в БД. Если такой есть, то обновляет его данные. Из листа берет размер
+     * листа -1, т.е. позицию этого элемента (когда он только добавлен, то он последний).
+     * В момент когда данные юнита обновлены, он может быть и не последний, но его позиция сохранена*/
+    public void getThisListUnitFromDB(DUnit unit, MutableLiveData<ArrayList<DUnit>> list) {
+        dbh.getUnitById(unit.getId(), list,  list.getValue().size()-1);
     }
 
     @Override
         public void addUnitToCollection(String s) {
         DUnit unit = getDUnitFromString(s);
         if (unit!=null){
-            unitList.add(unit);
-            getFoundUnitsList().setValue(unitList);
+            if (foundUnitsList.getValue()==null) foundUnitsList.setValue(new ArrayList<>());
+            foundUnitsList.getValue().add(unit);
+            getThisListUnitFromDB(unit, foundUnitsList);
         }
     }
 

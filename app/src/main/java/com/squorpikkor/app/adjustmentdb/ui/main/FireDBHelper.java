@@ -123,6 +123,36 @@ class FireDBHelper {
                 });
     }
 
+    void getUnitById(String id, MutableLiveData<ArrayList<DUnit>> list, int position) {
+        db.collection(TABLE_UNITS)
+                .whereEqualTo(UNIT_ID, id)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        if (querySnapshot == null || querySnapshot.size() == 0) return;
+                        DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
+                        MutableLiveData<ArrayList<DUnit>> newList = new MutableLiveData<>();
+                        newList.setValue(list.getValue());
+
+                        DUnit unit = newList.getValue().get(position);
+                        unit.setDescription(String.valueOf(documentSnapshot.get(UNIT_DESCRIPTION)));
+                        unit.setName(String.valueOf(documentSnapshot.get(UNIT_DEVICE)));
+                        unit.setEmployee(String.valueOf(documentSnapshot.get(UNIT_EMPLOYEE)));
+                        unit.setId(String.valueOf(documentSnapshot.get(UNIT_ID)));
+                        unit.setInnerSerial(String.valueOf(documentSnapshot.get(UNIT_INNER_SERIAL)));
+                        unit.setLocation(String.valueOf(documentSnapshot.get(UNIT_LOCATION)));
+                        unit.setSerial(String.valueOf(documentSnapshot.get(UNIT_SERIAL)));
+                        unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
+                        unit.setType(String.valueOf(documentSnapshot.get(UNIT_TYPE)));
+
+                        list.setValue(newList.getValue());
+                    } else {
+                        Log.e(TAG, "Error getting documents: ", task.getException());
+                    }
+                });
+    }
+
     //этот метод будет заменой getUnitById
     void getUnitById_EXP(String id, MutableLiveData<DUnit> selectedUnit) {
         db.collection(TABLE_UNITS)

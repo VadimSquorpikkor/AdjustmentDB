@@ -13,6 +13,9 @@ import com.squorpikkor.app.adjustmentdb.R;
 
 import java.util.ArrayList;
 
+import static com.squorpikkor.app.adjustmentdb.Utils.insertRightValue;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_UNIT;
+
 public class FoundUnitAdapter extends RecyclerView.Adapter<FoundUnitAdapter.FoundViewHolder>{
     private final ArrayList<DUnit> units;
 
@@ -29,18 +32,18 @@ public class FoundUnitAdapter extends RecyclerView.Adapter<FoundUnitAdapter.Foun
         return new FoundViewHolder(view);
     }
 
-
     @Override
     public void onBindViewHolder(@NonNull FoundViewHolder holder, int position) {
         DUnit unit = units.get(position);
-        holder.tType.setText(unit.getType());
-        if (unit.isRepairUnit()) {
-            holder.tFirst.setText(unit.getId());
-            holder.tSecond.setText("");
+        if (unit.isRepairUnit()) { //Ремонт r_0001 AT6130
+            holder.tFirst.setText(REPAIR_UNIT);
+            holder.tSecond.setText(insertRightValue(unit.getId()));
+            holder.tThird.setText(insertRightValue(unit.getName()));
         }
-        if (unit.isSerialUnit()) {
-            holder.tFirst.setText(unit.getName());
-            holder.tSecond.setText(unit.getInnerSerial());
+        if (unit.isSerialUnit()) { //AT6130 13245 123
+            holder.tFirst.setText(insertRightValue(unit.getName()));
+            holder.tSecond.setText(insertRightValue(unit.getInnerSerial()));
+            holder.tThird.setText(insertRightValue(unit.getSerial()));
         }
     }
 
@@ -51,15 +54,15 @@ public class FoundUnitAdapter extends RecyclerView.Adapter<FoundUnitAdapter.Foun
     }
 
     static class FoundViewHolder extends RecyclerView.ViewHolder {
-        private final TextView tType;
         private final TextView tFirst;
         private final TextView tSecond;
+        private final TextView tThird;
 
         public FoundViewHolder(@NonNull View itemView) {
             super(itemView);
-            tType = itemView.findViewById(R.id.textType);
-            tFirst = itemView.findViewById(R.id.textFirst);
-            tSecond = itemView.findViewById(R.id.textSecond);
+            tFirst = itemView.findViewById(R.id.textType);
+            tSecond = itemView.findViewById(R.id.textFirst);
+            tThird = itemView.findViewById(R.id.textSecond);
         }
     }
 }

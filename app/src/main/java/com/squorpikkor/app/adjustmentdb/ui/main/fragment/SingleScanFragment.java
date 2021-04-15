@@ -21,11 +21,12 @@ import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.StatesAdapter;
-import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialogNew;
+import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialogSingle;
 
 import java.util.ArrayList;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
+import static com.squorpikkor.app.adjustmentdb.Utils.insertRightValue;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_SINGLE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_STATES;
 
@@ -44,7 +45,6 @@ public class SingleScanFragment extends Fragment {
     private FloatingActionButton addNewStateButton;
     private SurfaceView surfaceView;
     private ConstraintLayout infoLayout;
-    public static final String EMPTY_VALUE = "- - -";
 
     public static SingleScanFragment newInstance() {
         return new SingleScanFragment();
@@ -137,22 +137,12 @@ public class SingleScanFragment extends Fragment {
         mViewModel.addSelectedUnitStatesListListener(unit);
     }
 
-    private String insertRightValue(String s) {
-        if (s==null||s.equals("")||s.equals("null")) return EMPTY_VALUE;
-        else return s;
-    }
-
 //    private void openUnitFragment(DUnit unit) {
 //
 //    }
 
     private void openStatesDialog() {
-        //Загружается тот список, тип прибора который загружен — ремонт или серия
-        ArrayList<String> rightList;
-        if (mViewModel.getSelectedUnit().getValue().isRepairUnit()) rightList = mViewModel.getRepairStatesNames().getValue();
-        else rightList = mViewModel.getSerialStatesNames().getValue();
-
-        SelectStateDialogNew dialog = new SelectStateDialogNew(getActivity(), mViewModel, rightList);
+        SelectStateDialogSingle dialog = new SelectStateDialogSingle(getActivity());
         dialog.show();
     }
 

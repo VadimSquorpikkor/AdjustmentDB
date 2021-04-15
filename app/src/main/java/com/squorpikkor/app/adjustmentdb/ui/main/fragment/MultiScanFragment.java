@@ -1,7 +1,6 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.fragment;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
@@ -19,10 +18,10 @@ import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.FoundUnitAdapter;
+import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialogMulti;
 import java.util.ArrayList;
-
-import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_MULTI;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_MULTI_STATES;
 
 public class MultiScanFragment extends Fragment {
 
@@ -32,6 +31,7 @@ public class MultiScanFragment extends Fragment {
     private ArrayList<DUnit> foundUnitsList;
     private SurfaceView surfaceView;
     private TextView foundCount;
+    private FoundUnitAdapter foundUnitAdapter;
 
     public static MultiScanFragment newInstance() {
         return new MultiScanFragment();
@@ -58,29 +58,51 @@ public class MultiScanFragment extends Fragment {
         foundUnits.observe(getViewLifecycleOwner(), s -> {
             foundUnitsList = foundUnits.getValue();
             foundCount.setText(String.valueOf(foundUnitsList.size()));
-            if (foundUnitsList.size()!=0) nextButton.setVisibility(View.VISIBLE);
-            FoundUnitAdapter foundUnitAdapter = new FoundUnitAdapter(foundUnitsList);
-            if (foundUnits.getValue() != null) Log.e(TAG, "♦ список найденных: " + foundUnits.getValue().size());
+            if (foundUnitsList.size() != 0) {
+                nextButton.setVisibility(View.VISIBLE);
+                mViewModel.setBackPressCommand(BACK_PRESS_MULTI_STATES);
+            } else {
+                mViewModel.setBackPressCommand(BACK_PRESS_MULTI);
+            }
+
+            foundUnitAdapter = new FoundUnitAdapter(foundUnitsList);
             recyclerFoundUnits.setLayoutManager(new LinearLayoutManager(getActivity()));
             recyclerFoundUnits.setAdapter(foundUnitAdapter);
         });
 
         nextButton.setOnClickListener(v -> {
-            //todo
+            SelectStateDialogMulti dialog = new SelectStateDialogMulti(getActivity());
+            dialog.show();
+//            mViewModel.goToSearch();
         });
+
+        final MutableLiveData<Boolean> restartMultiScanning = mViewModel.getRestartMultiScanning();
+        restartMultiScanning.observe(this, this::restartMultiScanning);
 
         mViewModel.startMultiScanner(getActivity(), surfaceView);
 
         return view;
     }
 
+    private void restartMultiScanning(Boolean state) {
+        if (state) {
+            nextButton.setVisibility(View.GONE);
+            foundUnitsList = new ArrayList<>();
+            surfaceView.setVisibility(View.VISIBLE);
+        }
+    }
 
     @Override
     public void onResume() {
         super.onResume();
         surfaceView.setVisibility(View.VISIBLE);
         mViewModel.getMultiScanner().initialiseDetectorsAndSources();
-        mViewModel.setBackPressCommand(BACK_PRESS_MULTI);
+        if (foundUnitsList!=null && foundUnitsList.size() != 0) {
+            nextButton.setVisibility(View.VISIBLE);
+            mViewModel.setBackPressCommand(BACK_PRESS_MULTI_STATES);
+        } else {
+            mViewModel.setBackPressCommand(BACK_PRESS_MULTI);
+        }
     }
 
     @Override
