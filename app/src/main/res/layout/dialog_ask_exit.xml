@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:background="@drawable/main_gradient">
+    >
+<!--    android:background="@drawable/main_gradient"-->
 
     <Button
         android:id="@+id/cancel_button"

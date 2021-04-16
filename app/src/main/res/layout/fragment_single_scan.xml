@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-
-
 
     <!--        android:background="@color/cardview_dark_background"-->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -21,7 +17,6 @@
         app:layout_constraintStart_toStartOf="@+id/surfaceViewS"
         app:layout_constraintTop_toTopOf="@+id/surfaceViewS">
 
-
         <TextView
             android:id="@+id/textViewType"
             android:layout_width="wrap_content"
@@ -31,7 +26,8 @@
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/db_info_layout" />
+            app:layout_constraintTop_toTopOf="@+id/db_info_layout"
+            tools:text="Серия" />
 
         <TextView
             android:id="@+id/textViewName"
@@ -53,7 +49,7 @@
             android:layout_margin="10dp"
             android:layout_marginStart="20dp"
             android:gravity="end"
-            android:text="Внутренний номер:"
+            android:text="@string/inner_serial"
             app:layout_constrainedWidth="true"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -79,7 +75,7 @@
             android:layout_margin="10dp"
             android:layout_marginStart="20dp"
             android:gravity="end"
-            android:text="Серийный номер:"
+            android:text="@string/serial_number"
             app:layout_constrainedWidth="true"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -105,7 +101,7 @@
             android:layout_margin="10dp"
             android:layout_marginStart="20dp"
             android:gravity="end"
-            android:text="Локация:"
+            android:text="@string/location"
             app:layout_constrainedWidth="true"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -131,7 +127,7 @@
             android:layout_margin="10dp"
             android:layout_marginStart="20dp"
             android:gravity="end"
-            android:text="id:"
+            android:text="@string/id"
             app:layout_constrainedWidth="true"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -150,6 +146,32 @@
             app:layout_constraintTop_toBottomOf="@+id/textLocation"
             tools:text="0005" />
 
+        <TextView
+            android:id="@+id/textViewEmployee"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_marginStart="20dp"
+            android:gravity="end"
+            android:text="@string/employee"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/textViewEmployeeValue"
+            app:layout_constraintTop_toBottomOf="@+id/textViewId" />
+
+        <TextView
+            android:id="@+id/textViewEmployeeValue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_marginEnd="20dp"
+            android:gravity="start"
+            app:layout_constraintLeft_toRightOf="@+id/textViewEmployee"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewId"
+            tools:text="Сериков" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
@@ -158,7 +180,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewIdValue" />
+            app:layout_constraintTop_toBottomOf="@+id/textViewEmployeeValue" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/addNewState"
@@ -167,6 +189,8 @@
             android:layout_margin="25dp"
             android:backgroundTint="@color/main_orange"
             android:clickable="true"
+            android:contentDescription="@string/add_state_button"
+            android:focusable="true"
             app:backgroundTint="#F44336"
             app:elevation="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -174,7 +198,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:rippleColor="#FFFFFF"
             app:srcCompat="@drawable/ic_baseline_add_24" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -192,14 +215,12 @@
         android:id="@+id/txtBarcodeValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
         android:layout_margin="5dp"
-
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="БДКГ-02 12345" />
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

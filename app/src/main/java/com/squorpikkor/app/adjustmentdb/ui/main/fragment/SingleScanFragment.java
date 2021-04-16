@@ -108,7 +108,7 @@ public class SingleScanFragment extends Fragment {
 
     private void restartScanning(boolean state) {
         if (state) {
-            states.clear();
+            if (states!=null) states.clear();
             surfaceView.setVisibility(View.VISIBLE);
             infoLayout.setVisibility(View.GONE);
             mViewModel.startSingleScanner(getActivity(), surfaceView);

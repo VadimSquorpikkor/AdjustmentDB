@@ -46,6 +46,7 @@ public class SelectStateDialogMulti extends Dialog {
         if (mViewModel.getFoundUnitsList().getValue().get(0).isRepairUnit()) rightList = mViewModel.getRepairStatesNames().getValue();
         else rightList = mViewModel.getSerialStatesNames().getValue();
 
+        //todo заменить ссылку на подписку
         ArrayList<String> nameList = mViewModel.getDevicesList().getValue();
 
         Button cancelButton = findViewById(R.id.cancel_button);

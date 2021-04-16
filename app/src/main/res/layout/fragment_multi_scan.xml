@@ -16,14 +16,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/found_count" />
 
-
     <TextView
         android:id="@+id/found_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:textColor="@color/main_orange"
-        android:textSize="33dp"
+        android:textSize="33sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="23" />
@@ -38,17 +37,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
     <Button
         android:id="@+id/button_next"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="NEXT"
+        android:text="@string/next"
         android:layout_margin="30dp"
-        android:background="@color/main_orange"
+        android:background="@drawable/button_shape_selector"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 <!--        android:background="@drawable/screen_button_selector"-->
+<!--        android:background="@color/main_orange"-->
 
     <TextView
         android:id="@+id/txtBarcodeValue"
@@ -56,11 +55,9 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:layout_margin="5dp"
-
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="БДКГ-02 12345" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
