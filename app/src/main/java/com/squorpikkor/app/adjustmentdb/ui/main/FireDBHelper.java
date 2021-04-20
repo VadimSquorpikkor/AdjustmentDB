@@ -61,10 +61,11 @@ class FireDBHelper {
         data.put(UNIT_INNER_SERIAL, unit.getInnerSerial());
         data.put(UNIT_LOCATION, unit.getLocation());
         data.put(UNIT_SERIAL, unit.getSerial());
-        data.put(UNIT_STATE, unit.getState());
+        /*if (!unit.getState().equals("")) */data.put(UNIT_STATE, unit.getState());
         data.put(UNIT_TYPE, unit.getType());
         db.collection(TABLE_UNITS)
                 .document(unit.getId())
+//                .update(data)
                 .set(data)
                 .addOnSuccessListener(aVoid -> Log.e(TAG, "DocumentSnapshot successfully written!"))
                 .addOnFailureListener(e -> Log.e(TAG, "Error writing document", e));
@@ -179,6 +180,12 @@ class FireDBHelper {
                 });
     }
 
+    /**
+     * Получаем лист String из БД и помещаем её в MutableLiveDate
+     * @param table имя таблицы (коллекции) из которой берем данные
+     * @param mList Mutable, в который помещаем найденные стринги
+     * @param fieldName поле таблицы, значение которой считываем в лист
+     */
     void getStringArrayFromDB(String table, MutableLiveData<ArrayList<String>> mList, String fieldName) {
         db.collection(table).get().addOnCompleteListener(task -> {
             ArrayList<String> list = new ArrayList<>();
@@ -187,17 +194,6 @@ class FireDBHelper {
             }
             mList.setValue(list);
         });
-    }
-
-    void getStringArrayFromDB(String table, String document, String table2, MutableLiveData<ArrayList<String>> mList, String fieldName) {
-        db.collection(table).document(document).collection(table2).get().addOnCompleteListener(task -> {
-            ArrayList<String> list = new ArrayList<>();
-            for (DocumentSnapshot document1 : task.getResult()) {
-                list.add(document1.get(fieldName).toString());
-                /////mList.getValue().add(document.get(fieldName).toString());
-            }
-            mList.setValue(list);
-        }).addOnFailureListener(e -> Log.e(TAG, "onFailure: "+e));
     }
 
     /**Слушатель для новых событий у выбранного юнита. Слушает всю коллекцию событий и при новом
@@ -233,15 +229,6 @@ class FireDBHelper {
                         Log.e(TAG, "Error - " + task.getException());
                     }
                 });
-    }
-
-
-
-    void addStringArrayListener(String table, String document, String table2, MutableLiveData<ArrayList<String>> mList, String fieldName) {
-        db.collection(table).document(document).collection(table2).addSnapshotListener((queryDocumentSnapshots, error) -> {
-            //getStringFromDB(table, s);
-            getStringArrayFromDB(table, document, table2, mList, fieldName);
-        });
     }
 
     /**

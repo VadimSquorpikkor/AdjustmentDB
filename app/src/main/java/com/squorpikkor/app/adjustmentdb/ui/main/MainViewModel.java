@@ -110,6 +110,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     private final MutableLiveData<ArrayList<String>> repairStateIdList;
     private final MutableLiveData<ArrayList<String>> serialStatesNames;
     private final MutableLiveData<ArrayList<String>> repairStatesNames;
+    private final MutableLiveData<ArrayList<String>> employeeNamesList;
 
     private final MutableLiveData<ArrayList<DEvent>> unitStatesList;
     private final MutableLiveData<ArrayList<DUnit>> foundUnitsList;
@@ -151,6 +152,8 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         goToSearchTab = new MutableLiveData<>();
         restartScanning = new MutableLiveData<>();
         restartMultiScanning = new MutableLiveData<>();
+        employeeNamesList = new MutableLiveData<>();
+        addEmployeeNamesListener();
     }
 
     /**Выбрать профиль (сборка, регулировка...). При смене профиля обновляем лисенеры для имен
@@ -203,6 +206,10 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
      * юнита (т.е. только те, которые принадлежат этому юниту)*/
     public void addSelectedUnitStatesListListener(DUnit unit) {
         dbh.addSelectedUnitListener(unit.getId(), unitStatesList);
+    }
+
+    void addEmployeeNamesListener() {
+        dbh.getStringArrayFromDB(TABLE_EMPLOYEES, employeeNamesList, EMPLOYEE_NAME);
     }
 
 //--------------------------------------------------------------------------------------------------
@@ -282,6 +289,10 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
     public MutableLiveData<Boolean> getRestartMultiScanning() {
         return restartMultiScanning;
+    }
+
+    public MutableLiveData<ArrayList<String>> getEmployeeNamesList() {
+        return employeeNamesList;
     }
 
     public void restartMultiScanning() {

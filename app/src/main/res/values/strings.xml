@@ -3,9 +3,9 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_main_temp">MainActivityTemp</string>
-    <string name="tab_text_1">Single\nscan</string>
-    <string name="tab_text_2">Search in DB</string>
-    <string name="tab_text_3">Multi scan</string>
+<!--    <string name="tab_text_1">Single\nscan</string>-->
+<!--    <string name="tab_text_2">Search in DB</string>-->
+<!--    <string name="tab_text_3">Multi scan</string>-->
     <string name="add_states">Добавить новый статус для устройств:</string>
     <string name="add_type">Добавить тип устройства:</string>
     <string name="add_description">Добавить описание</string>
@@ -13,14 +13,24 @@
     <string name="ok">ОК</string>
     <string name="add_state">Добавить новый статус для устройства:</string>
     <string name="next">Дальше</string>
-    <string name="inner_serial">Внутренний номер:</string>
-    <string name="serial_number">Серийный номер:</string>
-    <string name="location">Локация:</string>
-    <string name="id">id:</string>
-    <string name="employee">Ответственный:</string>
+
+    <string name="inner_serial_doted">Внутренний номер:</string>
+    <string name="serial_number_doted">Серийный номер:</string>
+    <string name="id_doted">id:</string>
+    <string name="identifier">Идентификатор:</string>
+    <string name="employee_doted">Ответственный:</string>
+    <string name="location_doted">Локация:</string>
+    <string name="add_state_doted">Добавить статус:</string>
+
+    <string name="inner_serial">Внутренний номер</string>
+    <string name="serial_number">Серийный номер</string>
+    <string name="id">id</string>
+    <string name="employee">Ответственный</string>
+    <string name="location">Локация</string>
+
     <string name="add_state_button">Добавить статус</string>
 
-    <!--    <string name="tab_text_1">Одиночное\nсканирование</string>-->
-    <!--    <string name="tab_text_2">Поиск\nустройства</string>-->
-    <!--    <string name="tab_text_3">Множественное\nсканирование</string>-->
+        <string name="tab_text_1">Одиночное\nсканирование</string>
+        <string name="tab_text_2">Поиск\nустройства</string>
+        <string name="tab_text_3">Множественное\nсканирование</string>
 </resources>
