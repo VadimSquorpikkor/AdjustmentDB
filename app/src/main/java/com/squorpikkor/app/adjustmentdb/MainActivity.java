@@ -78,7 +78,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
-        setupTabIcons();
+
+        //CustomView
+        tabs.getTabAt(0).setCustomView(R.layout.tab_view_0);
+        tabs.getTabAt(1).setCustomView(R.layout.tab_view_1);
+        tabs.getTabAt(2).setCustomView(R.layout.tab_view_2);
+
+        //Для варианта без customView
+        //setupTabIcons();
 
         location = findViewById(R.id.location);
 
@@ -192,8 +199,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
         if (id == R.id.first) {
             reSignIn();
-        } else if (id == R.id.second) {
-            Log.e(TAG, "onNavigationItemSelected: SECOND");
         } else if (id == R.id.third) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 this.finishAndRemoveTask();

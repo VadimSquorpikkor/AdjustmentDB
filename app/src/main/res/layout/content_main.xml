@@ -4,9 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tool="http://schemas.android.com/tools"
-    android:id="@+id/constraintLayout">
+    android:id="@+id/constraintLayout"
+    >
 
     <!--        app:tabInlineLabel="true" чтобы и иконки и текст были в одну линию-->
+
+
+<!--        style="@style/myTabs"-->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabs"
         app:tabTextAppearance="@style/all_caps_false"
@@ -25,6 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tool:text="Регулировка"
+        android:layout_margin="10dp"
         android:textSize="18sp"
         android:textColor="@color/main_orange"
         app:layout_constraintEnd_toEndOf="parent"

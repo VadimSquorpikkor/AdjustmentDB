@@ -66,4 +66,10 @@
         <item name="android:textColor">@color/main_orange</item>
     </style>
 
+    <style name="myTabs" parent="android:TextAppearance.Medium">
+        <item name="android:typeface">monospace</item>
+        <item name="android:singleLine">false</item>
+        <item name="android:maxLines">2</item>
+    </style>
+
 </resources>

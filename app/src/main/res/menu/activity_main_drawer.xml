@@ -10,9 +10,6 @@
             android:icon="@drawable/fui_ic_anonymous_white_24dp"
             android:title="Поменять аккаунт"/>
         <item
-            android:id="@+id/second"
-            android:title="Second" />
-        <item
             android:id="@+id/third"
             android:icon="@drawable/ic_baseline_meeting_room_24"
             android:title="Выйти" />
