@@ -8,6 +8,24 @@
     android:padding="5dp"
     android:layout_margin="20dp">
 
+    <TextView
+        style="@style/dialogTextLabel"
+        android:id="@+id/dialogNewNameLabel"
+        android:text="@string/add_type"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/newName"
+        />
+
+    <Spinner
+        android:id="@+id/newName"
+        style="@style/dialogSpinner"
+        android:layout_width="0dp"
+        android:layout_marginStart="5dp"
+        android:textSize="20sp"
+        android:textColor="@color/main_orange"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/dialogNewNameLabel"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/dName"
@@ -19,7 +37,7 @@
         android:textColor="@color/main_orange"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/newName" />
 
     <TextView
         style="@style/dialogTextLabel"

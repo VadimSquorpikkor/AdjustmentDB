@@ -20,6 +20,7 @@ import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static com.squorpikkor.app.adjustmentdb.Utils.insertRightValue;
 import static com.squorpikkor.app.adjustmentdb.Utils.isEmptyOrNull;
@@ -44,58 +45,74 @@ public class SelectStateDialogSingle extends Dialog {
 
         //Загружается тот список, тип прибора который загружен — ремонт или серия
         ArrayList<String> rightList;
-        if (mViewModel.getSelectedUnit().getValue().isRepairUnit())
-            rightList = mViewModel.getRepairStatesNames().getValue();
-        else rightList = mViewModel.getSerialStatesNames().getValue();
+        if (Objects.requireNonNull(mViewModel.getSelectedUnit().getValue()).isRepairUnit())
+            rightList = new ArrayList<>(Objects.requireNonNull(mViewModel.getRepairStatesNames().getValue()));
+        else
+            rightList = new ArrayList<>(Objects.requireNonNull(mViewModel.getSerialStatesNames().getValue()));
         rightList.add(0, "");
 
-        ArrayList<String> employeeList = mViewModel.getEmployeeNamesList().getValue();
+        ArrayList<String> employeeList = new ArrayList<>(Objects.requireNonNull(mViewModel.getEmployeeNamesList().getValue()));
         employeeList.add(0, "");//Добавляю пустой элемент в начало списка
+
+        ArrayList<String> devIdList = new ArrayList<>(Objects.requireNonNull(mViewModel.getDeviceIdList().getValue()));
+        devIdList.add(0, "");
 
         Button cancelButton = findViewById(R.id.cancel_button);
         Button okButton = findViewById(R.id.ok_button);
         EditText description = findViewById(R.id.description);
         Spinner spinner = findViewById(R.id.state_spinner);
+        Spinner employee = findViewById(R.id.state_spinner_employee);
+        Spinner devices = findViewById(R.id.newName);
         TextView tName = findViewById(R.id.dName);
         EditText inner = findViewById(R.id.dInner);
         EditText eSerial = findViewById(R.id.dSerial);
-        Spinner employee = findViewById(R.id.state_spinner_employee);
 
+        TextView labelDevices = findViewById(R.id.dialogNewNameLabel);
         TextView labelInner = findViewById(R.id.dialogInnerLabel);
         TextView labelSerial = findViewById(R.id.dialogSerialLabel);
         TextView labelEmployee = findViewById(R.id.dialogEmployeeLabel);
 
+        devices.setVisibility(View.GONE);
+        tName.setVisibility(View.GONE);
         inner.setVisibility(View.GONE);
         eSerial.setVisibility(View.GONE);
         employee.setVisibility(View.GONE);
 
+        labelDevices.setVisibility(View.GONE);
         labelInner.setVisibility(View.GONE);
         labelSerial.setVisibility(View.GONE);
         labelEmployee.setVisibility(View.GONE);
 
-        tName.setText(unit.getName());
-        //Если у юнита уже есть серийный или внутренний номер, то его уже нельзя поменять, поэтому я просто скрываю его
+        if (!isEmptyOrNull(unit.getName())) tName.setText(unit.getName());
+
+
+        //Если у юнита уже есть серийный или внутренний номер или имя или ответственный, то его уже нельзя поменять, поэтому я просто скрываю его
+        if (isEmptyOrNull(unit.getName())) {
+            devices.setVisibility(View.VISIBLE);
+            labelDevices.setVisibility(View.VISIBLE);
+        } else {
+            tName.setVisibility(View.VISIBLE);
+            tName.setText(unit.getName());
+        }
         if (isEmptyOrNull(unit.getInnerSerial())) {
             inner.setVisibility(View.VISIBLE);
             labelInner.setVisibility(View.VISIBLE);
-        }
+        } else
+            inner.setText(unit.getInnerSerial()); //смысл — если unit.getInnerSerial()==null, то и setText не нужно делать (иначе номер будет "null", а надо "")
         if (isEmptyOrNull(unit.getSerial())) {
             eSerial.setVisibility(View.VISIBLE);
             labelSerial.setVisibility(View.VISIBLE);
-        }
+        } else eSerial.setText(unit.getSerial());
         if (isEmptyOrNull(unit.getEmployee())) {
             employee.setVisibility(View.VISIBLE);
             labelEmployee.setVisibility(View.VISIBLE);
         }
 
-        inner.setText(unit.getInnerSerial());
-        eSerial.setText(unit.getSerial());
-
         cancelButton.setOnClickListener(view -> dismiss());
 
         okButton.setOnClickListener(view -> {
             String id = unit.getId();
-            String name = unit.getName();
+            String name = insertRightValue(unit.getName(), devices.getSelectedItem().toString());
             String innerSerial = insertRightValue(unit.getInnerSerial(), inner.getText().toString());
             String serial = insertRightValue(unit.getSerial(), eSerial.getText().toString());
             String state = "";
@@ -105,12 +122,10 @@ public class SelectStateDialogSingle extends Dialog {
                 int position;
                 if (unit.isRepairUnit()) {
                     position = mViewModel.getRepairStatesNames().getValue().indexOf(state);
-                    position--;//отнимаю 1, потому как в rightList добавлена первым элементом пустая строка
                     state_id = mViewModel.getRepairStateIdList().getValue().get(position);
                 }
                 if (unit.isSerialUnit()) {
                     position = mViewModel.getSerialStatesNames().getValue().indexOf(state);
-                    position--;//отнимаю 1, потому как в rightList добавлена первым элементом пустая строка
                     state_id = mViewModel.getSerialStateIdList().getValue().get(position);
                 }
             } else {
@@ -120,23 +135,25 @@ public class SelectStateDialogSingle extends Dialog {
             String desc = description.getText().toString();
             String type = unit.getType();
             String location = mViewModel.getLocation_id().getValue();
-//            mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, unit.getState(), desc, type, location), state_id);
-            mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state_id, desc, type, location));
+//            mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state_id, desc, type, location));
+            mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state_id, desc, type, location), unit.getState());
             dismiss();
         });
 
         // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<String> stateAdapter = new ArrayAdapter<>(context,
-                android.R.layout.simple_spinner_item, rightList);
+        ArrayAdapter<String> stateAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, rightList);
         // Specify the layout to use when the list of choices appears
         stateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         spinner.setAdapter(stateAdapter);
 
-        ArrayAdapter<String> employeeAdapter = new ArrayAdapter<>(context,
-                android.R.layout.simple_spinner_item, employeeList);
+        ArrayAdapter<String> employeeAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, employeeList);
         employeeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         employee.setAdapter(employeeAdapter);
+
+        ArrayAdapter<String> deviceAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, devIdList);
+        deviceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        devices.setAdapter(deviceAdapter);
     }
 
 }

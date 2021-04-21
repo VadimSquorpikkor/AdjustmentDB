@@ -14,6 +14,8 @@
     <string name="add_state">Добавить новый статус для устройства:</string>
     <string name="next">Дальше</string>
 
+
+    <string name="device_type_doted">Тип устройства:</string>
     <string name="inner_serial_doted">Внутренний номер:</string>
     <string name="serial_number_doted">Серийный номер:</string>
     <string name="id_doted">id:</string>
@@ -33,4 +35,6 @@
         <string name="tab_text_1">Одиночное\nсканирование</string>
         <string name="tab_text_2">Поиск\nустройства</string>
         <string name="tab_text_3">Множественное\nсканирование</string>
+    <string name="new_name">Название</string>
+    <string name="show">Показать</string>
 </resources>

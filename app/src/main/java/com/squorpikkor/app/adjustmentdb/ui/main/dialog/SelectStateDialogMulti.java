@@ -3,7 +3,6 @@ package com.squorpikkor.app.adjustmentdb.ui.main.dialog;
 import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -47,7 +46,7 @@ public class SelectStateDialogMulti extends Dialog {
         else rightList = mViewModel.getSerialStatesNames().getValue();
 
         //todo заменить ссылку на подписку
-        ArrayList<String> nameList = mViewModel.getDevicesList().getValue();
+        ArrayList<String> nameList = mViewModel.getDeviceNameList().getValue();
 
         Button cancelButton = findViewById(R.id.cancel_button);
         Button okButton = findViewById(R.id.ok_button);

@@ -5,7 +5,6 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_TYPE
 
 public class DUnit {
 
-
     private String id; //"0001"
     private String name; //БДКГ-02
     private String innerSerial; //№12345
@@ -16,7 +15,6 @@ public class DUnit {
     private String location;
     private String employee; //Фамилия ответственного
 
-    /**Конструктор без параметров нужен для работы с Firebase*/
     public DUnit() {
     }
 
@@ -31,14 +29,17 @@ public class DUnit {
         this.location = location;
     }
 
+    /**Возвращает true, если это ремонтное устройство*/
     public boolean isRepairUnit() {
         return type.equals(REPAIR_TYPE);
     }
 
+    /**Возвращает true, если это серийное устройство*/
     public boolean isSerialUnit() {
         return type.equals(SERIAL_TYPE);
     }
 
+    /**Имя последнего статуса устройства*/
     public String getState() {
         return state;
     }
@@ -47,6 +48,7 @@ public class DUnit {
         this.state = state;
     }
 
+    /**Имя устройства (БДКГ-02)*/
     public String getName() {
         return name;
     }
@@ -55,6 +57,7 @@ public class DUnit {
         this.name = name;
     }
 
+    /**Внутренний номер устройства*/
     public String getInnerSerial() {
         return innerSerial;
     }
@@ -63,6 +66,7 @@ public class DUnit {
         this.innerSerial = serial;
     }
 
+    /**Серийный номер устройства*/
     public String getSerial() {
         return serial;
     }
@@ -71,6 +75,7 @@ public class DUnit {
         this.serial = serial;
     }
 
+    /**Идентификатор устройства (для серии - AT6130_123, для ремонтных - r_0005)*/
     public String getId() {
         return id;
     }
@@ -79,6 +84,7 @@ public class DUnit {
         this.id = id;
     }
 
+    /**Тип устройства: серийный или ремонтный*/
     public String getType() {
         return type;
     }
@@ -87,6 +93,7 @@ public class DUnit {
         this.type = type;
     }
 
+    /**Описание (необязательный параметр)*/
     public String getDescription() {
         return description;
     }
@@ -95,6 +102,7 @@ public class DUnit {
         this.description = description;
     }
 
+    /**Имя последней локации (местонахождения) устройства*/
     public String getLocation() {
         return location;
     }
@@ -103,6 +111,7 @@ public class DUnit {
         this.location = location;
     }
 
+    /**Фамилия ответственного*/
     public String getEmployee() {
         return employee;
     }

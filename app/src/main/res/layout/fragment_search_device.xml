@@ -8,11 +8,12 @@
     >
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="20dp"
 
 
+        android:layout_margin="10dp"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,43 +23,69 @@
         android:id="@+id/constraintLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
+        android:layout_margin="10dp"
         android:background="@color/dark_grey"
         android:elevation="6dp"
+        android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
+        <TextView
+            style="@style/dialogTextLabel"
+            android:id="@+id/dialogNameLabel"
+            android:layout_marginStart="10dp"
+            android:text="@string/device_type_doted"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/spinner"
+            />
 
         <Spinner
             android:id="@+id/spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/dialogSpinner"
+            android:layout_width="0dp"
             android:layout_margin="20dp"
             app:layout_constraintBottom_toTopOf="@+id/spinner2"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toEndOf="@+id/dialogNameLabel"/>
+
+        <TextView
+            style="@style/dialogTextLabel"
+            android:id="@+id/dialogLocationLabel"
+            android:layout_marginStart="10dp"
+            android:text="@string/location_doted"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/spinner2"
+            />
 
         <Spinner
             android:id="@+id/spinner2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/dialogSpinner"
+            android:layout_width="0dp"
             android:layout_margin="20dp"
             app:layout_constraintBottom_toTopOf="@+id/spinner3"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toEndOf="@+id/dialogLocationLabel" />
+
+        <TextView
+            style="@style/dialogTextLabel"
+            android:id="@+id/dialogEmployeeLabel"
+            android:layout_marginStart="10dp"
+            android:text="@string/employee_doted"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/spinner3"/>
 
         <Spinner
             android:id="@+id/spinner3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/dialogSpinner"
+            android:layout_width="0dp"
             android:layout_margin="20dp"
             app:layout_constraintBottom_toTopOf="@+id/button2"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toEndOf="@+id/dialogEmployeeLabel" />
 
 <!--            android:background="@drawable/screen_button_selector"-->
-        <Button
+        <!--<Button
             style="@style/nice_button"
             android:id="@+id/button2"
             android:layout_height="28dp"
@@ -69,13 +96,22 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:elevation="6dp"
-            />
+            />-->
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/show"
+            android:elevation="6dp"
+            android:background="@drawable/button_shape_selector_reverced"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <RadioGroup
             android:id="@+id/radioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
             android:orientation="horizontal"
             app:layout_constraintBottom_toTopOf="@+id/spinner"
             app:layout_constraintEnd_toEndOf="parent"
@@ -105,5 +141,18 @@
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="30dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/recyclerView2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/logo_big_grayscale" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

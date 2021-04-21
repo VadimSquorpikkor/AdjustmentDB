@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_DATE;
@@ -87,6 +86,7 @@ class FireDBHelper {
     }
 
 
+    @SuppressWarnings("SameParameterValue")
     void addStringArrayListener(String table, MutableLiveData<ArrayList<String>> mList, String fieldName) {
         Log.e(TAG, "addStringArrayListener: ");
         db.collection(table).addSnapshotListener((queryDocumentSnapshots, error) -> {
@@ -124,7 +124,7 @@ class FireDBHelper {
                 });
     }
 
-    void getUnitById(String id, MutableLiveData<ArrayList<DUnit>> list, int position) {
+    void getUnitByIdAndAddToList(String id, MutableLiveData<ArrayList<DUnit>> list, int position) {
         db.collection(TABLE_UNITS)
                 .whereEqualTo(UNIT_ID, id)
                 .get()
@@ -154,6 +154,42 @@ class FireDBHelper {
                 });
     }
 
+    //todo поменять на этот вариант
+    void getUnitByIdAndAddToList_EXP(String id, MutableLiveData<ArrayList<DUnit>> list, int position) {
+        db.collection(TABLE_UNITS)
+                .document(id)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        if (documentSnapshot.exists()) {
+                            MutableLiveData<ArrayList<DUnit>> newList = new MutableLiveData<>();
+                            newList.setValue(list.getValue());
+
+                            DUnit unit = newList.getValue().get(position);
+                            unit.setDescription(String.valueOf(documentSnapshot.get(UNIT_DESCRIPTION)));
+                            unit.setName(String.valueOf(documentSnapshot.get(UNIT_DEVICE)));
+                            unit.setEmployee(String.valueOf(documentSnapshot.get(UNIT_EMPLOYEE)));
+                            unit.setId(String.valueOf(documentSnapshot.get(UNIT_ID)));
+                            unit.setInnerSerial(String.valueOf(documentSnapshot.get(UNIT_INNER_SERIAL)));
+                            unit.setLocation(String.valueOf(documentSnapshot.get(UNIT_LOCATION)));
+                            unit.setSerial(String.valueOf(documentSnapshot.get(UNIT_SERIAL)));
+                            unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
+                            unit.setType(String.valueOf(documentSnapshot.get(UNIT_TYPE)));
+
+                            list.setValue(newList.getValue());
+                        }
+                    } else {
+                        Log.e(TAG, "Error getting documents: ", task.getException());
+                    }
+                });
+    }
+
+    /**
+     * Получаем юнит из БД по его идентификатору
+     * @param id id юнита, которого нужно прочитать в БД
+     * @param selectedUnit MutableListData, в который записываем найденный юнит
+     */
     //этот метод будет заменой getUnitById
     void getUnitById_EXP(String id, MutableLiveData<DUnit> selectedUnit) {
         db.collection(TABLE_UNITS)
@@ -162,18 +198,22 @@ class FireDBHelper {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         DocumentSnapshot documentSnapshot = task.getResult();
-                        if (documentSnapshot == null) return;
-                        DUnit unit = new DUnit();
-                        unit.setDescription(String.valueOf(documentSnapshot.get(UNIT_DESCRIPTION)));
-                        unit.setName(String.valueOf(documentSnapshot.get(UNIT_DEVICE)));
-                        unit.setEmployee(String.valueOf(documentSnapshot.get(UNIT_EMPLOYEE)));
-                        unit.setId(String.valueOf(documentSnapshot.get(UNIT_ID)));
-                        unit.setInnerSerial(String.valueOf(documentSnapshot.get(UNIT_INNER_SERIAL)));
-                        unit.setLocation(String.valueOf(documentSnapshot.get(UNIT_LOCATION)));
-                        unit.setSerial(String.valueOf(documentSnapshot.get(UNIT_SERIAL)));
-                        unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
-                        unit.setType(String.valueOf(documentSnapshot.get(UNIT_TYPE)));
-                        selectedUnit.setValue(unit);
+                        //todo НЕ РАБОТАЛО С "if (documentSnapshot == null) return" только с "if (documentSnapshot.exists())", нужно проверить у других методов, как там работает
+                        if (documentSnapshot.exists()){
+                            DUnit unit = new DUnit();
+                            unit.setDescription(String.valueOf(documentSnapshot.get(UNIT_DESCRIPTION)));
+                            unit.setName(String.valueOf(documentSnapshot.get(UNIT_DEVICE)));
+                            unit.setEmployee(String.valueOf(documentSnapshot.get(UNIT_EMPLOYEE)));
+                            unit.setId(String.valueOf(documentSnapshot.get(UNIT_ID)));
+                            unit.setInnerSerial(String.valueOf(documentSnapshot.get(UNIT_INNER_SERIAL)));
+                            unit.setLocation(String.valueOf(documentSnapshot.get(UNIT_LOCATION)));
+                            unit.setSerial(String.valueOf(documentSnapshot.get(UNIT_SERIAL)));
+                            unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
+                            unit.setType(String.valueOf(documentSnapshot.get(UNIT_TYPE)));
+                            selectedUnit.setValue(unit);
+                        }
+                        else{ Log.e(TAG, "☻ getUnitById_EXP: NOT EXISTS");}
+                        ///if (documentSnapshot == null) return;
                     } else {
                         Log.e(TAG, "Error getting documents: ", task.getException());
                     }
@@ -199,9 +239,15 @@ class FireDBHelper {
     /**Слушатель для новых событий у выбранного юнита. Слушает всю коллекцию событий и при новом
      * событии загружает те, у которых "unit_id" равен id выбранного юнита. Другими словами
      * обновляет события выбранного юнита, если список событий изменился*/
-    void addSelectedUnitListener(String unit_id, MutableLiveData<ArrayList<DEvent>> unitStatesList) {
+    void addSelectedUnitStatesListener(String unit_id, MutableLiveData<ArrayList<DEvent>> unitStatesList) {
         db.collection(TABLE_EVENTS).addSnapshotListener((queryDocumentSnapshots, error) -> {
             getEventsFromDB(unit_id, unitStatesList);
+        });
+    }
+
+    void addSelectedUnitListener(DUnit unit, MutableLiveData<DUnit> mUnit) {
+        db.collection(TABLE_UNITS).document(unit.getId()).addSnapshotListener((queryDocumentSnapshots, error) -> {
+            getUnitById_EXP(unit.getId(), mUnit);
         });
     }
 
@@ -232,13 +278,13 @@ class FireDBHelper {
     }
 
     /**
-     *
-     * @param table
-     * @param mList
-     * @param param1
-     * @param value1
-     * @param param2
-     * @param value2
+     * Получение MutableLiveData<ArrayList<String>> из БД по 2-м параметрам
+     * @param table коллекция, по которой будет произведен поиск
+     * @param mList MutableLiveData в который будет записан найденный лист
+     * @param param1 имя параметра 1 (поля), по которому ведется поиск
+     * @param value1 значение параметра 1, по которому ведется поиск
+     * @param param2 имя параметра 2 (поля), по которому ведется поиск
+     * @param value2 значение параметра 2, по которому ведется поиск
      * @param fieldName это то поле, значение которого будет считываться в возвращаемый ArrayList<String>
      */
     void getStringArrayByParam(String table, MutableLiveData<ArrayList<String>> mList, String param1, String value1, String param2, String value2, String fieldName) {
@@ -255,7 +301,7 @@ class FireDBHelper {
     }
 
     /**
-     * Поиск по БД по параметру документа и запись результата поиска в Mutable<String>
+     * Поиск по БД по параметру документа и запись результата поиска в MutableLiveData<String>
      * @param table коллекция, по которой будет произведен поиск
      * @param byParamName имя параметра (поля), по которому ведется поиск
      * @param byValueName значение параметра, по которому ведется поиск
