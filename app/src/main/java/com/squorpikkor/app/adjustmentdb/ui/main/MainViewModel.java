@@ -20,6 +20,7 @@ import java.util.Date;
 import io.grpc.android.BuildConfig;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
+import static com.squorpikkor.app.adjustmentdb.Utils.getIdByName;
 import static com.squorpikkor.app.adjustmentdb.ui.main.scanner.Encrypter.decodeMe;
 
 /**
@@ -90,6 +91,8 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
     private static final String SPLIT_SYMBOL = " ";
     public static final String REPAIR_UNIT = "Ремонт";
+    public static final String ANY_VALUE = "any_value";
+    public static final String ANY_VALUE_TEXT = "";
 //--------------------------------------------------------------------------------------------------
 
     public static final String BACK_PRESS_SEARCH = "back_press_search";
@@ -100,7 +103,6 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
     private final FireDBHelper dbh;
     private final MutableLiveData<ArrayList<DUnit>> serialUnitsList;
-    private final MutableLiveData<ArrayList<DUnit>> repairsUnitsList;
     private final MutableLiveData<DUnit> selectedUnit;
 
     private final MutableLiveData<ArrayList<String>> deviceNameList;
@@ -110,9 +112,12 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     private final MutableLiveData<ArrayList<String>> serialStatesNames;
     private final MutableLiveData<ArrayList<String>> repairStatesNames;
     private final MutableLiveData<ArrayList<String>> employeeNamesList;
+    private final MutableLiveData<ArrayList<String>> employeeIdList;
+    private final MutableLiveData<ArrayList<String>> locationNamesList;
+    private final MutableLiveData<ArrayList<String>> locationIdList;
 
     private final MutableLiveData<ArrayList<DEvent>> unitStatesList;
-    private final MutableLiveData<ArrayList<DUnit>> foundUnitsList;
+    private final MutableLiveData<ArrayList<DUnit>> scannerFoundUnitsList;
 
     private final MutableLiveData<String> location_id;
     private final MutableLiveData<String> locationName;
@@ -131,18 +136,17 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
     public MainViewModel() {
         serialUnitsList = new MutableLiveData<>();
-        repairsUnitsList = new MutableLiveData<>();
         selectedUnit = new MutableLiveData<>();
         dbh = new FireDBHelper();
         deviceNameList = new MutableLiveData<>();
         serialStateIdList = new MutableLiveData<>();
         repairStateIdList = new MutableLiveData<>();
         unitStatesList = new MutableLiveData<>();
-        foundUnitsList = new MutableLiveData<>();
+        scannerFoundUnitsList = new MutableLiveData<>();
         location_id = new MutableLiveData<>();
         locationName = new MutableLiveData<>();
         barcodeText = new MutableLiveData<>();
-        addDevNamesTableListener();
+        addDeviceNameListener();
         serialStatesNames = new MutableLiveData<>();
         repairStatesNames = new MutableLiveData<>();
         email = new MutableLiveData<>();
@@ -154,7 +158,13 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         employeeNamesList = new MutableLiveData<>();
         addEmployeeNamesListener();
         deviceIdList = new MutableLiveData<>();
-        addDevIdTableListener();
+        addDeviceIdListener();
+        locationNamesList = new MutableLiveData<>();
+        locationIdList = new MutableLiveData<>();
+        addLocationNamesListener();
+        addLocationIdListener();
+        employeeIdList = new MutableLiveData<>();
+        addEmployeeIdListener();
     }
 
     /**
@@ -203,15 +213,24 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
 //----- LISTENERS ----------------------------------------------------------------------------------
 
+    //todo ВСЕ парные лисенеры (Name / Id) переделать в один лисенер, который будет отслеживать одну таблицу, а заполнять изменения в два MutableLiveData
     /**
      * Слушатель для таблицы имен приборов
      */
-    void addDevNamesTableListener() {
+    void addDeviceNameListener() {
         dbh.addStringArrayListener(TABLE_DEVICES, deviceNameList, DEVICE_NAME);
     }
 
-    void addDevIdTableListener() {
+    void addDeviceIdListener() {
         dbh.addStringArrayListener(TABLE_DEVICES, deviceIdList, DEVICE_ID);
+    }
+
+    void addLocationNamesListener() {
+        dbh.addStringArrayListener(TABLE_LOCATIONS, locationNamesList, LOCATION_NAME);
+    }
+
+    void addLocationIdListener() {
+        dbh.addStringArrayListener(TABLE_LOCATIONS, locationIdList, LOCATION_ID);
     }
 
     /**
@@ -240,6 +259,10 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
     void addEmployeeNamesListener() {
         dbh.getStringArrayFromDB(TABLE_EMPLOYEES, employeeNamesList, EMPLOYEE_NAME);
+    }
+
+    void addEmployeeIdListener() {
+        dbh.getStringArrayFromDB(TABLE_EMPLOYEES, employeeIdList, EMPLOYEE_ID);
     }
 
     public void addSelectedUnitListener(DUnit unit) {
@@ -285,16 +308,12 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         return unitStatesList;
     }
 
-    public MutableLiveData<ArrayList<DUnit>> getRepairUnitsList() {
-        return repairsUnitsList;
-    }
-
     public MutableLiveData<DUnit> getSelectedUnit() {
         return selectedUnit;
     }
 
-    public MutableLiveData<ArrayList<DUnit>> getFoundUnitsList() {
-        return foundUnitsList;
+    public MutableLiveData<ArrayList<DUnit>> getScannerFoundUnitsList() {
+        return scannerFoundUnitsList;
     }
 
     public MutableLiveData<String> getEmail() {
@@ -333,8 +352,32 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         return deviceIdList;
     }
 
+    public MutableLiveData<ArrayList<String>> getLocationNamesList() {
+        return locationNamesList;
+    }
+
+    public MutableLiveData<ArrayList<String>> getLocationIdList() {
+        return locationIdList;
+    }
+
+    public MutableLiveData<ArrayList<String>> getEmployeeIdList() {
+        return employeeIdList;
+    }
+
+    /**По выбранным параметрам получает из БД список юнитов*/
+    public void getUnitListFromBD(String deviceName, String location, String employee, String type) {
+        Log.e(TAG, "♦ deviceName - "+deviceName+" location - "+location+" employee - "+employee+" type - "+type);
+        //Если параметр не "any", то имя параметра переводим в его идентификатор ("Диагностика" -> "adj_r_diagnostica")
+        //Если "any", то так и оставляем
+        if (!deviceName.equals(ANY_VALUE)) deviceName = getIdByName(deviceName, deviceNameList.getValue(), deviceIdList.getValue());
+        if (!location.equals(ANY_VALUE)) location = getIdByName(location, locationNamesList.getValue(), locationIdList.getValue());
+        if (!employee.equals(ANY_VALUE)) employee = getIdByName(employee, employeeNamesList.getValue(), employeeIdList.getValue());
+
+        dbh.getUnitListByParam(serialUnitsList, UNIT_DEVICE, deviceName, UNIT_LOCATION, location, UNIT_EMPLOYEE, employee, UNIT_TYPE, type);
+    }
+
     public void restartMultiScanning() {
-        foundUnitsList.setValue(new ArrayList<>());
+        scannerFoundUnitsList.setValue(new ArrayList<>());
         restartMultiScanning.postValue(true);
         multiScanner.clearFoundedBarcodes();
     }
@@ -418,9 +461,9 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     public void addUnitToCollection(String s) {
         DUnit unit = getDUnitFromString(s);
         if (unit != null) {
-            if (foundUnitsList.getValue() == null) foundUnitsList.setValue(new ArrayList<>());
-            foundUnitsList.getValue().add(unit);
-            getThisListUnitFromDB(unit, foundUnitsList);
+            if (scannerFoundUnitsList.getValue() == null) scannerFoundUnitsList.setValue(new ArrayList<>());
+            scannerFoundUnitsList.getValue().add(unit);
+            getThisListUnitFromDB(unit, scannerFoundUnitsList);
         }
     }
 

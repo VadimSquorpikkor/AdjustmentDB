@@ -37,4 +37,8 @@
         <string name="tab_text_3">Множественное\nсканирование</string>
     <string name="new_name">Название</string>
     <string name="show">Показать</string>
+    <string name="nothing_found">Ничего не найдено!</string>
+    <string name="serial">Серия</string>
+    <string name="repair">Ремонт</string>
+    <string name="app_logo">Логотип приложения</string>
 </resources>

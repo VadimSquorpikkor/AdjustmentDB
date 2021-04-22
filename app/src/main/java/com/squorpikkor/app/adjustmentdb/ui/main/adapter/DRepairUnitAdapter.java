@@ -13,6 +13,8 @@ import com.squorpikkor.app.adjustmentdb.R;
 
 import java.util.ArrayList;
 
+
+//deprecated
 public class DRepairUnitAdapter extends RecyclerView.Adapter<DRepairUnitAdapter.DUnitViewHolder>{
 
     private final ArrayList<DUnit> units;

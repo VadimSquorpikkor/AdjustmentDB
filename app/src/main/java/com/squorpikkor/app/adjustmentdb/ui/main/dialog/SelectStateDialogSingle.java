@@ -22,6 +22,7 @@ import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static com.squorpikkor.app.adjustmentdb.Utils.getIdByName;
 import static com.squorpikkor.app.adjustmentdb.Utils.insertRightValue;
 import static com.squorpikkor.app.adjustmentdb.Utils.isEmptyOrNull;
 
@@ -83,7 +84,7 @@ public class SelectStateDialogSingle extends Dialog {
         labelSerial.setVisibility(View.GONE);
         labelEmployee.setVisibility(View.GONE);
 
-        if (!isEmptyOrNull(unit.getName())) tName.setText(unit.getName());
+        ////if (!isEmptyOrNull(unit.getName())) tName.setText(unit.getName());
 
 
         //Если у юнита уже есть серийный или внутренний номер или имя или ответственный, то его уже нельзя поменять, поэтому я просто скрываю его
@@ -119,14 +120,17 @@ public class SelectStateDialogSingle extends Dialog {
             String state_id = "";
             if (spinner.getSelectedItem() != null) state = spinner.getSelectedItem().toString();
             if (!state.equals("")) {
-                int position;
+//                int position;
                 if (unit.isRepairUnit()) {
-                    position = mViewModel.getRepairStatesNames().getValue().indexOf(state);
-                    state_id = mViewModel.getRepairStateIdList().getValue().get(position);
+                    state_id = getIdByName(state, mViewModel.getRepairStatesNames().getValue(), mViewModel.getRepairStateIdList().getValue());
+//                    position = mViewModel.getRepairStatesNames().getValue().indexOf(state);
+//                    state_id = mViewModel.getRepairStateIdList().getValue().get(position);
                 }
                 if (unit.isSerialUnit()) {
-                    position = mViewModel.getSerialStatesNames().getValue().indexOf(state);
-                    state_id = mViewModel.getSerialStateIdList().getValue().get(position);
+                    state_id = getIdByName(state, mViewModel.getSerialStatesNames().getValue(), mViewModel.getSerialStateIdList().getValue());
+
+//                    position = mViewModel.getSerialStatesNames().getValue().indexOf(state);
+//                    state_id = mViewModel.getSerialStateIdList().getValue().get(position);
                 }
             } else {
                 state_id = "";

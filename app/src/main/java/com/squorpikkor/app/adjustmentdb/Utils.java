@@ -1,5 +1,7 @@
 package com.squorpikkor.app.adjustmentdb;
 
+import java.util.ArrayList;
+
 public class Utils {
 
     public static final String EMPTY_VALUE = "- - -";
@@ -33,5 +35,15 @@ public class Utils {
         return s == null || s.equals("") || s.equals("null");
     }
 
+    /**Заменяет имя на его идентификатор (переводчик)
+     * @param name имя ("Диагностика")
+     * @param nameList лист имен
+     * @param idList лист идентификаторов
+     * @return id ("adj_r_diagnostica")
+     */
+    public static String getIdByName(String name, ArrayList<String> nameList, ArrayList<String> idList) {
+        int position = nameList.indexOf(name);
+        return idList.get(position);
+    }
 
 }

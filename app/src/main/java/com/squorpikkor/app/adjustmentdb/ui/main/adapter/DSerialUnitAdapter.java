@@ -13,6 +13,7 @@ import com.squorpikkor.app.adjustmentdb.R;
 
 import java.util.ArrayList;
 
+//todo это адаптер не для серийных, а для всех типов. надо поменять название
 public class DSerialUnitAdapter extends RecyclerView.Adapter<DSerialUnitAdapter.DUnitViewHolder>{
 
     private final ArrayList<DUnit> units;

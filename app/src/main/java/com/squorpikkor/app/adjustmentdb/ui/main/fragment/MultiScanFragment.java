@@ -54,7 +54,7 @@ public class MultiScanFragment extends Fragment {
         nextButton.setVisibility(View.GONE);
         foundCount = view.findViewById(R.id.found_count);
 
-        final MutableLiveData<ArrayList<DUnit>> foundUnits = mViewModel.getFoundUnitsList();
+        final MutableLiveData<ArrayList<DUnit>> foundUnits = mViewModel.getScannerFoundUnitsList();
         foundUnits.observe(getViewLifecycleOwner(), s -> {
             foundUnitsList = foundUnits.getValue();
             foundCount.setText(String.valueOf(foundUnitsList.size()));

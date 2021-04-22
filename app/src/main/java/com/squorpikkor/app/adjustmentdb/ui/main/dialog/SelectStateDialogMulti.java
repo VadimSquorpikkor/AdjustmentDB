@@ -37,12 +37,12 @@ public class SelectStateDialogMulti extends Dialog {
 
         mViewModel = new ViewModelProvider((MainActivity)context).get(MainViewModel.class);
 
-        ArrayList<DUnit> unitList = mViewModel.getFoundUnitsList().getValue();
+        ArrayList<DUnit> unitList = mViewModel.getScannerFoundUnitsList().getValue();
         DUnit unit = unitList.get(0);
 
         //Загружается тот список, тип прибора который загружен — ремонт или серия
         ArrayList<String> rightList;
-        if (mViewModel.getFoundUnitsList().getValue().get(0).isRepairUnit()) rightList = mViewModel.getRepairStatesNames().getValue();
+        if (mViewModel.getScannerFoundUnitsList().getValue().get(0).isRepairUnit()) rightList = mViewModel.getRepairStatesNames().getValue();
         else rightList = mViewModel.getSerialStatesNames().getValue();
 
         //todo заменить ссылку на подписку

@@ -5,10 +5,12 @@ import androidx.lifecycle.MutableLiveData;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
+import com.squorpikkor.app.adjustmentdb.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
+import static com.squorpikkor.app.adjustmentdb.Utils.isEmptyOrNull;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_DATE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_DESCRIPTION;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_LOCATION;
@@ -220,6 +224,39 @@ class FireDBHelper {
                 });
     }
 
+    void getUnitListByParam(MutableLiveData<ArrayList<DUnit>> unitList, String param1, String value1, String param2, String value2, String param3, String value3, String param4, String value4) {
+        Query query = db.collection(TABLE_UNITS);
+        if (!value1.equals(ANY_VALUE)) query = query.whereEqualTo(param1, value1);
+        if (!value2.equals(ANY_VALUE)) query = query.whereEqualTo(param2, value2);
+        if (!value3.equals(ANY_VALUE)) query = query.whereEqualTo(param3, value3);
+        if (!value4.equals(ANY_VALUE)) query = query.whereEqualTo(param4, value4);
+
+        query.get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        if (querySnapshot == null) return;
+                        ArrayList<DUnit> list = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult()) {
+                            DUnit unit = new DUnit();
+                            unit.setDescription(String.valueOf(document.get(UNIT_DESCRIPTION)));
+                            unit.setName(String.valueOf(document.get(UNIT_DEVICE)));
+                            unit.setEmployee(String.valueOf(document.get(UNIT_EMPLOYEE)));
+                            unit.setId(String.valueOf(document.get(UNIT_ID)));
+                            unit.setInnerSerial(String.valueOf(document.get(UNIT_INNER_SERIAL)));
+                            unit.setLocation(String.valueOf(document.get(UNIT_LOCATION)));
+                            unit.setSerial(String.valueOf(document.get(UNIT_SERIAL)));
+                            unit.setState(String.valueOf(document.get(UNIT_STATE)));
+                            unit.setType(String.valueOf(document.get(UNIT_TYPE)));
+                            list.add(unit);
+                        }
+                        unitList.setValue(list);
+                    } else {
+                        Log.e(TAG, "Error getting documents: ", task.getException());
+                    }
+                });
+    }
+
     /**
      * Получаем лист String из БД и помещаем её в MutableLiveDate
      * @param table имя таблицы (коллекции) из которой берем данные
@@ -230,7 +267,7 @@ class FireDBHelper {
         db.collection(table).get().addOnCompleteListener(task -> {
             ArrayList<String> list = new ArrayList<>();
             for (DocumentSnapshot document : task.getResult()) {
-                list.add(document.get(fieldName).toString());
+                if (document.get(fieldName)!=null) list.add(document.get(fieldName).toString());
             }
             mList.setValue(list);
         });
