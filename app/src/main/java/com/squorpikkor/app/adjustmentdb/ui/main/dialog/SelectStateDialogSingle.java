@@ -20,6 +20,7 @@ import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
 
 import static com.squorpikkor.app.adjustmentdb.Utils.getIdByName;
@@ -111,6 +112,7 @@ public class SelectStateDialogSingle extends Dialog {
 
         cancelButton.setOnClickListener(view -> dismiss());
 
+        //todo надо сделать не через создание нового юнита, а через присваивание параметров уже существующему юниту, затем этот старый юнит сохранять
         okButton.setOnClickListener(view -> {
             String id = unit.getId();
             String name = insertRightValue(unit.getName(), devices.getSelectedItem().toString());
@@ -120,17 +122,11 @@ public class SelectStateDialogSingle extends Dialog {
             String state_id = "";
             if (spinner.getSelectedItem() != null) state = spinner.getSelectedItem().toString();
             if (!state.equals("")) {
-//                int position;
                 if (unit.isRepairUnit()) {
                     state_id = getIdByName(state, mViewModel.getRepairStatesNames().getValue(), mViewModel.getRepairStateIdList().getValue());
-//                    position = mViewModel.getRepairStatesNames().getValue().indexOf(state);
-//                    state_id = mViewModel.getRepairStateIdList().getValue().get(position);
                 }
                 if (unit.isSerialUnit()) {
                     state_id = getIdByName(state, mViewModel.getSerialStatesNames().getValue(), mViewModel.getSerialStateIdList().getValue());
-
-//                    position = mViewModel.getSerialStatesNames().getValue().indexOf(state);
-//                    state_id = mViewModel.getSerialStateIdList().getValue().get(position);
                 }
             } else {
                 state_id = "";
@@ -139,8 +135,9 @@ public class SelectStateDialogSingle extends Dialog {
             String desc = description.getText().toString();
             String type = unit.getType();
             String location = mViewModel.getLocation_id().getValue();
+            Date date = unit.getDate();
 //            mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state_id, desc, type, location));
-            mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state_id, desc, type, location), unit.getState());
+            mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state_id, desc, type, location, date), unit.getState());
             dismiss();
         });
 

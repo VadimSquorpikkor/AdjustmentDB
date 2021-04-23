@@ -113,6 +113,7 @@ public class SingleScanFragment extends Fragment {
             infoLayout.setVisibility(View.GONE);
             mViewModel.startSingleScanner(getActivity(), surfaceView);
             mViewModel.getSingleScanner().initialiseDetectorsAndSources();
+            mViewModel.setBackPressCommand(BACK_PRESS_SINGLE);
         }
     }
 
@@ -151,7 +152,8 @@ public class SingleScanFragment extends Fragment {
         super.onResume();
         surfaceView.setVisibility(View.VISIBLE);
         mViewModel.getSingleScanner().initialiseDetectorsAndSources();
-        mViewModel.setBackPressCommand(BACK_PRESS_SINGLE);
+        if (infoLayout.getVisibility()==View.GONE) mViewModel.setBackPressCommand(BACK_PRESS_SINGLE);
+        else mViewModel.setBackPressCommand(BACK_PRESS_STATES);
     }
 
     @Override

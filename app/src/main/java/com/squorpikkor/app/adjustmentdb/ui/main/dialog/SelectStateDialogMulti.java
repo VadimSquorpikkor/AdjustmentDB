@@ -16,6 +16,7 @@ import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class SelectStateDialogMulti extends Dialog {
     private MainViewModel mViewModel;
@@ -84,7 +85,8 @@ public class SelectStateDialogMulti extends Dialog {
                 else name = unitFromList.getName();
                 String innerSerial = unitFromList.getInnerSerial();
                 String serial = unitFromList.getSerial();
-                mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state_id, desc, type, location));
+                Date date = unitFromList.getDate();
+                mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state_id, desc, type, location, date));
             }
 
             dismiss();

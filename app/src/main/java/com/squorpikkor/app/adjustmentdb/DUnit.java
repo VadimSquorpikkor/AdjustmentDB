@@ -1,9 +1,15 @@
 package com.squorpikkor.app.adjustmentdb;
 
+import java.util.Date;
+
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_TYPE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_TYPE;
 
 public class DUnit {
+
+    //todo сейчас последнее событие сохраняется в юните, что не правильно, надо хранить все события
+    // в событиях и только. При чтении юнита нужно загружать из коллекции событий последнее.
+    // Поэтому нужно сделать загрузку последнего события и убрать из юнита поля: state, description, location, date
 
     private String id; //"0001"
     private String name; //БДКГ-02
@@ -14,6 +20,9 @@ public class DUnit {
     private String description;
     private String location;
     private String employee; //Фамилия ответственного
+
+    Date date;
+
 
     public DUnit() {
     }
@@ -27,6 +36,18 @@ public class DUnit {
         this.state = state;
         this.description = description;
         this.location = location;
+    }
+
+    public DUnit(String id, String name, String innerSerial, String serial, String state, String description, String type, String location, Date date) {
+        this.id = id;
+        this.name = name;
+        this.innerSerial = innerSerial;
+        this.serial = serial;
+        this.type = type;
+        this.state = state;
+        this.description = description;
+        this.location = location;
+        this.date = date;
     }
 
     /**Возвращает true, если это ремонтное устройство*/
@@ -118,5 +139,13 @@ public class DUnit {
 
     public void setEmployee(String employee) {
         this.employee = employee;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 }

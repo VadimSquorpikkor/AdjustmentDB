@@ -41,6 +41,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 //--------------------------------------------------------------------------------------------------
     //Новые стринги для новой БД:
     public static final String TABLE_UNITS = "units";
+    public static final String UNIT_DATE = "date";
     public static final String UNIT_DESCRIPTION = "description";
     public static final String UNIT_DEVICE = "device_id"; //todo возможно в имени стринга и не нужен "_ID", только в значении
     public static final String UNIT_EMPLOYEE = "employee_id";
@@ -182,7 +183,6 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
      * Сохраняет DUnit в БД в соответствующую таблицу
      */
     public void saveDUnitToDB(DUnit unit) {
-        dbh.addUnitToDB(unit);
         // В коллекцию статусов текущего устройства добавляем статус: описание+дата (добавляем
         // коллекцию в коллекцию). Если поля статуса оставить пустым, то статус не будет добавлне
         // (нужно, наример, если необходимо просто добавить серийный номер, никакого статуса в этом
@@ -195,6 +195,9 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
             String location_id = getLocation_id().getValue();
             dbh.addEventToDB(date, state, description, unit_id, location_id);
         }
+        //Если есть новое событие, то обновляем дату/время
+        unit.setDate(new Date());
+        dbh.addUnitToDB(unit);
     }
 
     /**

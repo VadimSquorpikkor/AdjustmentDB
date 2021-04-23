@@ -1,6 +1,9 @@
 package com.squorpikkor.app.adjustmentdb;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class Utils {
 
@@ -46,4 +49,31 @@ public class Utils {
         return idList.get(position);
     }
 
+    /**Заменяет идентификатор на его имя (переводчик). Если id не найден, то возвращает "- - -"
+     * @param id имя ("adj_r_diagnostica")
+     * @param nameList лист имен
+     * @param idList лист идентификаторов
+     * @return name ("Диагностика")
+     */
+    public static String getNameById(String id, ArrayList<String> nameList, ArrayList<String> idList) {
+        int position = idList.indexOf(id);
+        if (position==-1)return EMPTY_VALUE;
+        else return nameList.get(position);
+    }
+
+    public static String getRightDate(long time_stamp_server) {
+        String DATE_PATTERN = "dd.MM.yyyy HH:mm";
+        SimpleDateFormat formatter = new SimpleDateFormat(DATE_PATTERN);
+        return formatter.format(time_stamp_server);
+    }
+
+    public static int daysPassed(Date startDate) {
+        return daysPassed(startDate, new Date());
+
+    }
+
+    public static int daysPassed(Date startDate, Date endDate) {
+        return ((int)((endDate.getTime()/(24*60*60*1000))
+                -(int)(startDate.getTime()/(24*60*60*1000))));
+    }
 }

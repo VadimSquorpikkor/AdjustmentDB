@@ -14,12 +14,12 @@ import com.squorpikkor.app.adjustmentdb.R;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+import static com.squorpikkor.app.adjustmentdb.Utils.getRightDate;
+
 /**Адаптер для списка всех статусов для выбранного конкретного устройства. Показывает дату, время и сам статус*/
 public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesViewHolder> {
 
     private final ArrayList<DEvent> states;
-    @SuppressWarnings("FieldCanBeLocal")
-    private final String DATE_PATTERN = "dd.MM.yyyy HH:mm";
 
     /**
      * Конструктор, в котором передаем ArrayList для RecyclerView
@@ -43,11 +43,6 @@ public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesView
         DEvent state = states.get(position);
         holder.tDate.setText(getRightDate(state.getDate().getTime()));
         holder.tState.setText(state.getState());
-    }
-
-    private String getRightDate(long time_stamp_server) {
-        SimpleDateFormat formatter = new SimpleDateFormat(DATE_PATTERN);
-        return formatter.format(time_stamp_server);
     }
 
     /**

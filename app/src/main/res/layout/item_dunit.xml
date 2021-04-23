@@ -16,39 +16,72 @@
 
 
         <TextView
-            android:padding="4dp"
             android:id="@+id/textName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="БДКГ-02"
+            android:textSize="11sp"
+            android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/textInnerSerial"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="4dp"
-            app:layout_constraintStart_toEndOf="@+id/textName"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="12345" />
+            />
 
         <TextView
             android:id="@+id/textSerial"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="4dp"
             tools:text="123.002"
-            app:layout_constraintStart_toEndOf="@+id/textInnerSerial"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:textColor="@color/main_orange"
+            android:paddingEnd="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textName"
+            />
+
+        <TextView
+            android:id="@+id/textInnerSerial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="(вн. 12345)"
+            android:textColor="@color/main_orange"
+            app:layout_constraintStart_toEndOf="@+id/textSerial"
+            app:layout_constraintTop_toTopOf="@+id/textSerial"
+            />
+
+        <TextView
+            android:id="@+id/textDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="9sp"
+            android:textStyle="italic"
+            tools:text="12.04.21"
+            android:paddingEnd="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textSerial"
+            />
 
         <TextView
             android:id="@+id/textState"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="На линейке"
+            android:paddingEnd="10dp"
+            android:textColor="@color/white"
+            android:textSize="9sp"
+            android:textStyle="italic"
+            app:layout_constraintStart_toEndOf="@+id/textDate"
+            app:layout_constraintTop_toBottomOf="@+id/textSerial"
+            tools:text="Передано на линейку" />
+
+        <TextView
+            android:id="@+id/textDatePassed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:padding="4dp"
-            app:layout_constraintStart_toEndOf="@+id/textSerial"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="5 дней" />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

@@ -10,7 +10,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
-import com.squorpikkor.app.adjustmentdb.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
-import static com.squorpikkor.app.adjustmentdb.Utils.isEmptyOrNull;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_DATE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_DESCRIPTION;
@@ -34,6 +32,7 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_STATE
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TYPE_ANY;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_EVENTS;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_UNITS;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_DATE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_DESCRIPTION;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_DEVICE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_EMPLOYEE;
@@ -64,8 +63,9 @@ class FireDBHelper {
         data.put(UNIT_INNER_SERIAL, unit.getInnerSerial());
         data.put(UNIT_LOCATION, unit.getLocation());
         data.put(UNIT_SERIAL, unit.getSerial());
-        /*if (!unit.getState().equals("")) */data.put(UNIT_STATE, unit.getState());
+        data.put(UNIT_STATE, unit.getState());
         data.put(UNIT_TYPE, unit.getType());
+        data.put(UNIT_DATE, unit.getDate());
         db.collection(TABLE_UNITS)
                 .document(unit.getId())
 //                .update(data)
@@ -120,6 +120,8 @@ class FireDBHelper {
                         unit.setSerial(String.valueOf(documentSnapshot.get(UNIT_SERIAL)));
                         unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
                         unit.setType(String.valueOf(documentSnapshot.get(UNIT_TYPE)));
+                        Timestamp timestamp = (Timestamp) documentSnapshot.get(UNIT_DATE);
+                        if (timestamp!=null)unit.setDate(timestamp.toDate());
                         selectedUnit.setValue(unit);
 
                     } else {
@@ -150,6 +152,8 @@ class FireDBHelper {
                         unit.setSerial(String.valueOf(documentSnapshot.get(UNIT_SERIAL)));
                         unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
                         unit.setType(String.valueOf(documentSnapshot.get(UNIT_TYPE)));
+                        Timestamp timestamp = (Timestamp) documentSnapshot.get(UNIT_DATE);
+                        if (timestamp!=null)unit.setDate(timestamp.toDate());
 
                         list.setValue(newList.getValue());
                     } else {
@@ -180,6 +184,8 @@ class FireDBHelper {
                             unit.setSerial(String.valueOf(documentSnapshot.get(UNIT_SERIAL)));
                             unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
                             unit.setType(String.valueOf(documentSnapshot.get(UNIT_TYPE)));
+                            Timestamp timestamp = (Timestamp) documentSnapshot.get(UNIT_DATE);
+                            if (timestamp!=null)unit.setDate(timestamp.toDate());
 
                             list.setValue(newList.getValue());
                         }
@@ -187,6 +193,22 @@ class FireDBHelper {
                         Log.e(TAG, "Error getting documents: ", task.getException());
                     }
                 });
+    }
+
+    private DUnit getUnitFromSnapshot(DocumentSnapshot documentSnapshot) {
+        DUnit unit = new DUnit();
+        unit.setDescription(String.valueOf(documentSnapshot.get(UNIT_DESCRIPTION)));
+        unit.setName(String.valueOf(documentSnapshot.get(UNIT_DEVICE)));
+        unit.setEmployee(String.valueOf(documentSnapshot.get(UNIT_EMPLOYEE)));
+        unit.setId(String.valueOf(documentSnapshot.get(UNIT_ID)));
+        unit.setInnerSerial(String.valueOf(documentSnapshot.get(UNIT_INNER_SERIAL)));
+        unit.setLocation(String.valueOf(documentSnapshot.get(UNIT_LOCATION)));
+        unit.setSerial(String.valueOf(documentSnapshot.get(UNIT_SERIAL)));
+        unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
+        unit.setType(String.valueOf(documentSnapshot.get(UNIT_TYPE)));
+        Timestamp timestamp = (Timestamp) documentSnapshot.get(UNIT_DATE);
+        if (timestamp!=null)unit.setDate(timestamp.toDate());
+        return unit;
     }
 
     /**
@@ -214,6 +236,8 @@ class FireDBHelper {
                             unit.setSerial(String.valueOf(documentSnapshot.get(UNIT_SERIAL)));
                             unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
                             unit.setType(String.valueOf(documentSnapshot.get(UNIT_TYPE)));
+                            Timestamp timestamp = (Timestamp) documentSnapshot.get(UNIT_DATE);
+                            if (timestamp!=null)unit.setDate(timestamp.toDate());
                             selectedUnit.setValue(unit);
                         }
                         else{ Log.e(TAG, "☻ getUnitById_EXP: NOT EXISTS");}
@@ -248,6 +272,8 @@ class FireDBHelper {
                             unit.setSerial(String.valueOf(document.get(UNIT_SERIAL)));
                             unit.setState(String.valueOf(document.get(UNIT_STATE)));
                             unit.setType(String.valueOf(document.get(UNIT_TYPE)));
+                            Timestamp timestamp = (Timestamp) document.get(UNIT_DATE);
+                            if (timestamp!=null)unit.setDate(timestamp.toDate());
                             list.add(unit);
                         }
                         unitList.setValue(list);
@@ -256,6 +282,8 @@ class FireDBHelper {
                     }
                 });
     }
+
+
 
     /**
      * Получаем лист String из БД и помещаем её в MutableLiveDate
@@ -285,6 +313,28 @@ class FireDBHelper {
     void addSelectedUnitListener(DUnit unit, MutableLiveData<DUnit> mUnit) {
         db.collection(TABLE_UNITS).document(unit.getId()).addSnapshotListener((queryDocumentSnapshots, error) -> {
             getUnitById_EXP(unit.getId(), mUnit);
+        });
+    }
+
+    void getLastEventFromDB(String unit_id, DEvent event) {
+        db.collection(TABLE_EVENTS)
+                .whereEqualTo(EVENT_UNIT, unit_id)
+                .orderBy(EVENT_DATE, Query.Direction.DESCENDING)
+                .limit(1)
+                .get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot querySnapshot = task.getResult();
+                if (querySnapshot == null) return;
+                DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
+                Timestamp timestamp = (Timestamp) documentSnapshot.get(EVENT_DATE);
+                event.setDate(timestamp.toDate());
+                event.setState(documentSnapshot.get(EVENT_STATE).toString());
+                event.setDescription(documentSnapshot.get(EVENT_DESCRIPTION).toString());
+                event.setLocation(documentSnapshot.get(EVENT_LOCATION).toString());
+                event.setUnit_id(documentSnapshot.get(EVENT_UNIT).toString());
+            } else {
+                Log.e(TAG, "Error - " + task.getException());
+            }
         });
     }
 
@@ -358,6 +408,8 @@ class FireDBHelper {
             else outPutString.setValue(list.get(0));
         });
     }
+
+    //void getString
 
     /**Загружает список статусов по типу (серия/ремонт) и локации (регулировка/монтаж...). Так как
      * есть статусы, которые одинаковые и для ремонта и для серии (у этих статусов тип "any"), то

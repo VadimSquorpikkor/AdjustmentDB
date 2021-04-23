@@ -139,7 +139,7 @@ public class SearchDeviceFragment extends Fragment {
         } else {
             logoImage.setVisibility(View.GONE);
         }
-        DSerialUnitAdapter unitAdapter = new DSerialUnitAdapter(list);
+        DSerialUnitAdapter unitAdapter = new DSerialUnitAdapter(list, mViewModel);
         foundUnitRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         foundUnitRecycler.setAdapter(unitAdapter);
     }
