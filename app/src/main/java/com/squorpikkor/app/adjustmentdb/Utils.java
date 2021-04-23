@@ -1,5 +1,9 @@
 package com.squorpikkor.app.adjustmentdb;
 
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -75,5 +79,33 @@ public class Utils {
     public static int daysPassed(Date startDate, Date endDate) {
         return ((int)((endDate.getTime()/(24*60*60*1000))
                 -(int)(startDate.getTime()/(24*60*60*1000))));
+    }
+
+    public static void insertValueOrGone(String value, TextView view) {
+        if (isEmptyOrNull(value)) {
+            view.setVisibility(View.GONE);
+        } else {
+            view.setVisibility(View.VISIBLE);
+            view.setText(value);
+        }
+    }
+
+    public static void insertValueOrGone(String value, TextView view, String format) {
+        if (isEmptyOrNull(value)) {
+            view.setVisibility(View.GONE);
+        } else {
+            view.setVisibility(View.VISIBLE);
+            view.setText(String.format(format, value));
+        }
+    }
+
+    public static String rightDayString(int i) {
+        switch (i%10) {
+            case 1:return "день";
+            case 2:
+            case 3:
+            case 4:return "дня";
+            default:return "дней";
+        }
     }
 }

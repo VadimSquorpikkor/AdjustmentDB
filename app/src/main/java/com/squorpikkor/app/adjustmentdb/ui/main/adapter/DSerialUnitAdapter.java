@@ -13,6 +13,7 @@ import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static com.squorpikkor.app.adjustmentdb.Utils.EMPTY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.Utils.daysPassed;
@@ -33,6 +34,16 @@ public class DSerialUnitAdapter extends RecyclerView.Adapter<DSerialUnitAdapter.
         this.mViewModel = model;
     }
 
+    private OnItemClickListener onItemClickListener;
+
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
     /**Присваиваем xml лэйаут к итему RecyclerView */
     @NonNull
     @Override
@@ -47,23 +58,35 @@ public class DSerialUnitAdapter extends RecyclerView.Adapter<DSerialUnitAdapter.
     @Override
     public void onBindViewHolder(@NonNull DUnitViewHolder holder, int position) {
         DUnit unit = units.get(position);
-        holder.tName.setText(getNameById(unit.getName(), mViewModel.getDeviceNameList().getValue(), mViewModel.getDeviceIdList().getValue()));
+//        String serial = unit.getSerial();
+//        String innerSerial = unit.getInnerSerial();
+
+//        insertValueOrGone(name, holder.tName);
+//        insertValueOrGone(serial, holder.tSerial, "№ %s");
+//        insertValueOrGone(innerSerial, holder.tInnerSerial, "(вн. %s)");
+//        insertValueOrGone(state, holder.tState);
+
+
+        String state = getNameById(unit.getState(), mViewModel.getAllStatesNameList().getValue(), Objects.requireNonNull(mViewModel.getAllStatesIdList().getValue()));
+        String name = getNameById(unit.getName(), mViewModel.getDeviceNameList().getValue(), Objects.requireNonNull(mViewModel.getDeviceIdList().getValue()));
+
+        holder.tState.setText(state);
+        holder.tName.setText(name);
         holder.tSerial.setText(String.format("№ %s", insertRightValue(unit.getSerial())));
-        holder.tInnerSerial.setText(String.format("(вн. %s)", insertRightValue(unit.getInnerSerial())));
+        if (unit.getInnerSerial()==null||unit.getInnerSerial().equals(""))holder.tInnerSerial.setText("");
+        else holder.tInnerSerial.setText(String.format("(вн. %s)", unit.getInnerSerial()));
 
-
-
-        ArrayList<String> statesNames = unit.isSerialUnit()?mViewModel.getSerialStatesNames().getValue():mViewModel.getRepairStatesNames().getValue();
-        ArrayList<String> statesId = unit.isSerialUnit()?mViewModel.getSerialStateIdList().getValue():mViewModel.getRepairStateIdList().getValue();
-        holder.tState.setText(getNameById(unit.getState(), statesNames, statesId));
-
-
-
+//        ArrayList<String> statesNames = unit.isSerialUnit()?mViewModel.getSerialStatesNames().getValue():mViewModel.getRepairStatesNames().getValue();
+//        ArrayList<String> statesId = unit.isSerialUnit()?mViewModel.getSerialStateIdList().getValue():mViewModel.getRepairStateIdList().getValue();
+//        holder.tState.setText(getNameById(unit.getState(), statesNames, statesId));
 
         if (unit.getDate()!=null){
+//            holder.tDate.setVisibility(View.VISIBLE);
             holder.tDate.setText(getRightDate(unit.getDate().getTime()));
-            holder.tDatePassed.setText(String.format("%s дней", daysPassed(unit.getDate())));
+//            int days = daysPassed(unit.getDate());
+            holder.tDatePassed.setText(String.format("%s д.", daysPassed(unit.getDate())));
         } else {
+//            holder.tDate.setVisibility(View.GONE);
             holder.tDate.setText(EMPTY_VALUE);
             holder.tDatePassed.setText("");
         }
@@ -75,7 +98,7 @@ public class DSerialUnitAdapter extends RecyclerView.Adapter<DSerialUnitAdapter.
         return units.size();
     }
 
-    static class DUnitViewHolder extends RecyclerView.ViewHolder {
+    class DUnitViewHolder extends RecyclerView.ViewHolder {
         private final TextView tName;
         private final TextView tInnerSerial;
         private final TextView tSerial;
@@ -91,6 +114,13 @@ public class DSerialUnitAdapter extends RecyclerView.Adapter<DSerialUnitAdapter.
             tState = itemView.findViewById(R.id.textState);
             tDate = itemView.findViewById(R.id.textDate);
             tDatePassed = itemView.findViewById(R.id.textDatePassed);
+
+            //для работы OnNoteClickListener
+            itemView.setOnClickListener(view -> {
+                if (onItemClickListener != null) {
+                    onItemClickListener.onItemClick(getAdapterPosition());
+                }
+            });
         }
     }
 }

@@ -409,7 +409,42 @@ class FireDBHelper {
         });
     }
 
-    //void getString
+    void getString(String table, String documentId, String field, /*String changingValue*/MutableLiveData<String> changingValue) {
+        db.collection(table)
+                .document(documentId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        if (documentSnapshot.exists()) {
+                            Object o = documentSnapshot.get(field);
+                            String value = o==null?"":o.toString();
+                            changingValue.setValue(value);
+                        } else {
+                            Log.e(TAG, "☻ NOT EXISTS");
+                        }
+                    } else {
+                        Log.e(TAG, "Error getting documents: ", task.getException());
+                    }
+                });
+    }
+
+    void getListIdsAndListNames(String table, MutableLiveData<ArrayList<String>> idList, String idField, MutableLiveData<ArrayList<String>> nameList, String nameField) {
+        db.collection(table).get().addOnCompleteListener(task -> {
+            ArrayList<String> list1 = new ArrayList<>();
+            ArrayList<String> list2 = new ArrayList<>();
+            int count = 0;
+            for (DocumentSnapshot document : task.getResult()) {
+                String id = document.get(idField).toString();
+                String name = document.get(nameField).toString();
+                list1.add(id);
+                list2.add(name);
+                //todo если буду делать локализацию, то здесь надо будет вставлять что-то типа if(lang.isEng)name = "name_eng". В БД будет дополнительное поле "name_eng", оно будет выбираться вместо "name". И всё, весь остальной код уже будет работать. Это конечно касается только имени статуса, для других сделать аналогично
+            }
+            idList.setValue(list1);
+            nameList.setValue(list2);
+        });
+    }
 
     /**Загружает список статусов по типу (серия/ремонт) и локации (регулировка/монтаж...). Так как
      * есть статусы, которые одинаковые и для ремонта и для серии (у этих статусов тип "any"), то

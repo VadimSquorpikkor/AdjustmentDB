@@ -94,6 +94,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     public static final String REPAIR_UNIT = "Ремонт";
     public static final String ANY_VALUE = "any_value";
     public static final String ANY_VALUE_TEXT = "";
+    public static final String EXTRA_POSITION = "position";
 //--------------------------------------------------------------------------------------------------
 
     public static final String BACK_PRESS_SEARCH = "back_press_search";
@@ -116,6 +117,8 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     private final MutableLiveData<ArrayList<String>> employeeIdList;
     private final MutableLiveData<ArrayList<String>> locationNamesList;
     private final MutableLiveData<ArrayList<String>> locationIdList;
+    private final MutableLiveData<ArrayList<String>> allStatesIdList;
+    private final MutableLiveData<ArrayList<String>> allStatesNameList;
 
     private final MutableLiveData<ArrayList<DEvent>> unitStatesList;
     private final MutableLiveData<ArrayList<DUnit>> scannerFoundUnitsList;
@@ -134,6 +137,8 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
     Scanner singleScanner;
     Scanner multiScanner;
+
+    private int position;
 
     public MainViewModel() {
         serialUnitsList = new MutableLiveData<>();
@@ -166,6 +171,9 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         addLocationIdListener();
         employeeIdList = new MutableLiveData<>();
         addEmployeeIdListener();
+        allStatesIdList = new MutableLiveData<>();
+        allStatesNameList = new MutableLiveData<>();
+        addAllStatesListener();
     }
 
     /**
@@ -216,7 +224,13 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
 //----- LISTENERS ----------------------------------------------------------------------------------
 
-    //todo ВСЕ парные лисенеры (Name / Id) переделать в один лисенер, который будет отслеживать одну таблицу, а заполнять изменения в два MutableLiveData
+
+    //todo ВСЕ парные лисенеры (Name / Id) переделать в один лисенер, который будет отслеживать одну таблицу, а заполнять изменения в два MutableLiveData.
+    // Типа так:
+    void addAllStatesListener() {
+        dbh.getListIdsAndListNames(TABLE_STATES, allStatesIdList, STATE_ID, allStatesNameList, STATE_NAME);
+    }
+
     /**
      * Слушатель для таблицы имен приборов
      */
@@ -367,6 +381,14 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         return employeeIdList;
     }
 
+    public MutableLiveData<ArrayList<String>> getAllStatesIdList() {
+        return allStatesIdList;
+    }
+
+    public MutableLiveData<ArrayList<String>> getAllStatesNameList() {
+        return allStatesNameList;
+    }
+
     /**По выбранным параметрам получает из БД список юнитов*/
     public void getUnitListFromBD(String deviceName, String location, String employee, String type) {
         Log.e(TAG, "♦ deviceName - "+deviceName+" location - "+location+" employee - "+employee+" type - "+type);
@@ -491,6 +513,13 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         }
     }
 
+    //todo объединить saveUnit и selectUnit
+    public void selectUnit(DUnit unit) {
+        updateSelectedUnit(unit);
+        addSelectedUnitListener(unit);
+        getEventForThisUnit(unit);
+    }
+
     @Override
     public DUnit getDUnitFromString(String s) {
         s = decodeMe(s);
@@ -518,6 +547,16 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
             // Если строка некорректная, возвращаю null
         } else return null;
+    }
+
+    public void setPosition(int position) {
+
+        this.position = position;
+        //selectUnit(serialUnitsList.getValue().get(position));
+    }
+
+    public int getPosition() {
+        return position;
     }
 }
 

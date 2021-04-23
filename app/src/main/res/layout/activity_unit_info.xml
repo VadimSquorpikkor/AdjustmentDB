@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UnitInfoActivity">
+
+
+    <TextView
+        android:id="@+id/textViewType2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/main_orange"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Серия" />
+
+    <TextView
+        android:id="@+id/textViewName2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:textColor="@color/main_orange"
+        android:textSize="26sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewType2"
+        tools:text="AT6130" />
+
+
+    <TextView
+        android:id="@+id/textViewInnerSerial2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginStart="20dp"
+        android:gravity="end"
+        android:text="@string/inner_serial_doted"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/textViewInnerSerialValue2"
+        app:layout_constraintTop_toBottomOf="@+id/textViewName2" />
+
+    <TextView
+        android:id="@+id/textViewInnerSerialValue2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginEnd="20dp"
+        android:gravity="start"
+        app:layout_constraintLeft_toRightOf="@+id/textViewInnerSerial2"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewName2"
+        tools:text="12345" />
+
+    <TextView
+        android:id="@+id/textViewSerial2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginStart="20dp"
+        android:gravity="end"
+        android:text="@string/serial_number_doted"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/textViewSerialValue2"
+        app:layout_constraintTop_toBottomOf="@+id/textViewInnerSerial2" />
+
+    <TextView
+        android:id="@+id/textViewSerialValue2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginEnd="20dp"
+        android:gravity="start"
+        app:layout_constraintLeft_toRightOf="@+id/textViewSerial2"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewInnerSerial2"
+        tools:text="6789" />
+
+    <TextView
+        android:id="@+id/textLocation2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginStart="20dp"
+        android:gravity="end"
+        android:text="@string/location_doted"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/textLocationValue2"
+        app:layout_constraintTop_toBottomOf="@+id/textViewSerial2" />
+
+    <TextView
+        android:id="@+id/textLocationValue2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginEnd="20dp"
+        android:gravity="start"
+        app:layout_constraintLeft_toRightOf="@+id/textLocation2"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewSerial2"
+        tools:text="Регулировка" />
+
+    <TextView
+        android:id="@+id/textViewId2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginStart="20dp"
+        android:gravity="end"
+        android:text="@string/identifier"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/textViewIdValue2"
+        app:layout_constraintTop_toBottomOf="@+id/textLocation2" />
+
+    <TextView
+        android:id="@+id/textViewIdValue2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginEnd="20dp"
+        android:gravity="start"
+        app:layout_constraintLeft_toRightOf="@+id/textViewId2"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textLocation2"
+        tools:text="0005" />
+
+    <TextView
+        android:id="@+id/textViewEmployee2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginStart="20dp"
+        android:gravity="end"
+        android:text="@string/employee_doted"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/textViewEmployeeValue2"
+        app:layout_constraintTop_toBottomOf="@+id/textViewId2" />
+
+    <TextView
+        android:id="@+id/textViewEmployeeValue2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginEnd="20dp"
+        android:gravity="start"
+        app:layout_constraintLeft_toRightOf="@+id/textViewEmployee2"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewId2"
+        tools:text="Сериков" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewEmployeeValue2" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

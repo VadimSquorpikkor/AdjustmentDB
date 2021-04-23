@@ -1,6 +1,8 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
+import com.squorpikkor.app.adjustmentdb.UnitInfoActivity;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.DSerialUnitAdapter;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.ExitAskDialog;
@@ -29,6 +33,7 @@ import java.util.Objects;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE_TEXT;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_SEARCH;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EXTRA_POSITION;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_TYPE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_TYPE;
 
@@ -140,7 +145,14 @@ public class SearchDeviceFragment extends Fragment {
             logoImage.setVisibility(View.GONE);
         }
         DSerialUnitAdapter unitAdapter = new DSerialUnitAdapter(list, mViewModel);
+        unitAdapter.setOnItemClickListener(this::openInfoFragment);
         foundUnitRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         foundUnitRecycler.setAdapter(unitAdapter);
+    }
+
+    private void openInfoFragment(int position) {
+        mViewModel.setPosition(position);
+        mViewModel.selectUnit(mViewModel.getSerialUnitsList().getValue().get(position));
+        startActivity(new Intent(getActivity(), UnitInfoActivity.class));
     }
 }
