@@ -5,22 +5,16 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
-
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.StatesAdapter;
-
 import java.util.ArrayList;
-
-import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.Utils.insertRightValue;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_STATES;
 
 public class UnitInfoActivity extends AppCompatActivity {
+
+    //todo Для этой активити не нужен такая ViewModel, как основная, нужно сделать сильно урезанную версию
 
     MainViewModel mViewModel;
     TextView deviceType;
@@ -31,6 +25,7 @@ public class UnitInfoActivity extends AppCompatActivity {
     TextView id;
     TextView employee;
     RecyclerView events;
+    public static final String EXTRA_UNIT_ID = "extra_unit_id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +42,12 @@ public class UnitInfoActivity extends AppCompatActivity {
         employee = findViewById(R.id.textViewEmployeeValue2);
         events = findViewById(R.id.recyclerView2);
 
-        int position = mViewModel.getPosition();
-        mViewModel.selectUnit(mViewModel.getSerialUnitsList().getValue().get(position));
+        String unit_id = this.getIntent().getStringExtra(EXTRA_UNIT_ID);
+        mViewModel.addSelectedUnitStatesListListener(unit_id);
+
+//        int position = mViewModel.getPosition();
+//        mViewModel.selectUnit(mViewModel.getSerialUnitsList().getValue().get(position));
+        mViewModel.selectUnit(unit_id);
 
         final MutableLiveData<DUnit> selectedUnits = mViewModel.getSelectedUnit();
         selectedUnits.observe(this, this::insertDataToFields);
@@ -58,7 +57,7 @@ public class UnitInfoActivity extends AppCompatActivity {
     }
 
     void updateAdapter(ArrayList<DEvent> list) {
-        StatesAdapter statesAdapter = new StatesAdapter(list);
+        StatesAdapter statesAdapter = new StatesAdapter(list, mViewModel);
         events.setLayoutManager(new LinearLayoutManager(this));
         events.setAdapter(statesAdapter);
     }
@@ -72,6 +71,5 @@ public class UnitInfoActivity extends AppCompatActivity {
         serial.setText(insertRightValue(unit.getSerial()));
         //location.setText(location);
 
-        mViewModel.addSelectedUnitStatesListListener(unit);
     }
 }

@@ -1,13 +1,11 @@
 package com.squorpikkor.app.adjustmentdb;
 
-import android.util.Log;
+import android.annotation.SuppressLint;
 import android.view.View;
 import android.widget.TextView;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 public class Utils {
 
@@ -65,8 +63,23 @@ public class Utils {
         else return nameList.get(position);
     }
 
-    public static String getRightDate(long time_stamp_server) {
+    @SuppressLint("SimpleDateFormat")
+    public static String getRightDateAndTime(long time_stamp_server) {
         String DATE_PATTERN = "dd.MM.yyyy HH:mm";
+        SimpleDateFormat formatter = new SimpleDateFormat(DATE_PATTERN);
+        return formatter.format(time_stamp_server);
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    public static String getRightDate(long time_stamp_server) {
+        String DATE_PATTERN = "dd.MM.yyyy";
+        SimpleDateFormat formatter = new SimpleDateFormat(DATE_PATTERN);
+        return formatter.format(time_stamp_server);
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    public static String getRightTime(long time_stamp_server) {
+        String DATE_PATTERN = "HH:mm";
         SimpleDateFormat formatter = new SimpleDateFormat(DATE_PATTERN);
         return formatter.format(time_stamp_server);
     }
@@ -81,6 +94,7 @@ public class Utils {
                 -(int)(startDate.getTime()/(24*60*60*1000))));
     }
 
+    @SuppressWarnings({"unused", "RedundantSuppression"})
     public static void insertValueOrGone(String value, TextView view) {
         if (isEmptyOrNull(value)) {
             view.setVisibility(View.GONE);
@@ -90,6 +104,7 @@ public class Utils {
         }
     }
 
+    @SuppressWarnings({"unused", "RedundantSuppression"})
     public static void insertValueOrGone(String value, TextView view, String format) {
         if (isEmptyOrNull(value)) {
             view.setVisibility(View.GONE);
@@ -99,6 +114,7 @@ public class Utils {
         }
     }
 
+    @SuppressWarnings({"unused", "RedundantSuppression"})
     public static String rightDayString(int i) {
         switch (i%10) {
             case 1:return "день";

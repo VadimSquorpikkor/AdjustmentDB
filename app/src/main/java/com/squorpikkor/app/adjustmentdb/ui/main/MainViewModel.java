@@ -270,8 +270,9 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
      * Слушает изменения в коллекции статусов и при новом событии загружает статусы для выбранного
      * юнита (т.е. только те, которые принадлежат этому юниту)
      */
-    public void addSelectedUnitStatesListListener(DUnit unit) {
-        dbh.addSelectedUnitStatesListener(unit.getId(), unitStatesList);
+    public void addSelectedUnitStatesListListener(String unit_id) {
+        Log.e(TAG, "addSelectedUnitStatesListListener: "+unit_id);
+        dbh.addSelectedUnitStatesListener(unit_id, unitStatesList);
     }
 
     void addEmployeeNamesListener() {
@@ -282,8 +283,8 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         dbh.getStringArrayFromDB(TABLE_EMPLOYEES, employeeIdList, EMPLOYEE_ID);
     }
 
-    public void addSelectedUnitListener(DUnit unit) {
-        dbh.addSelectedUnitListener(unit, selectedUnit);
+    public void addSelectedUnitListener(String unit_id) {
+        dbh.addSelectedUnitListener(unit_id, selectedUnit);
     }
 
 //--------------------------------------------------------------------------------------------------
@@ -425,8 +426,8 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         selectedUnit.setValue(newUnit);
     }
 
-    public void getEventForThisUnit(DUnit unit) {
-        dbh.getEventsFromDB(unit.getId(), unitStatesList);
+    public void getEventForThisUnit(String unit_id) {
+        dbh.getEventsFromDB(unit_id, unitStatesList);
     }
 
     public String getVersion() {
@@ -508,16 +509,14 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
             // беруться из БД (getRepairUnitById), если этого блока в БД нет (новый), то данные для
             // блока берутся из QR-кода
             updateSelectedUnit(unit);
-            addSelectedUnitListener(unit);
-            getEventForThisUnit(unit);
+            addSelectedUnitListener(unit.getId());
+            getEventForThisUnit(unit.getId());
         }
     }
 
-    //todo объединить saveUnit и selectUnit
-    public void selectUnit(DUnit unit) {
-        updateSelectedUnit(unit);
-        addSelectedUnitListener(unit);
-        getEventForThisUnit(unit);
+    public void selectUnit(String unit_id) {
+        addSelectedUnitListener(unit_id);
+        getEventForThisUnit(unit_id);
     }
 
     @Override

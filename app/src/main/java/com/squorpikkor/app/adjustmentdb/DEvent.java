@@ -9,9 +9,10 @@ public class DEvent {
     private String location;
     private String unit_id;
 
-    public DEvent(Date date, String state) {
+    public DEvent(Date date, String state, String location) {
         this.date = date;
         this.state = state;
+        this.location = location;
     }
 
     public DEvent(Date date, String state, String description, String location, String unit_id) {
@@ -20,9 +21,6 @@ public class DEvent {
         this.description = description;
         this.location = location;
         this.unit_id = unit_id;
-    }
-
-    public DEvent() {
     }
 
     public Date getDate() {

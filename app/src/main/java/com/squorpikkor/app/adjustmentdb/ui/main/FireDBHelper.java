@@ -310,9 +310,9 @@ class FireDBHelper {
         });
     }
 
-    void addSelectedUnitListener(DUnit unit, MutableLiveData<DUnit> mUnit) {
-        db.collection(TABLE_UNITS).document(unit.getId()).addSnapshotListener((queryDocumentSnapshots, error) -> {
-            getUnitById_EXP(unit.getId(), mUnit);
+    void addSelectedUnitListener(String unit_id, MutableLiveData<DUnit> mUnit) {
+        db.collection(TABLE_UNITS).document(unit_id).addSnapshotListener((queryDocumentSnapshots, error) -> {
+            getUnitById_EXP(unit_id, mUnit);
         });
     }
 
@@ -342,7 +342,7 @@ class FireDBHelper {
     void getEventsFromDB(String unit_id, MutableLiveData<ArrayList<DEvent>> events) {
         db.collection(TABLE_EVENTS)
                 .whereEqualTo(EVENT_UNIT, unit_id)
-                .orderBy(EVENT_DATE)
+                .orderBy(EVENT_DATE, Query.Direction.DESCENDING)
                 .get().addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         QuerySnapshot querySnapshot = task.getResult();
@@ -355,7 +355,12 @@ class FireDBHelper {
                             Log.e(TAG, "2: "+timestamp.toDate());
                             Log.e(TAG, "2: "+getRightDate(timestamp.getSeconds()));
                             Log.e(TAG, "3: "+q.get("state"));*/
-                            newEvents.add(new DEvent(timestamp.toDate(), q.get(EVENT_STATE).toString()));
+
+                            Date date = timestamp.toDate();
+                            String state = q.get(EVENT_STATE).toString();
+                            String location = q.get(EVENT_LOCATION).toString();
+                            Log.e(TAG, "♦getEventsFromDB: " + location);
+                            newEvents.add(new DEvent(date, state, location));
                         }
                         events.setValue(newEvents);
                     } else {

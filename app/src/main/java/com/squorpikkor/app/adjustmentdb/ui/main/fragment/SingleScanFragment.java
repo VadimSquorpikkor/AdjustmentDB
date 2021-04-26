@@ -91,7 +91,7 @@ public class SingleScanFragment extends Fragment {
             Log.e(TAG, "onCreateView: список статусов mViewModel.getUnitStatesList");
             this.states = unitEvents.getValue();
             if (unitEvents.getValue() != null) Log.e(TAG, "onCreateView список статусов: " + unitEvents.getValue().size());
-            StatesAdapter statesAdapter = new StatesAdapter(this.states);
+            StatesAdapter statesAdapter = new StatesAdapter(this.states, mViewModel);
             recyclerUnitsStates.setLayoutManager(new LinearLayoutManager(getActivity()));
             recyclerUnitsStates.setAdapter(statesAdapter);
         });
@@ -114,6 +114,7 @@ public class SingleScanFragment extends Fragment {
             mViewModel.startSingleScanner(getActivity(), surfaceView);
             mViewModel.getSingleScanner().initialiseDetectorsAndSources();
             mViewModel.setBackPressCommand(BACK_PRESS_SINGLE);
+            mViewModel.getSelectedUnit().setValue(null);
         }
     }
 
@@ -135,7 +136,7 @@ public class SingleScanFragment extends Fragment {
         tSerial.setText(insertRightValue(unit.getSerial()));
         tLocation.setText(location);
 
-        mViewModel.addSelectedUnitStatesListListener(unit);
+        mViewModel.addSelectedUnitStatesListListener(unit.getId());
     }
 
 //    private void openUnitFragment(DUnit unit) {
