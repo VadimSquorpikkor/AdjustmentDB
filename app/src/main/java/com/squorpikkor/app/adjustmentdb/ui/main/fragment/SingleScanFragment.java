@@ -19,6 +19,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
+import com.squorpikkor.app.adjustmentdb.Utils;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.StatesAdapter;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialogSingle;
@@ -26,7 +27,6 @@ import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialogSingle;
 import java.util.ArrayList;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
-import static com.squorpikkor.app.adjustmentdb.Utils.insertRightValue;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_SINGLE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_STATES;
 
@@ -38,10 +38,10 @@ public class SingleScanFragment extends Fragment {
     private TextView tInnerSerial;
     private TextView tSerial;
     private TextView tId;
-    private TextView tLocation;
+//    private TextView tLocation;
     private RecyclerView recyclerUnitsStates;
     private ArrayList<DEvent> states;
-    private String location;//todo надо как observe Mutable, иначе может значение не успеть подгрузиться
+//    private String location;//todo надо как observe Mutable, иначе может значение не успеть подгрузиться
     private FloatingActionButton addNewStateButton;
     private SurfaceView surfaceView;
     private ConstraintLayout infoLayout;
@@ -65,7 +65,7 @@ public class SingleScanFragment extends Fragment {
         tInnerSerial = view.findViewById(R.id.textViewInnerSerialValue);
         tSerial = view.findViewById(R.id.textViewSerialValue);
         tId = view.findViewById(R.id.textViewIdValue);
-        tLocation = view.findViewById(R.id.textLocationValue);
+//        tLocation = view.findViewById(R.id.textLocationValue);
         recyclerUnitsStates = view.findViewById(R.id.recyclerView);
 
         infoLayout = view.findViewById(R.id.db_info_layout);
@@ -101,7 +101,7 @@ public class SingleScanFragment extends Fragment {
 
         mViewModel.startSingleScanner(getActivity(), surfaceView);
 
-        location = mViewModel.getLocationName().getValue();
+//        location = mViewModel.getLocationName().getValue();
 
         return view;
     }
@@ -130,11 +130,11 @@ public class SingleScanFragment extends Fragment {
         tType.setText("- - -");
         if (unit.isRepairUnit()) tType.setText("Ремонт");
         if (unit.isSerialUnit()) tType.setText("Серия");
-        tId.setText(insertRightValue(unit.getId()));
-        tName.setText(insertRightValue(unit.getName()));
-        tInnerSerial.setText(insertRightValue(unit.getInnerSerial()));
-        tSerial.setText(insertRightValue(unit.getSerial()));
-        tLocation.setText(location);
+        tId.setText(Utils.getRightValue(unit.getId()));
+        tName.setText(Utils.getRightValue(unit.getName()));
+        tInnerSerial.setText(Utils.getRightValue(unit.getInnerSerial()));
+        tSerial.setText(Utils.getRightValue(unit.getSerial()));
+        //tLocation.setText(location);
 
         mViewModel.addSelectedUnitStatesListListener(unit.getId());
     }

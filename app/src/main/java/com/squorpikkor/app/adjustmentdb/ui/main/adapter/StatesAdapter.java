@@ -48,7 +48,8 @@ public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesView
         DEvent event = events.get(position);
 
         String state = getNameById(event.getState(), mViewModel.getAllStatesNameList().getValue(), Objects.requireNonNull(mViewModel.getAllStatesIdList().getValue()));
-        String location = getNameById(event.getLocation(), mViewModel.getLocationNamesList().getValue(), Objects.requireNonNull(mViewModel.getLocationIdList().getValue()));
+        String location = getNameById(event.getLocation(),mViewModel.getLocationNamesList().getValue(),
+                mViewModel.getLocationIdList().getValue());
 
         holder.tState.setText(state);
         holder.tLocation.setText(location);

@@ -248,12 +248,14 @@ class FireDBHelper {
                 });
     }
 
-    void getUnitListByParam(MutableLiveData<ArrayList<DUnit>> unitList, String param1, String value1, String param2, String value2, String param3, String value3, String param4, String value4) {
+    void getUnitListByParam(MutableLiveData<ArrayList<DUnit>> unitList, String param1, String value1, String param2, String value2, String param3, String value3, String param4, String value4, String param5, String value5, String param6, String value6) {
         Query query = db.collection(TABLE_UNITS);
         if (!value1.equals(ANY_VALUE)) query = query.whereEqualTo(param1, value1);
         if (!value2.equals(ANY_VALUE)) query = query.whereEqualTo(param2, value2);
         if (!value3.equals(ANY_VALUE)) query = query.whereEqualTo(param3, value3);
         if (!value4.equals(ANY_VALUE)) query = query.whereEqualTo(param4, value4);
+        if (!value5.equals(ANY_VALUE)) query = query.whereEqualTo(param5, value5);
+        if (!value6.equals(ANY_VALUE)) query = query.whereEqualTo(param6, value6);
 
         query.get()
                 .addOnCompleteListener(task -> {

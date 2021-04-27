@@ -10,18 +10,25 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
+import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
-import static com.squorpikkor.app.adjustmentdb.Utils.insertRightValue;
+import static com.squorpikkor.app.adjustmentdb.Utils.getNameById;
+import static com.squorpikkor.app.adjustmentdb.Utils.getRightValue;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_UNIT;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_UNIT;
 
+/**Адаптер для списка найденных устройств в режиме мультисканирования*/
 public class FoundUnitAdapter extends RecyclerView.Adapter<FoundUnitAdapter.FoundViewHolder>{
     private final ArrayList<DUnit> units;
+    MainViewModel mViewModel;
 
     /**Конструктор, в котором передаем ArrayList для RecyclerView */
-    public FoundUnitAdapter(ArrayList<DUnit> units) {
+    public FoundUnitAdapter(ArrayList<DUnit> units, MainViewModel model) {
         this.units = units;
+        this.mViewModel = model;
     }
 
     /**Присваиваем xml лэйаут к итему RecyclerView */
@@ -35,16 +42,17 @@ public class FoundUnitAdapter extends RecyclerView.Adapter<FoundUnitAdapter.Foun
     @Override
     public void onBindViewHolder(@NonNull FoundViewHolder holder, int position) {
         DUnit unit = units.get(position);
-        if (unit.isRepairUnit()) { //Ремонт r_0001 AT6130
-            holder.tFirst.setText(REPAIR_UNIT);
-            holder.tSecond.setText(insertRightValue(unit.getId()));
-            holder.tThird.setText(insertRightValue(unit.getName()));
-        }
-        if (unit.isSerialUnit()) { //AT6130 13245 123
-            holder.tFirst.setText(insertRightValue(unit.getName()));
-            holder.tSecond.setText(insertRightValue(unit.getInnerSerial()));
-            holder.tThird.setText(insertRightValue(unit.getSerial()));
-        }
+        String type = unit.isRepairUnit()?REPAIR_UNIT:SERIAL_UNIT;
+        String name = getNameById(unit.getName(), mViewModel.getDeviceNameList().getValue(), Objects.requireNonNull(mViewModel.getDeviceIdList().getValue()));
+        String serial = getRightValue(unit.getSerial());
+        String innerSerial = getRightValue(unit.getInnerSerial());
+        String id = getRightValue(unit.getId());
+
+        holder.deviceType.setText(type);
+        holder.deviceName.setText(name);
+        holder.deviceSerial.setText(serial);
+        holder.deviceInnerSerial.setText(innerSerial);
+        holder.deviceId.setText(id);
     }
 
     /**Просто возвращает кол-во элементов в массиве*/
@@ -54,15 +62,19 @@ public class FoundUnitAdapter extends RecyclerView.Adapter<FoundUnitAdapter.Foun
     }
 
     static class FoundViewHolder extends RecyclerView.ViewHolder {
-        private final TextView tFirst;
-        private final TextView tSecond;
-        private final TextView tThird;
+        private final TextView deviceType;
+        private final TextView deviceName;
+        private final TextView deviceSerial;
+        private final TextView deviceInnerSerial;
+        private final TextView deviceId;
 
         public FoundViewHolder(@NonNull View itemView) {
             super(itemView);
-            tFirst = itemView.findViewById(R.id.textType);
-            tSecond = itemView.findViewById(R.id.textFirst);
-            tThird = itemView.findViewById(R.id.textSecond);
+            deviceType = itemView.findViewById(R.id.dev_type);
+            deviceName = itemView.findViewById(R.id.dev_name);
+            deviceSerial = itemView.findViewById(R.id.dev_serial);
+            deviceInnerSerial = itemView.findViewById(R.id.dev_inner_serial);
+            deviceId = itemView.findViewById(R.id.dev_id);
         }
     }
 }

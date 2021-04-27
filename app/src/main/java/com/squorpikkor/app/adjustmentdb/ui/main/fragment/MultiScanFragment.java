@@ -65,7 +65,7 @@ public class MultiScanFragment extends Fragment {
                 mViewModel.setBackPressCommand(BACK_PRESS_MULTI);
             }
 
-            foundUnitAdapter = new FoundUnitAdapter(foundUnitsList);
+            foundUnitAdapter = new FoundUnitAdapter(foundUnitsList, mViewModel);
             recyclerFoundUnits.setLayoutManager(new LinearLayoutManager(getActivity()));
             recyclerFoundUnits.setAdapter(foundUnitAdapter);
         });

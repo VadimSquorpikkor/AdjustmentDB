@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.StatesAdapter;
 import java.util.ArrayList;
-import static com.squorpikkor.app.adjustmentdb.Utils.insertRightValue;
+import static com.squorpikkor.app.adjustmentdb.Utils.getRightValue;
 
 public class UnitInfoActivity extends AppCompatActivity {
 
@@ -21,7 +21,6 @@ public class UnitInfoActivity extends AppCompatActivity {
     TextView deviceName;
     TextView innerSerial;
     TextView serial;
-    TextView location;
     TextView id;
     TextView employee;
     RecyclerView events;
@@ -37,7 +36,6 @@ public class UnitInfoActivity extends AppCompatActivity {
         deviceName = findViewById(R.id.textViewName2);
         innerSerial = findViewById(R.id.textViewInnerSerialValue2);
         serial = findViewById(R.id.textViewSerialValue2);
-        location = findViewById(R.id.textLocationValue2);
         id = findViewById(R.id.textViewIdValue2);
         employee = findViewById(R.id.textViewEmployeeValue2);
         events = findViewById(R.id.recyclerView2);
@@ -45,8 +43,6 @@ public class UnitInfoActivity extends AppCompatActivity {
         String unit_id = this.getIntent().getStringExtra(EXTRA_UNIT_ID);
         mViewModel.addSelectedUnitStatesListListener(unit_id);
 
-//        int position = mViewModel.getPosition();
-//        mViewModel.selectUnit(mViewModel.getSerialUnitsList().getValue().get(position));
         mViewModel.selectUnit(unit_id);
 
         final MutableLiveData<DUnit> selectedUnits = mViewModel.getSelectedUnit();
@@ -65,11 +61,9 @@ public class UnitInfoActivity extends AppCompatActivity {
     private void insertDataToFields(DUnit unit) {
         if (unit.isRepairUnit()) deviceType.setText("Ремонт");
         if (unit.isSerialUnit()) deviceType.setText("Серия");
-        id.setText(insertRightValue(unit.getId()));
-        deviceName.setText(insertRightValue(unit.getName()));
-        innerSerial.setText(insertRightValue(unit.getInnerSerial()));
-        serial.setText(insertRightValue(unit.getSerial()));
-        //location.setText(location);
-
+        id.setText(Utils.getRightValue(unit.getId()));
+        deviceName.setText(Utils.getRightValue(unit.getName()));
+        innerSerial.setText(Utils.getRightValue(unit.getInnerSerial()));
+        serial.setText(Utils.getRightValue(unit.getSerial()));
     }
 }

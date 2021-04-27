@@ -11,6 +11,8 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.fragment.SearchDeviceFragment;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +25,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @StringRes
     private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2, R.string.tab_text_3};
     private final Context mContext;
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final Map<Integer, Fragment> fragmentMap;
     FragmentManager fm;
 
@@ -41,6 +44,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
 
 
+    @NotNull
     @Override
     public Fragment getItem(int position) {
         // getItem is called to instantiate the fragment for the given page.

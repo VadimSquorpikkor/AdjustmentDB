@@ -66,6 +66,45 @@
         <item name="android:textColor">@color/main_orange</item>
     </style>
 
+<!-- ******************************************************************************************* -->
+
+    <style name="dialogLinearText">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">2</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:gravity">end</item>
+        <item name="android:textColor">@color/main_orange</item>
+    </style>
+
+    <style name="dialogLinearEdit">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">3</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="dialogLinearSpinner">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">3</item>
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:textAlignment">viewStart</item>
+        <item name="android:scrollbarSize">22dp</item>
+    </style>
+
+    <style name="dialogLinearHorizontal">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+<!-- ******************************************************************************************* -->
+
     <style name="myTabs" parent="android:TextAppearance.Medium">
         <item name="android:typeface">monospace</item>
         <item name="android:singleLine">false</item>

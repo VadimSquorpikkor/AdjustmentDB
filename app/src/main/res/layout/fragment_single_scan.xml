@@ -95,32 +95,6 @@
             tools:text="6789" />
 
         <TextView
-            android:id="@+id/textLocation"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_marginStart="20dp"
-            android:gravity="end"
-            android:text="@string/location_doted"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintHorizontal_chainStyle="spread"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/textLocationValue"
-            app:layout_constraintTop_toBottomOf="@+id/textViewSerial" />
-
-        <TextView
-            android:id="@+id/textLocationValue"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_marginEnd="20dp"
-            android:gravity="start"
-            app:layout_constraintLeft_toRightOf="@+id/textLocation"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewSerial"
-            tools:text="Регулировка" />
-
-        <TextView
             android:id="@+id/textViewId"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -132,7 +106,7 @@
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/textViewIdValue"
-            app:layout_constraintTop_toBottomOf="@+id/textLocation" />
+            app:layout_constraintTop_toBottomOf="@+id/textViewSerial" />
 
         <TextView
             android:id="@+id/textViewIdValue"
@@ -143,7 +117,7 @@
             android:gravity="start"
             app:layout_constraintLeft_toRightOf="@+id/textViewId"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textLocation"
+            app:layout_constraintTop_toBottomOf="@+id/textViewSerial"
             tools:text="0005" />
 
         <TextView
@@ -193,10 +167,10 @@
             android:focusable="true"
             app:backgroundTint="#F44336"
             app:elevation="6dp"
+            app:rippleColor="#FFFFFF"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:rippleColor="#FFFFFF"
             app:srcCompat="@drawable/ic_baseline_add_24" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

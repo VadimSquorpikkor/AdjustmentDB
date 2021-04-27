@@ -11,126 +11,11 @@
         android:id="@+id/found_unit_recycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginTop="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
+        android:layout_margin="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginBottom="10dp"
-        android:background="@color/dark_grey"
-        android:elevation="6dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <TextView
-            style="@style/dialogTextLabel"
-            android:id="@+id/dialogNameLabel"
-            android:layout_marginStart="10dp"
-            android:text="@string/device_type_doted"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/spinnerDevName"
-            />
-
-        <Spinner
-            android:id="@+id/spinnerDevName"
-            style="@style/dialogSpinner"
-            android:layout_width="0dp"
-            android:layout_margin="15dp"
-            app:layout_constraintBottom_toTopOf="@+id/spinnerLocation"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/dialogNameLabel"/>
-
-        <TextView
-            style="@style/dialogTextLabel"
-            android:id="@+id/dialogLocationLabel"
-            android:layout_marginStart="10dp"
-            android:text="@string/location_doted"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/spinnerLocation"
-            />
-
-        <Spinner
-            android:id="@+id/spinnerLocation"
-            style="@style/dialogSpinner"
-            android:layout_width="0dp"
-            android:layout_margin="15dp"
-            app:layout_constraintBottom_toTopOf="@+id/spinnerEmployee"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/dialogLocationLabel" />
-
-        <TextView
-            style="@style/dialogTextLabel"
-            android:id="@+id/dialogEmployeeLabel"
-            android:layout_marginStart="10dp"
-            android:text="@string/employee_doted"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/spinnerEmployee"/>
-
-        <Spinner
-            android:id="@+id/spinnerEmployee"
-            style="@style/dialogSpinner"
-            android:layout_width="0dp"
-            android:layout_margin="15dp"
-            app:layout_constraintBottom_toTopOf="@+id/show_button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/dialogEmployeeLabel" />
-
-        <Button
-            android:id="@+id/show_button"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:text="@string/show"
-            android:elevation="6dp"
-            android:layout_margin="10dp"
-            android:background="@drawable/button_shape_selector_reversed"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <RadioGroup
-            android:id="@+id/radioGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toTopOf="@+id/spinnerDevName"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <RadioButton
-                android:id="@+id/radio_button_serial"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginVertical="5dp"
-                android:checked="true"
-                android:textSize="12sp"
-                android:text="@string/serial"
-                android:buttonTint="@color/main_orange"
-                tools:layout_editor_absoluteX="64dp"
-                tools:layout_editor_absoluteY="421dp" />
-
-            <RadioButton
-                android:id="@+id/radio_button_repair"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginVertical="5dp"
-                android:textSize="12sp"
-                android:text="@string/repair"
-                android:buttonTint="@color/main_orange"
-                tools:layout_editor_absoluteX="146dp"
-                tools:layout_editor_absoluteY="512dp" />
-
-        </RadioGroup>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView
         android:id="@+id/logo_image"
@@ -138,12 +23,29 @@
         android:layout_height="0dp"
         android:layout_margin="50dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/found_unit_recycler"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.4"
+        app:layout_constraintBottom_toTopOf="@+id/open_search"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@mipmap/logo_big_grayscale"
         android:contentDescription="@string/app_logo" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/open_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:contentDescription="@string/add_state_button"
+        android:layout_margin="25dp"
+        android:backgroundTint="@color/main_orange"
+        app:backgroundTint="#F44336"
+        app:elevation="6dp"
+        app:rippleColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_baseline_search_24" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,11 +1,13 @@
 package com.squorpikkor.app.adjustmentdb;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.EmptyStackException;
 
 public class Utils {
 
@@ -14,7 +16,7 @@ public class Utils {
     /**
      * @param s если параметр null или "", то возвращает "- - -"
      */
-    public static String insertRightValue(String s) {
+    public static String getRightValue(String s) {
         if (isEmptyOrNull(s)) return EMPTY_VALUE;
         else return s;
     }
@@ -26,7 +28,7 @@ public class Utils {
      * @param s параметр
      * @param text текст
      */
-    public static String insertRightValue(String s, String text) {
+    public static String getRightValue(String s, String text) {
         boolean paramIsEmpty = isEmptyOrNull(s);
         boolean textIsEmpty = isEmptyOrNull(text);
 
@@ -58,6 +60,10 @@ public class Utils {
      * @return name ("Диагностика")
      */
     public static String getNameById(String id, ArrayList<String> nameList, ArrayList<String> idList) {
+        if (nameList==null||idList==null){
+            Log.e("TAG", "☻ nameList==null||idList==null");
+            return EMPTY_VALUE;
+        }
         int position = idList.indexOf(id);
         if (position==-1)return EMPTY_VALUE;
         else return nameList.get(position);

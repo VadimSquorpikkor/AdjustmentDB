@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
+import com.squorpikkor.app.adjustmentdb.Utils;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 
 import java.util.ArrayList;
@@ -19,7 +20,6 @@ import static com.squorpikkor.app.adjustmentdb.Utils.EMPTY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.Utils.daysPassed;
 import static com.squorpikkor.app.adjustmentdb.Utils.getNameById;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightDateAndTime;
-import static com.squorpikkor.app.adjustmentdb.Utils.insertRightValue;
 
 //todo это адаптер не для серийных, а для всех типов. надо поменять название
 public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolder>{
@@ -72,7 +72,7 @@ public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolde
 
         holder.tState.setText(state);
         holder.tName.setText(name);
-        holder.tSerial.setText(String.format("№ %s", insertRightValue(unit.getSerial())));
+        holder.tSerial.setText(String.format("№ %s", Utils.getRightValue(unit.getSerial())));
         if (unit.getInnerSerial()==null||unit.getInnerSerial().equals(""))holder.tInnerSerial.setText("");
         else holder.tInnerSerial.setText(String.format("(вн. %s)", unit.getInnerSerial()));
 

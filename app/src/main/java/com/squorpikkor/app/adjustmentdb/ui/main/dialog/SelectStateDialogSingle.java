@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.Objects;
 
 import static com.squorpikkor.app.adjustmentdb.Utils.getIdByName;
-import static com.squorpikkor.app.adjustmentdb.Utils.insertRightValue;
+import static com.squorpikkor.app.adjustmentdb.Utils.getRightValue;
 import static com.squorpikkor.app.adjustmentdb.Utils.isEmptyOrNull;
 
 public class SelectStateDialogSingle extends Dialog {
@@ -115,9 +115,9 @@ public class SelectStateDialogSingle extends Dialog {
         //todo надо сделать не через создание нового юнита, а через присваивание параметров уже существующему юниту, затем этот старый юнит сохранять
         okButton.setOnClickListener(view -> {
             String id = unit.getId();
-            String name = insertRightValue(unit.getName(), devices.getSelectedItem().toString());
-            String innerSerial = insertRightValue(unit.getInnerSerial(), inner.getText().toString());
-            String serial = insertRightValue(unit.getSerial(), eSerial.getText().toString());
+            String name = getRightValue(unit.getName(), devices.getSelectedItem().toString());
+            String innerSerial = getRightValue(unit.getInnerSerial(), inner.getText().toString());
+            String serial = getRightValue(unit.getSerial(), eSerial.getText().toString());
             String state = "";
             String state_id = "";
             if (spinner.getSelectedItem() != null) state = spinner.getSelectedItem().toString();

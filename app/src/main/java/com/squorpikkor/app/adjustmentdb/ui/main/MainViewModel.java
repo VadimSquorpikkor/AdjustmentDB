@@ -92,6 +92,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
     private static final String SPLIT_SYMBOL = " ";
     public static final String REPAIR_UNIT = "Ремонт";
+    public static final String SERIAL_UNIT = "Серия";
     public static final String ANY_VALUE = "any_value";
     public static final String ANY_VALUE_TEXT = "";
     public static final String EXTRA_POSITION = "position";
@@ -391,15 +392,16 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     }
 
     /**По выбранным параметрам получает из БД список юнитов*/
-    public void getUnitListFromBD(String deviceName, String location, String employee, String type) {
+    public void getUnitListFromBD(String deviceName, String location, String employee, String type, String state, String serial) {
         Log.e(TAG, "♦ deviceName - "+deviceName+" location - "+location+" employee - "+employee+" type - "+type);
         //Если параметр не "any", то имя параметра переводим в его идентификатор ("Диагностика" -> "adj_r_diagnostica")
         //Если "any", то так и оставляем
         if (!deviceName.equals(ANY_VALUE)) deviceName = getIdByName(deviceName, deviceNameList.getValue(), deviceIdList.getValue());
         if (!location.equals(ANY_VALUE)) location = getIdByName(location, locationNamesList.getValue(), locationIdList.getValue());
+        if (!state.equals(ANY_VALUE)) state = getIdByName(state, allStatesNameList.getValue(), allStatesIdList.getValue());
         if (!employee.equals(ANY_VALUE)) employee = getIdByName(employee, employeeNamesList.getValue(), employeeIdList.getValue());
 
-        dbh.getUnitListByParam(serialUnitsList, UNIT_DEVICE, deviceName, UNIT_LOCATION, location, UNIT_EMPLOYEE, employee, UNIT_TYPE, type);
+        dbh.getUnitListByParam(serialUnitsList, UNIT_DEVICE, deviceName, UNIT_LOCATION, location, UNIT_EMPLOYEE, employee, UNIT_TYPE, type, UNIT_STATE, state, UNIT_SERIAL, serial);
     }
 
     public void restartMultiScanning() {
@@ -528,7 +530,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         if (ar.length == 2) {
             //Для серии: имя+внутренний_серийный (БДКГ-02 1234), id = БДКГ-02_1234
             //Для ремонта: "Ремонт"+id (Ремонт 0001), id = r_0005
-            String name = ar[0];
+            String name = ar[0];//это device_id
             String innerSerial = ar[1];
             String id;
             String location = getLocation_id().getValue();

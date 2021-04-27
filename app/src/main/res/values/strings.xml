@@ -31,6 +31,7 @@
     <string name="location">Локация</string>
 
     <string name="add_state_button">Добавить статус</string>
+    <string name="open_search_button">Открыть диалог поиска</string>
 
     <string name="tab_text_1">Одиночное\nсканирование</string>
     <string name="tab_text_2">Поиск\nустройства</string>
@@ -41,4 +42,5 @@
     <string name="serial">Серия</string>
     <string name="repair">Ремонт</string>
     <string name="app_logo">Логотип приложения</string>
+    <string name="state_doted">Статус:</string>
 </resources>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraintLayout2"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="5dp"
+    android:orientation="vertical"
+    android:padding="15dp"
+    android:background="@color/colorBackground"
+    >
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+
+        <RadioGroup
+
+            android:id="@+id/radioGroup"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="5dp">
+
+            <RadioButton
+                android:layout_marginHorizontal="20dp"
+                android:id="@+id/radio_button_serial"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/main_orange"
+                android:checked="true"
+                android:text="@string/serial"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:layout_marginHorizontal="20dp"
+                android:id="@+id/radio_button_repair"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/main_orange"
+                android:text="@string/repair"
+                android:textSize="12sp" />
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+
+        <TextView
+            android:id="@+id/dialogSerialLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/serial_number_doted" />
+
+        <EditText
+            android:id="@+id/editTextSerial"
+            style="@style/dialogLinearEdit"
+            android:background="@drawable/edit_text_field"
+            android:inputType="textPersonName"
+            tools:text="12345"
+            android:importantForAutofill="no"
+            tools:ignore="LabelFor" />
+
+    </LinearLayout>
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+
+        <TextView
+            android:id="@+id/dialogNameLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/device_type_doted" />
+
+        <Spinner
+            android:id="@+id/spinnerDevName"
+            style="@style/dialogLinearEdit" />
+
+    </LinearLayout>
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+
+        <TextView
+            android:id="@+id/dialogLocationLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/location_doted" />
+
+        <Spinner
+            android:id="@+id/spinnerLocation"
+            style="@style/dialogLinearEdit" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+
+        <TextView
+            android:id="@+id/dialogStateLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/state_doted" />
+
+        <Spinner
+            android:id="@+id/spinnerState"
+            style="@style/dialogLinearSpinner" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+
+        <TextView
+            android:id="@+id/dialogEmployeeLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/employee_doted" />
+
+        <Spinner
+            android:id="@+id/spinnerEmployee"
+            style="@style/dialogLinearSpinner" />
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/show_button"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/button_shape_selector_reversed"
+        android:elevation="6dp"
+        android:text="@string/show"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinnerEmployee" />
+
+
+</LinearLayout>
