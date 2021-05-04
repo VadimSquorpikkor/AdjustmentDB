@@ -1,18 +1,14 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.fragment_cradle;
 
 import android.content.Context;
-
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
-
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.fragment.SearchDeviceFragment;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,8 +38,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         };
     }
 
-
-
+    @SuppressWarnings("ConstantConditions")
     @NotNull
     @Override
     public Fragment getItem(int position) {

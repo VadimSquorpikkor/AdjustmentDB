@@ -1,8 +1,9 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.dialog;
 
-import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.view.View;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -10,7 +11,8 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 
-import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
@@ -19,6 +21,8 @@ import com.squorpikkor.app.adjustmentdb.MainActivity;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
@@ -26,11 +30,10 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE_T
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_TYPE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_TYPE;
 
-public class SearchUnitParamsDialog extends Dialog {
+public class SearchUnitParamsDialog extends DialogFragment {
 
-    private final Activity context;
+    Context mContext;
     MainViewModel mViewModel;
-
     RadioButton isSerialRadio;
     RadioButton isRepairRadio;
     Spinner devNameSpinner;
@@ -40,43 +43,57 @@ public class SearchUnitParamsDialog extends Dialog {
     Button searchButton;
     EditText serialEdit;
 
-    public SearchUnitParamsDialog(@NonNull Activity context, MainViewModel mViewModel) {
-        super(context);
-        this.context = context;
-        this.mViewModel = mViewModel;
+//    public static SearchUnitParamsDialog newInstance() {
+//        return new SearchUnitParamsDialog();
+//    }
+
+    public SearchUnitParamsDialog() {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onAttach(@NotNull Context context) {
+        mContext = context;
+        super.onAttach(context);
+    }
+
+    @NotNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.dialog_search_unit_param);
 
-        MainViewModel mViewModel = new ViewModelProvider((MainActivity) context).get(MainViewModel.class);
+        AlertDialog dialog = new AlertDialog.Builder(mContext).create();
+        Window window = dialog.getWindow();
+        if (window != null) window.setBackgroundDrawableResource(R.drawable.main_gradient);
+        View view = requireActivity().getLayoutInflater()
+                .inflate(R.layout.dialog_search_unit_param, null);
+        dialog.setView(view, 0, 0, 0, 0);
 
-        isSerialRadio = findViewById(R.id.radio_button_serial);
-        isRepairRadio = findViewById(R.id.radio_button_repair);
-        devNameSpinner = findViewById(R.id.spinnerDevName);
-        locationSpinner = findViewById(R.id.spinnerLocation);
-        statesSpinner = findViewById(R.id.spinnerState);
-        employeeSpinner = findViewById(R.id.spinnerEmployee);
-        searchButton = findViewById(R.id.show_button);
-        serialEdit = findViewById(R.id.editTextSerial);
+        MainViewModel mViewModel = new ViewModelProvider((MainActivity) mContext).get(MainViewModel.class);
+
+        isSerialRadio = view.findViewById(R.id.radio_button_serial);
+        isRepairRadio = view.findViewById(R.id.radio_button_repair);
+        devNameSpinner = view.findViewById(R.id.spinnerDevName);
+        locationSpinner = view.findViewById(R.id.spinnerLocation);
+        statesSpinner = view.findViewById(R.id.spinnerState);
+        employeeSpinner = view.findViewById(R.id.spinnerEmployee);
+        searchButton = view.findViewById(R.id.show_button);
+        serialEdit = view.findViewById(R.id.editTextSerial);
 
         final MutableLiveData<ArrayList<String>> types = mViewModel.getDeviceNameList();
-        types.observe((LifecycleOwner)context, this::updateDevNamesSpinner);
+        types.observe((LifecycleOwner)mContext, this::updateDevNamesSpinner);
 
         final MutableLiveData<ArrayList<String>> locations = mViewModel.getLocationNamesList();
-        locations.observe((LifecycleOwner)context, this::updateLocationSpinner);
+        locations.observe((LifecycleOwner)mContext, this::updateLocationSpinner);
 
         final MutableLiveData<ArrayList<String>> employees = mViewModel.getEmployeeNamesList();
-        employees.observe((LifecycleOwner)context, this::updateEmployeeSpinner);
+        employees.observe((LifecycleOwner)mContext, this::updateEmployeeSpinner);
 
         //todo сделать список статусов зависимым от выбраной локации (подгружать в диалог статусы ро локации). Для "пустой" локации подгружать все статусы
         final MutableLiveData<ArrayList<String>> states = mViewModel.getAllStatesNameList();
-        states.observe((LifecycleOwner)context, this::updateStatesSpinner);
+        states.observe((LifecycleOwner)mContext, this::updateStatesSpinner);
 
         searchButton.setOnClickListener(v -> startSearch());
+        return dialog;
     }
 
     private void startSearch() {
@@ -98,7 +115,7 @@ public class SearchUnitParamsDialog extends Dialog {
     private void updateDevNamesSpinner(ArrayList<String> list) {
         ArrayList<String> newList = new ArrayList<>(list);
         newList.add(0, ANY_VALUE_TEXT);
-        ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, newList);
+        ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, newList);
         typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         devNameSpinner.setAdapter(typeAdapter);
     }
@@ -106,7 +123,7 @@ public class SearchUnitParamsDialog extends Dialog {
     private void updateLocationSpinner(ArrayList<String> list) {
         ArrayList<String> newList = new ArrayList<>(list);
         newList.add(0, ANY_VALUE_TEXT);
-        ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, newList);
+        ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, newList);
         locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         locationSpinner.setAdapter(locationAdapter);
     }
@@ -114,7 +131,7 @@ public class SearchUnitParamsDialog extends Dialog {
     private void updateEmployeeSpinner(ArrayList<String> list) {
         ArrayList<String> newList = new ArrayList<>(list);
         newList.add(0, ANY_VALUE_TEXT);
-        ArrayAdapter<String> employeeAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, newList);
+        ArrayAdapter<String> employeeAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, newList);
         employeeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         employeeSpinner.setAdapter(employeeAdapter);
     }
@@ -122,7 +139,7 @@ public class SearchUnitParamsDialog extends Dialog {
     private void updateStatesSpinner(ArrayList<String> list) {
         ArrayList<String> newList = new ArrayList<>(list);
         newList.add(0, ANY_VALUE_TEXT);
-        ArrayAdapter<String> statesAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, newList);
+        ArrayAdapter<String> statesAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, newList);
         statesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         statesSpinner.setAdapter(statesAdapter);
     }

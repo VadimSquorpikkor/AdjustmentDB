@@ -43,4 +43,6 @@
     <string name="repair">Ремонт</string>
     <string name="app_logo">Логотип приложения</string>
     <string name="state_doted">Статус:</string>
+    <string name="found_count">Найдено устройств: %d</string>
+
 </resources>

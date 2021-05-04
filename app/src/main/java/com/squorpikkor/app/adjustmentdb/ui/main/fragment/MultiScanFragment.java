@@ -1,5 +1,6 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.fragment;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
@@ -37,6 +38,7 @@ public class MultiScanFragment extends Fragment {
         return new MultiScanFragment();
     }
 
+    @SuppressLint("DefaultLocale")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -57,7 +59,7 @@ public class MultiScanFragment extends Fragment {
         final MutableLiveData<ArrayList<DUnit>> foundUnits = mViewModel.getScannerFoundUnitsList();
         foundUnits.observe(getViewLifecycleOwner(), s -> {
             foundUnitsList = foundUnits.getValue();
-            foundCount.setText(String.valueOf(foundUnitsList.size()));
+            foundCount.setText(String.format(getString(R.string.found_count), foundUnitsList.size()));
             if (foundUnitsList.size() != 0) {
                 nextButton.setVisibility(View.VISIBLE);
                 mViewModel.setBackPressCommand(BACK_PRESS_MULTI_STATES);
@@ -73,7 +75,6 @@ public class MultiScanFragment extends Fragment {
         nextButton.setOnClickListener(v -> {
             SelectStateDialogMulti dialog = new SelectStateDialogMulti(getActivity());
             dialog.show();
-//            mViewModel.goToSearch();
         });
 
         final MutableLiveData<Boolean> restartMultiScanning = mViewModel.getRestartMultiScanning();

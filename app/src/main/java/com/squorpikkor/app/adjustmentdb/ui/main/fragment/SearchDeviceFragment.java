@@ -22,6 +22,7 @@ import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.UnitAdapter;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.ExitAskDialog;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SearchUnitParamsDialog;
+import com.squorpikkor.app.adjustmentdb.ui.main.recognition.RecognizeActivity;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -40,6 +41,7 @@ public class SearchDeviceFragment extends Fragment {
     RecyclerView foundUnitRecycler;
     ImageView logoImage;
     FloatingActionButton openSearchDialogButton;
+    FloatingActionButton recognizeButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,12 +61,15 @@ public class SearchDeviceFragment extends Fragment {
         openSearchDialogButton = view.findViewById(R.id.open_search);
         openSearchDialogButton.setOnClickListener(v -> openSearchDialog());
 
+        recognizeButton = view.findViewById(R.id.floatingActionButton);
+        recognizeButton.setOnClickListener(v -> openRecognize());
+
         return view;
     }
 
     private void openSearchDialog() {
-        SearchUnitParamsDialog dialog = new SearchUnitParamsDialog(getActivity(), mViewModel);
-        dialog.show();
+        SearchUnitParamsDialog dialog = new SearchUnitParamsDialog();
+        dialog.show(requireFragmentManager(), null);
     }
 
     @Override
@@ -94,8 +99,15 @@ public class SearchDeviceFragment extends Fragment {
     }
 
     private void openInfoFragment(int position) {
-        Intent intent = new Intent(getActivity(), UnitInfoActivity.class);
-        intent.putExtra(EXTRA_UNIT_ID, mViewModel.getSerialUnitsList().getValue().get(position).getId());
+        if (mViewModel.getSerialUnitsList().getValue() != null) {
+            Intent intent = new Intent(getActivity(), UnitInfoActivity.class);
+            intent.putExtra(EXTRA_UNIT_ID, mViewModel.getSerialUnitsList().getValue().get(position).getId());
+            startActivity(intent);
+        }
+    }
+
+    private void openRecognize() {
+        Intent intent = new Intent(getActivity(), RecognizeActivity.class);
         startActivity(intent);
     }
 }

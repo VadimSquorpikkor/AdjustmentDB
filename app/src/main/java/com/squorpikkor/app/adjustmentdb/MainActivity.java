@@ -33,6 +33,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.squorpikkor.app.adjustmentdb.ui.main.DrawableTask;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import com.squorpikkor.app.adjustmentdb.ui.main.fragment_cradle.SectionsPagerAdapter;
+import com.squorpikkor.app.adjustmentdb.ui.main.fragment_cradle.ZoomOutPageTransformer;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(sectionsPagerAdapter);
         viewPager.setCurrentItem(1);
+        viewPager.setPageTransformer(true, new ZoomOutPageTransformer());
 
         drawer_layout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);

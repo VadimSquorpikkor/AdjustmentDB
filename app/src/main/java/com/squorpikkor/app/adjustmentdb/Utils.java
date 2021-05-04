@@ -122,6 +122,7 @@ public class Utils {
 
     @SuppressWarnings({"unused", "RedundantSuppression"})
     public static String rightDayString(int i) {
+        if (i==11||i==12||i==13||i==14)return "дней";
         switch (i%10) {
             case 1:return "день";
             case 2:

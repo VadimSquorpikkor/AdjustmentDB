@@ -9,8 +9,12 @@
 
     <!--        app:tabInlineLabel="true" чтобы и иконки и текст были в одну линию-->
 
+<!-- todo Возможно есть смысл вместо того как использовать для info отдельную активити, <...>
+     использовать фрагмент, тогда content_main переделать, чтобы он был хостом, а не содержимым, т.е.
+     всё убрать, а вставить "<fragment android:id="@+id/nav_host_fragment..."и в него уже вставлять
+     либо фрагмент с вкладками или фрагмент с инфо-->
 
-<!--        style="@style/myTabs"-->
+    <!--        style="@style/myTabs"-->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabs"
         app:tabTextAppearance="@style/all_caps_false"

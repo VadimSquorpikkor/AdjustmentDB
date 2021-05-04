@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.squorpikkor.app.adjustmentdb">
+
 
     <uses-permission android:name="android.permission.CAMERA" />
 
@@ -10,8 +12,11 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/logo"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.NoActionBar">
-        <activity android:name=".UnitInfoActivity"></activity>
+        android:theme="@style/Theme.AppCompat.NoActionBar"
+        tools:ignore="AllowBackup">
+        <activity android:name=".ui.main.recognition.RecognizeActivity2" />
+        <activity android:name=".UnitInfoActivity" />
+        <activity android:name=".ui.main.recognition.RecognizeActivity" />
         <activity
             android:name=".MainActivity"
             android:icon="@mipmap/logo">
