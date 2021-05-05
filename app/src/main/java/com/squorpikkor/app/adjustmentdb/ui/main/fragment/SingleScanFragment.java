@@ -25,6 +25,7 @@ import com.squorpikkor.app.adjustmentdb.ui.main.adapter.StatesAdapter;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialogSingle;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_SINGLE;
@@ -54,7 +55,7 @@ public class SingleScanFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_single_scan, container, false);
-        mViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
+        mViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity())).get(MainViewModel.class);
 
         addNewStateButton = view.findViewById(R.id.addNewState);
         addNewStateButton.setVisibility(View.GONE);
@@ -144,8 +145,8 @@ public class SingleScanFragment extends Fragment {
 //    }
 
     private void openStatesDialog() {
-        SelectStateDialogSingle dialog = new SelectStateDialogSingle(getActivity());
-        dialog.show();
+        SelectStateDialogSingle dialog = new SelectStateDialogSingle();
+        dialog.show(requireFragmentManager(), null);
     }
 
     @Override

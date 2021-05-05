@@ -21,7 +21,6 @@ import static com.squorpikkor.app.adjustmentdb.Utils.daysPassed;
 import static com.squorpikkor.app.adjustmentdb.Utils.getNameById;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightDateAndTime;
 
-//todo это адаптер не для серийных, а для всех типов. надо поменять название
 public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolder>{
 
     private final ArrayList<DUnit> units;
@@ -54,7 +53,7 @@ public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolde
 
     /**Принимает объект ViewHolder (holder) и порядковый номер элемента массива (position)
     * т.е. у 1-ого элемента View будет порядковый номер 0, он возмёт элемент с этим индексом (заметку)
-    * и у ViewHolder'а установить все значения (присвоить значения к TextView) */
+    * и у ViewHolder-а установить все значения (присвоить значения к TextView) */
     @Override
     public void onBindViewHolder(@NonNull DUnitViewHolder holder, int position) {
         DUnit unit = units.get(position);

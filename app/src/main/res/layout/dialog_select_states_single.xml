@@ -1,158 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="300dp"
-    android:layout_gravity="center"
-    android:layout_height="wrap_content"
-    android:padding="5dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:layout_margin="5dp"
-    android:background="@color/colorBackground">
-
-    <TextView
-        style="@style/dialogTextLabel"
-        android:id="@+id/dialogNewNameLabel"
-        android:text="@string/add_type"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/newName"
-        />
-
-    <Spinner
-        android:id="@+id/newName"
-        style="@style/dialogSpinner"
-        android:layout_width="0dp"
-        android:layout_marginStart="5dp"
-        android:textSize="20sp"
-        android:textColor="@color/main_orange"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/dialogNewNameLabel"
-        app:layout_constraintTop_toTopOf="parent" />
+    android:background="@color/colorBackground"
+    android:orientation="vertical"
+    android:padding="15dp"
+    android:gravity="center_horizontal">
 
     <TextView
         android:id="@+id/dName"
-        android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text = "AT1630"
-        android:textSize="20sp"
         android:textColor="@color/main_orange"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/newName" />
+        android:textSize="20sp"
+        tools:text="AT1630" />
 
-    <TextView
-        style="@style/dialogTextLabel"
-        android:id="@+id/dialogInnerLabel"
-        android:text="@string/inner_serial_doted"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/dInner"
-        />
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <TextView
+            android:id="@+id/dialogNewNameLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/add_type" />
 
-    <EditText
-        android:id="@+id/dInner"
-        style="@style/dialogEditText"
-        android:hint="@string/inner_serial"
-        android:layout_width="0dp"
-        android:layout_marginStart="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/dialogInnerLabel"
-        app:layout_constraintTop_toBottomOf="@+id/dName"
-        android:importantForAutofill="no"
-        android:inputType="number" />
+        <Spinner
+            android:id="@+id/newName"
+            style="@style/dialogLinearEdit" />
+    </LinearLayout>
 
-    <TextView
-        style="@style/dialogTextLabel"
-        android:id="@+id/dialogSerialLabel"
-        android:text="@string/serial_number_doted"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/dSerial"
-        />
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <TextView
+            android:id="@+id/dialogInnerLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/inner_serial_doted"/>
 
-    <EditText
-        android:id="@+id/dSerial"
-        style="@style/dialogEditText"
-        android:hint="@string/serial_number"
-        android:layout_width="0dp"
-        android:layout_marginStart="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/dialogSerialLabel"
-        app:layout_constraintTop_toBottomOf="@+id/dInner"
-        android:importantForAutofill="no"
-        android:inputType="text" />
+        <EditText
+            android:id="@+id/dInner"
+            style="@style/dialogLinearEdit"
+            android:background="@drawable/edit_text_field"
+            android:hint="@string/inner_serial"
+            android:importantForAutofill="no"
+            android:inputType="number"/>
+    </LinearLayout>
 
-    <TextView
-        style="@style/dialogTextLabel"
-        android:id="@+id/dialogEmployeeLabel"
-        android:text="@string/employee_doted"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/state_spinner_employee"
-        />
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <TextView
+            android:id="@+id/dialogSerialLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/serial_number_doted"/>
 
-    <Spinner
-        android:id="@+id/state_spinner_employee"
-        style="@style/dialogSpinner"
-        android:layout_width="0dp"
-        android:layout_marginStart="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/dialogEmployeeLabel"
-        app:layout_constraintTop_toBottomOf="@+id/dSerial" />
+        <EditText
+            android:id="@+id/dSerial"
+            style="@style/dialogLinearEdit"
+            android:background="@drawable/edit_text_field"
+            android:hint="@string/serial_number"
+            android:importantForAutofill="no"
+            android:inputType="text"/>
+    </LinearLayout>
 
-    <TextView
-        style="@style/dialogTextLabel"
-        android:id="@+id/dialogStateLabel"
-        android:text="@string/add_state_doted"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/state_spinner"
-        />
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <TextView
+            android:id="@+id/dialogEmployeeLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/employee_doted"/>
 
-    <Spinner
-        android:id="@+id/state_spinner"
-        style="@style/dialogSpinner"
-        android:layout_width="0dp"
-        android:layout_marginStart="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/dialogStateLabel"
-        app:layout_constraintTop_toBottomOf="@+id/state_spinner_employee" />
+        <Spinner
+            android:id="@+id/state_spinner_employee"
+            style="@style/dialogLinearEdit"/>
+    </LinearLayout>
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <TextView
+            android:id="@+id/dialogStateLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/add_state_doted"/>
+
+        <Spinner
+            android:id="@+id/state_spinner"
+            style="@style/dialogLinearEdit"/>
+    </LinearLayout>
 
     <EditText
         android:id="@+id/description"
         style="@style/dialogEditText"
-        android:hint="@string/add_description"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/state_spinner"
-        app:layout_constraintBottom_toTopOf="@+id/cancel_button"
-        android:importantForAutofill="no"
+        android:background="@drawable/edit_text_field"
         android:layout_marginBottom="10dp"
-        android:inputType="text" />
+        android:hint="@string/add_description"
+        android:importantForAutofill="no"
+        android:inputType="text"/>
 
-    <Button
-        android:id="@+id/cancel_button"
-        style="?android:attr/buttonBarButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:textAllCaps="false"
-        android:paddingHorizontal="50dp"
-        android:text="@string/cancel"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/ok_button"
-        app:layout_constraintStart_toStartOf="parent" />
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <Button
+            android:id="@+id/cancel_button"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel"
+            android:textAllCaps="false"
+            android:textSize="12sp"/>
 
-    <Button
-        android:id="@+id/ok_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/ok"
-        style="?android:attr/buttonBarButtonStyle"
-        android:textSize="12sp"
-        android:textAllCaps="false"
-        android:paddingHorizontal="50dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/cancel_button"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <Button
+            android:id="@+id/ok_button"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/ok"
+            android:textAllCaps="false"
+            android:textSize="12sp"/>
+    </LinearLayout>
 
-
-
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

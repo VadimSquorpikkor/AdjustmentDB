@@ -312,13 +312,6 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         return repairStatesNames;
     }
 
-    /**
-     * Список имен (названий) приборов
-     */
-    public MutableLiveData<ArrayList<String>> getDeviceNameList() {
-        return deviceNameList;
-    }
-
     public MutableLiveData<ArrayList<DUnit>> getSerialUnitsList() {
         return serialUnitsList;
     }
@@ -369,6 +362,10 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
     public MutableLiveData<ArrayList<String>> getDeviceIdList() {
         return deviceIdList;
+    }
+
+    public MutableLiveData<ArrayList<String>> getDeviceNameList() {
+        return deviceNameList;
     }
 
     public MutableLiveData<ArrayList<String>> getLocationNamesList() {

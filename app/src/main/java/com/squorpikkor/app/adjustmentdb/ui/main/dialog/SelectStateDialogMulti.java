@@ -1,70 +1,67 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.dialog;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
-import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import androidx.annotation.NonNull;
-import androidx.lifecycle.ViewModelProvider;
+
 import com.squorpikkor.app.adjustmentdb.DUnit;
-import com.squorpikkor.app.adjustmentdb.MainActivity;
 import com.squorpikkor.app.adjustmentdb.R;
-import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-public class SelectStateDialogMulti extends Dialog {
-    private MainViewModel mViewModel;
-    private final Activity context;
+import static com.squorpikkor.app.adjustmentdb.Utils.getIdByName;
+
+public class SelectStateDialogMulti extends BaseDialog {
     private EditText description;
     private Spinner spinner;
     private Spinner devSpinner;
 
-    public SelectStateDialogMulti(@NonNull Activity context) {
-        super(context);
-        this.context = context;
+    public SelectStateDialogMulti() {
     }
 
+    @NotNull
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.dialog_select_states_multi);
 
-        mViewModel = new ViewModelProvider((MainActivity)context).get(MainViewModel.class);
+        initializeWithVM(R.layout.dialog_select_states_multi);
 
         ArrayList<DUnit> unitList = mViewModel.getScannerFoundUnitsList().getValue();
-        DUnit unit = unitList.get(0);
+        DUnit unit = unitList != null ? unitList.get(0) : null;
 
         //Загружается тот список, тип прибора который загружен — ремонт или серия
         ArrayList<String> rightList;
-        if (mViewModel.getScannerFoundUnitsList().getValue().get(0).isRepairUnit()) rightList = mViewModel.getRepairStatesNames().getValue();
+        if (mViewModel.getScannerFoundUnitsList().getValue().get(0).isRepairUnit())
+            rightList = mViewModel.getRepairStatesNames().getValue();
         else rightList = mViewModel.getSerialStatesNames().getValue();
 
         //todo заменить ссылку на подписку
         ArrayList<String> nameList = mViewModel.getDeviceNameList().getValue();
 
-        Button cancelButton = findViewById(R.id.cancel_button);
-        Button okButton = findViewById(R.id.ok_button);
-        description = findViewById(R.id.description);
-        spinner = findViewById(R.id.state_spinner);
-        devSpinner = findViewById(R.id.name_spinner);
+        Button cancelButton = view.findViewById(R.id.cancel_button);
+        Button okButton = view.findViewById(R.id.ok_button);
+        description = view.findViewById(R.id.description);
+        spinner = view.findViewById(R.id.state_spinner);
+        devSpinner = view.findViewById(R.id.name_spinner);
 
         cancelButton.setOnClickListener(view -> dismiss());
 
         okButton.setOnClickListener(view -> {
-            String state = "";
-            String state_id = "";
-            String type = unit.getType();
-            String spinnerName = "";
-            if (spinner.getSelectedItem()!=null) state = spinner.getSelectedItem().toString();
-            if (devSpinner.getSelectedItem()!=null) spinnerName = devSpinner.getSelectedItem().toString();
-            int position;
+            if (unit != null) {
+                String state = "";
+                String state_id = "";
+                String type = unit.getType();
+                String spinnerName = "";
+                if (spinner.getSelectedItem() != null) state = spinner.getSelectedItem().toString();
+                if (devSpinner.getSelectedItem() != null)
+                    spinnerName = devSpinner.getSelectedItem().toString();
+            /*int position;
             if (unit.isRepairUnit()){
                 position = mViewModel.getRepairStatesNames().getValue().indexOf(state);
                 state_id = mViewModel.getRepairStateIdList().getValue().get(position);
@@ -72,40 +69,45 @@ public class SelectStateDialogMulti extends Dialog {
             if (unit.isSerialUnit()){
                 position = mViewModel.getSerialStatesNames().getValue().indexOf(state);
                 state_id = mViewModel.getSerialStateIdList().getValue().get(position);
-            }
-            String desc = description.getText().toString();
-            String location = mViewModel.getLocation_id().getValue();
+            }*/
+                if (unit.isRepairUnit()
+                        && mViewModel.getRepairStatesNames().getValue() != null
+                        && mViewModel.getRepairStateIdList().getValue() != null) {
+                    state_id = getIdByName(state, mViewModel.getRepairStatesNames().getValue(), mViewModel.getRepairStateIdList().getValue());
+                }
+                if (unit.isSerialUnit()
+                        && mViewModel.getSerialStatesNames().getValue() != null
+                        && mViewModel.getSerialStateIdList().getValue() != null) {
+                    state_id = getIdByName(state, mViewModel.getSerialStatesNames().getValue(), mViewModel.getSerialStateIdList().getValue());
+                }
+                String desc = description.getText().toString();
+                String location = mViewModel.getLocation_id().getValue();
 
-            for (int i = 0; i < unitList.size(); i++) {
-                DUnit unitFromList = unitList.get(i);
-                String id = unitFromList.getId();
-                String name;
-                //Если у юнита уже было назначено имя (название устройства), то оно не будет перезаписано
-                if (unitFromList.getName()==null || unitFromList.getName().equals("")) name = spinnerName;
-                else name = unitFromList.getName();
-                String innerSerial = unitFromList.getInnerSerial();
-                String serial = unitFromList.getSerial();
-                Date date = unitFromList.getDate();
-                mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state_id, desc, type, location, date));
+                for (int i = 0; i < unitList.size(); i++) {
+                    DUnit unitFromList = unitList.get(i);
+                    String id = unitFromList.getId();
+                    String name;
+                    //Если у юнита уже было назначено имя (название устройства), то оно не будет перезаписано
+                    if (unitFromList.getName() == null || unitFromList.getName().equals(""))
+                        name = spinnerName;
+                    else name = unitFromList.getName();
+                    String innerSerial = unitFromList.getInnerSerial();
+                    String serial = unitFromList.getSerial();
+                    Date date = unitFromList.getDate();
+                    mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state_id, desc, type, location, date));
+                }
             }
-
             dismiss();
         });
 
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<String> stateAdapter = new ArrayAdapter<>(context,
-                android.R.layout.simple_spinner_item, rightList);
-        // Specify the layout to use when the list of choices appears
+        ArrayAdapter<String> stateAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, rightList);
         stateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
         spinner.setAdapter(stateAdapter);
 
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<String> nameAdapter = new ArrayAdapter<>(context,
-                android.R.layout.simple_spinner_item, nameList);
-        // Specify the layout to use when the list of choices appears
+        ArrayAdapter<String> nameAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, nameList);
         nameAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
         devSpinner.setAdapter(nameAdapter);
+
+        return dialog;
     }
 }

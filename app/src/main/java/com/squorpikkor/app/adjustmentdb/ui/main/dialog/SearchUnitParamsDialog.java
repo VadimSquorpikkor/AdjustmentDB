@@ -1,39 +1,24 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.dialog;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
-import android.view.View;
-import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModelProvider;
-
-import com.squorpikkor.app.adjustmentdb.MainActivity;
 import com.squorpikkor.app.adjustmentdb.R;
-import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
-
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE_TEXT;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_TYPE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_TYPE;
 
-public class SearchUnitParamsDialog extends DialogFragment {
+public class SearchUnitParamsDialog extends BaseDialog {
 
-    Context mContext;
-    MainViewModel mViewModel;
     RadioButton isSerialRadio;
     RadioButton isRepairRadio;
     Spinner devNameSpinner;
@@ -43,17 +28,7 @@ public class SearchUnitParamsDialog extends DialogFragment {
     Button searchButton;
     EditText serialEdit;
 
-//    public static SearchUnitParamsDialog newInstance() {
-//        return new SearchUnitParamsDialog();
-//    }
-
     public SearchUnitParamsDialog() {
-    }
-
-    @Override
-    public void onAttach(@NotNull Context context) {
-        mContext = context;
-        super.onAttach(context);
     }
 
     @NotNull
@@ -61,14 +36,7 @@ public class SearchUnitParamsDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AlertDialog dialog = new AlertDialog.Builder(mContext).create();
-        Window window = dialog.getWindow();
-        if (window != null) window.setBackgroundDrawableResource(R.drawable.main_gradient);
-        View view = requireActivity().getLayoutInflater()
-                .inflate(R.layout.dialog_search_unit_param, null);
-        dialog.setView(view, 0, 0, 0, 0);
-
-        MainViewModel mViewModel = new ViewModelProvider((MainActivity) mContext).get(MainViewModel.class);
+        initializeWithVM(R.layout.dialog_search_unit_param);
 
         isSerialRadio = view.findViewById(R.id.radio_button_serial);
         isRepairRadio = view.findViewById(R.id.radio_button_repair);

@@ -18,11 +18,13 @@ import com.google.android.gms.vision.text.TextRecognizer;
 import com.squorpikkor.app.adjustmentdb.R;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class RecognizeActivity extends AppCompatActivity {
 
     SurfaceView mCameraView;
-    TextView mTextView;
+    TextView mSerialText;
+    TextView mDevNameText;
     CameraSource mCameraSource;
 
     private static final String TAG = "MainActivity";
@@ -34,7 +36,8 @@ public class RecognizeActivity extends AppCompatActivity {
         setContentView(R.layout.recognize_activity);
 
         mCameraView = findViewById(R.id.surfaceView);
-        mTextView = findViewById(R.id.text_view);
+        mSerialText = findViewById(R.id.serial_txt);
+        mDevNameText = findViewById(R.id.dev_name_txt);
 
         startCameraSource();
     }
@@ -75,7 +78,6 @@ public class RecognizeActivity extends AppCompatActivity {
     }
 
     String getSerial(TextBlock item) {
-        String result = "";
         String text = item.getComponents().get(0).getValue();
         Log.e(TAG, "♦---------------");
         Log.e(TAG, "getSerial text: "+text);
@@ -90,9 +92,19 @@ public class RecognizeActivity extends AppCompatActivity {
     }
 
     String getDevName(TextBlock item) {
-        String result = "";
-        String text = item.getComponents().get(0).getValue();
-        return result;
+
+        String text = item.getValue();
+        //todo здесь потом будет ссылка на getDeviceNameLit
+        ArrayList<String> names = new ArrayList<>();
+
+        Log.e(TAG, "♦getDevName: "+text);
+
+        if (text.contains("AT6130C")) return "AT6130C";
+        else if (text.contains("AT6130")) return "AT6130";
+        else if (text.contains("USB-DU")) return "USB-DU";
+        else if (text.contains("PU2")) return "PU2";
+        else if (text.contains("BDKG-05")) return "BDKG-05";
+        else return "";
     }
 
     private void startCameraSource() {
@@ -160,11 +172,13 @@ public class RecognizeActivity extends AppCompatActivity {
                     final SparseArray<TextBlock> items = detections.getDetectedItems();
                     if (items.size() != 0 ){
 
-                        mTextView.post(() -> {
+                        mSerialText.post(() -> {
                             for(int i=0;i<items.size();i++){
                                 TextBlock item = items.valueAt(i);
-                                String res = getSerial(item);
-                                if (!res.equals("")) mTextView.setText(getSerial(item));
+                                String serial = getSerial(item);
+                                if (!serial.equals("")) mSerialText.setText(serial);
+                                String devName = getDevName(item);
+                                if (!devName.equals("")) mDevNameText.setText(devName);
                             }
                         });
                     }
