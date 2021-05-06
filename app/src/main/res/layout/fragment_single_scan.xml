@@ -166,12 +166,27 @@
             android:contentDescription="@string/add_state_button"
             android:focusable="true"
             app:backgroundTint="#F44336"
-            app:elevation="6dp"
+            app:elevation="10dp"
             app:rippleColor="#FFFFFF"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/recognize_button"
+            app:srcCompat="@drawable/ic_baseline_back_hand_24" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/recognize_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:backgroundTint="@color/main_green"
+            app:elevation="10dp"
+            app:backgroundTint="#43A436"
+            android:layout_margin="25dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/addNewState"
             app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/ic_baseline_add_24" />
+            app:srcCompat="@drawable/ic_baseline_camera_24"
+            android:focusable="true" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

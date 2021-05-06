@@ -41,7 +41,7 @@ public class SearchDeviceFragment extends Fragment {
     RecyclerView foundUnitRecycler;
     ImageView logoImage;
     FloatingActionButton openSearchDialogButton;
-    FloatingActionButton recognizeButton;
+//    FloatingActionButton recognizeButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,8 +61,8 @@ public class SearchDeviceFragment extends Fragment {
         openSearchDialogButton = view.findViewById(R.id.open_search);
         openSearchDialogButton.setOnClickListener(v -> openSearchDialog());
 
-        recognizeButton = view.findViewById(R.id.floatingActionButton);
-        recognizeButton.setOnClickListener(v -> openRecognize());
+//        recognizeButton = view.findViewById(R.id.floatingActionButton);
+//        recognizeButton.setOnClickListener(v -> openRecognize());
 
         return view;
     }
@@ -106,8 +106,9 @@ public class SearchDeviceFragment extends Fragment {
         }
     }
 
-    private void openRecognize() {
-        Intent intent = new Intent(getActivity(), RecognizeActivity.class);
-        startActivity(intent);
-    }
+//    private void openRecognize() {
+//        Intent intent = new Intent(getActivity(), RecognizeActivity.class);
+//        startActivity(intent);
+//    }
+
 }

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="5dp"
+    android:background="@color/colorBackground"
+    android:orientation="vertical"
+    android:padding="15dp"
+    android:gravity="center_horizontal">
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <TextView
+            android:id="@+id/dialogNewNameLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/add_type" />
+
+        <Spinner
+            android:id="@+id/newName"
+            style="@style/dialogLinearEdit" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <TextView
+            android:id="@+id/dialogSerialLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/serial_number_doted"/>
+
+        <EditText
+            android:id="@+id/dSerial"
+            style="@style/dialogLinearEdit"
+            android:background="@drawable/edit_text_field"
+            android:hint="@string/serial_number"
+            android:importantForAutofill="no"
+            android:inputType="text"/>
+    </LinearLayout>
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <TextView
+            android:id="@+id/dialogStateLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/add_state_doted"/>
+
+        <Spinner
+            android:id="@+id/state_spinner"
+            style="@style/dialogLinearEdit"/>
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+
+        <TextView
+            android:id="@+id/prompt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="10dp"
+            android:gravity="center_horizontal"
+            android:text="@string/tap_description"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/recognized_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textColor="@color/main_orange"
+            android:textSize="20sp"
+            tools:text="AT6130"
+            android:layout_margin="10dp"
+            android:elevation="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/prompt"
+            app:layout_constraintBottom_toTopOf="@+id/recognized_serial"/>
+
+        <TextView
+            android:id="@+id/recognized_serial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="12345"
+            android:textColor="@color/main_orange"
+            android:textSize="20sp"
+            android:layout_margin="10dp"
+            android:elevation="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/recognized_name" />
+
+        <SurfaceView
+            android:id="@+id/surface_for_recognize"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <Button
+            android:id="@+id/cancel_button"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel"
+            android:textAllCaps="false"
+            android:textSize="12sp"/>
+
+        <Button
+            android:id="@+id/ok_button"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/ok"
+            android:textAllCaps="false"
+            android:textSize="12sp"/>
+    </LinearLayout>
+
+
+
+</LinearLayout>

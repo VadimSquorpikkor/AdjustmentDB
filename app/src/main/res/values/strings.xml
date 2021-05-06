@@ -44,5 +44,6 @@
     <string name="app_logo">Логотип приложения</string>
     <string name="state_doted">Статус:</string>
     <string name="found_count">Найдено устройств: %d</string>
+    <string name="tap_description">Чтобы очистить распознанное значение, нужно тапнуть по нему</string>
 
 </resources>

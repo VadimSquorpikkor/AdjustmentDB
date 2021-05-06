@@ -22,6 +22,7 @@ import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.Utils;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.StatesAdapter;
+import com.squorpikkor.app.adjustmentdb.ui.main.dialog.RecognizeDialog;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialogSingle;
 
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ public class SingleScanFragment extends Fragment {
     private ArrayList<DEvent> states;
 //    private String location;//todo надо как observe Mutable, иначе может значение не успеть подгрузиться
     private FloatingActionButton addNewStateButton;
+    private FloatingActionButton recognizeButton;
     private SurfaceView surfaceView;
     private ConstraintLayout infoLayout;
 
@@ -60,6 +62,10 @@ public class SingleScanFragment extends Fragment {
         addNewStateButton = view.findViewById(R.id.addNewState);
         addNewStateButton.setVisibility(View.GONE);
         addNewStateButton.setOnClickListener(view1 -> openStatesDialog());
+
+        recognizeButton = view.findViewById(R.id.recognize_button);
+        recognizeButton.setVisibility(View.GONE);
+        recognizeButton.setOnClickListener(view1 -> openRecognizeDialog());
 
         tType = view.findViewById(R.id.textViewType);
         tName = view.findViewById(R.id.textViewName);
@@ -107,6 +113,8 @@ public class SingleScanFragment extends Fragment {
         return view;
     }
 
+
+
     private void restartScanning(boolean state) {
         if (state) {
             if (states!=null) states.clear();
@@ -135,6 +143,7 @@ public class SingleScanFragment extends Fragment {
         tName.setText(Utils.getRightValue(unit.getName()));
         tInnerSerial.setText(Utils.getRightValue(unit.getInnerSerial()));
         tSerial.setText(Utils.getRightValue(unit.getSerial()));
+        if (unit.isRepairUnit()) recognizeButton.setVisibility(View.VISIBLE);
         //tLocation.setText(location);
 
         mViewModel.addSelectedUnitStatesListListener(unit.getId());
@@ -146,6 +155,11 @@ public class SingleScanFragment extends Fragment {
 
     private void openStatesDialog() {
         SelectStateDialogSingle dialog = new SelectStateDialogSingle();
+        dialog.show(requireFragmentManager(), null);
+    }
+
+    private void openRecognizeDialog() {
+        RecognizeDialog dialog = new RecognizeDialog();
         dialog.show(requireFragmentManager(), null);
     }
 
