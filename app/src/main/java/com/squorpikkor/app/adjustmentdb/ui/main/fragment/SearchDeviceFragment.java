@@ -21,6 +21,7 @@ import com.squorpikkor.app.adjustmentdb.UnitInfoActivity;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.UnitAdapter;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.ExitAskDialog;
+import com.squorpikkor.app.adjustmentdb.ui.main.dialog.RecognizeDialog;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SearchUnitParamsDialog;
 import com.squorpikkor.app.adjustmentdb.ui.main.recognition.RecognizeActivity;
 
@@ -41,7 +42,7 @@ public class SearchDeviceFragment extends Fragment {
     RecyclerView foundUnitRecycler;
     ImageView logoImage;
     FloatingActionButton openSearchDialogButton;
-//    FloatingActionButton recognizeButton;
+    FloatingActionButton recognizeButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -106,9 +107,9 @@ public class SearchDeviceFragment extends Fragment {
         }
     }
 
-//    private void openRecognize() {
-//        Intent intent = new Intent(getActivity(), RecognizeActivity.class);
-//        startActivity(intent);
-//    }
+    private void openRecognize() {
+        RecognizeDialog dialog = new RecognizeDialog();
+        dialog.show(requireFragmentManager(), null);
+    }
 
 }

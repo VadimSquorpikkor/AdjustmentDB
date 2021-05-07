@@ -99,6 +99,13 @@ class FireDBHelper {
         });
     }
 
+    void addStringArrayOrderedListener(String table, MutableLiveData<ArrayList<String>> mList, String fieldName, String orderBy) {
+        Log.e(TAG, "addStringArrayListenerOrdered: ");
+        db.collection(table).addSnapshotListener((queryDocumentSnapshots, error) -> {
+            getStringArrayFromDBOrdered(table, mList, fieldName, orderBy);
+        });
+    }
+
 
     void getUnitById(String id, MutableLiveData<DUnit> selectedUnit) {
         db.collection(TABLE_UNITS)
@@ -298,6 +305,17 @@ class FireDBHelper {
             ArrayList<String> list = new ArrayList<>();
             for (DocumentSnapshot document : task.getResult()) {
                 if (document.get(fieldName)!=null) list.add(document.get(fieldName).toString());
+            }
+            mList.setValue(list);
+        });
+    }
+
+    void getStringArrayFromDBOrdered(String table, MutableLiveData<ArrayList<String>> mList, String fieldName, String orderBy) {
+        db.collection(table).orderBy(orderBy, Query.Direction.DESCENDING).get().addOnCompleteListener(task -> {
+            ArrayList<String> list = new ArrayList<>();
+            for (DocumentSnapshot document : task.getResult()) {
+                if (document.get(fieldName)!=null) list.add(document.get(fieldName).toString());
+                Log.e(TAG, "☻☻☻ getStringArrayFromDBOrdered: "+document.get(fieldName).toString());
             }
             mList.setValue(list);
         });

@@ -45,5 +45,7 @@
     <string name="state_doted">Статус:</string>
     <string name="found_count">Найдено устройств: %d</string>
     <string name="tap_description">Чтобы очистить распознанное значение, нужно тапнуть по нему</string>
+    <string name="name_already_recognized">У устройства уже есть имя</string>
+    <string name="serial_already_recognized">У устройства уже есть серийный номер</string>
 
 </resources>

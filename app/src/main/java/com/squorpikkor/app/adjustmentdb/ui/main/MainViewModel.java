@@ -94,7 +94,8 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     public static final String REPAIR_UNIT = "Ремонт";
     public static final String SERIAL_UNIT = "Серия";
     public static final String ANY_VALUE = "any_value";
-    public static final String ANY_VALUE_TEXT = "";
+    public static final String ANY_VALUE_TEXT = "- любой -";//"- любой -"
+    public static final String EMPTY_VALUE_TEXT = "- не выбран -";//"- не выбран -"
     public static final String EXTRA_POSITION = "position";
 //--------------------------------------------------------------------------------------------------
 

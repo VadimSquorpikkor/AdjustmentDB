@@ -48,6 +48,7 @@
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/surface_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
@@ -90,6 +91,36 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/recognized_name" />
+
+        <TextView
+            android:id="@+id/name_already_recognized"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            tools:text="У устройства уже есть имя"
+            android:text="@string/name_already_recognized"
+            android:textColor="@color/main_orange"
+            android:textSize="15sp"
+            android:layout_margin="10dp"
+            android:elevation="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/recognized_serial" />
+
+        <TextView
+            android:id="@+id/serial_already_recognized"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            tools:text="У устройства уже есть серийный номер"
+            android:text="@string/serial_already_recognized"
+            android:textColor="@color/main_orange"
+            android:textSize="15sp"
+            android:layout_margin="10dp"
+            android:elevation="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/name_already_recognized" />
 
         <SurfaceView
             android:id="@+id/surface_for_recognize"

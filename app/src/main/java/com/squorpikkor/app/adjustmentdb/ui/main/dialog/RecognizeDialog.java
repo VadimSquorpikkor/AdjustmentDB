@@ -2,6 +2,7 @@ package com.squorpikkor.app.adjustmentdb.ui.main.dialog;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.content.ClipData;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,12 +29,16 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Objects;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.Utils.getIdByName;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightValue;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_VALUE_TEXT;
 
 public class RecognizeDialog extends BaseDialog{
 
@@ -44,9 +49,10 @@ public class RecognizeDialog extends BaseDialog{
     Spinner devices;
     Spinner states;
     EditText eSerial;
+    ArrayList<String> names;
 
-    boolean nameIsEmpty;
-    boolean serialIsEmpty;
+    boolean nameIsEmpty = true;
+    boolean serialIsEmpty = true;
 
     private static final int requestPermissionID = 101;
 
@@ -76,19 +82,19 @@ public class RecognizeDialog extends BaseDialog{
 
         //Загружается тот список, тип прибора который загружен — ремонт или серия
         ArrayList<String> rightList;
-        if (Objects.requireNonNull(mViewModel.getSelectedUnit().getValue()).isRepairUnit())
+        if (mViewModel.getSelectedUnit().getValue()!=null && mViewModel.getSelectedUnit().getValue().isRepairUnit())
             rightList = new ArrayList<>(Objects.requireNonNull(mViewModel.getRepairStatesNames().getValue()));
         else
             rightList = new ArrayList<>(Objects.requireNonNull(mViewModel.getSerialStatesNames().getValue()));
-        rightList.add(0, "");
+        rightList.add(0, EMPTY_VALUE_TEXT);
 
         ArrayList<String> devIdList = new ArrayList<>(Objects.requireNonNull(mViewModel.getDeviceIdList().getValue()));
-        devIdList.add(0, "");
+        devIdList.add(0, EMPTY_VALUE_TEXT);
 
         view.findViewById(R.id.cancel_button).setOnClickListener(v -> dismiss());
         view.findViewById(R.id.ok_button).setOnClickListener(v -> saveData(unit));
 
-        if (unit!=null)setVisibility(unit);
+        setVisibility(unit);
 
         ArrayAdapter<String> stateAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, rightList);
         stateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -98,31 +104,45 @@ public class RecognizeDialog extends BaseDialog{
         deviceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         devices.setAdapter(deviceAdapter);
 
+        names = new ArrayList<>(mViewModel.getDeviceNameList().getValue());
+        //сортировка по длине имени в обратном порядке, чтобы сразу искался "6130С" и только потом "6130"
+        Collections.sort(names, Collections.reverseOrder());
+
         return dialog;
     }
 
     /**Если у юнита уже задано имя устройства, то все поля с имененм скрываем
-     * Если у юнита уже задан серийный номер, то все поля с серийным скрываем*/
+     * Если у юнита уже задан серийный номер, то все поля с серийным скрываем
+     * Если у юнита уже задан и номер, и имя, то скрываем все поля И ОКНО КАМЕРЫ */
     void setVisibility(DUnit unit) {
         nameIsEmpty = unit.getName().equals("");
         serialIsEmpty = unit.getSerial().equals("");
+        if (!nameIsEmpty && !serialIsEmpty) {
+            view.findViewById(R.id.surface_layout).setVisibility(View.GONE);
+        } else {
+            view.findViewById(R.id.surface_layout).setVisibility(View.VISIBLE);
+        }
         if (nameIsEmpty){
             mDevNameText.setVisibility(View.VISIBLE);
             view.findViewById(R.id.dialogNewNameLabel).setVisibility(View.VISIBLE);
             view.findViewById(R.id.newName).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.name_already_recognized).setVisibility(View.GONE);
         } else {
             mDevNameText.setVisibility(View.GONE);
             view.findViewById(R.id.dialogNewNameLabel).setVisibility(View.GONE);
             view.findViewById(R.id.newName).setVisibility(View.GONE);
+            view.findViewById(R.id.name_already_recognized).setVisibility(View.VISIBLE);
         }
         if (serialIsEmpty){
             mSerialText.setVisibility(View.VISIBLE);
             view.findViewById(R.id.dialogSerialLabel).setVisibility(View.VISIBLE);
             view.findViewById(R.id.dSerial).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.serial_already_recognized).setVisibility(View.GONE);
         } else {
             mSerialText.setVisibility(View.GONE);
             view.findViewById(R.id.dialogSerialLabel).setVisibility(View.GONE);
             view.findViewById(R.id.dSerial).setVisibility(View.GONE);
+            view.findViewById(R.id.serial_already_recognized).setVisibility(View.VISIBLE);
         }
 
     }
@@ -135,15 +155,12 @@ public class RecognizeDialog extends BaseDialog{
     private void saveData(DUnit unit) {
         if (unit != null) {
             String id = unit.getId();
-            //отличается здесь
-            String name = devices.getSelectedItem().toString().equals("")?mDevNameText.getText().toString():getRightValue(unit.getName(), devices.getSelectedItem().toString());
             String innerSerial = unit.getInnerSerial();
-            //отличается здесь
-            String serial = eSerial.getText().toString().equals("")?mSerialText.getText().toString():getRightValue(unit.getSerial(), eSerial.getText().toString());
             String state = "";
             String state_id = "";
             if (states.getSelectedItem() != null) state = states.getSelectedItem().toString();
-            if (!state.equals("")) {
+
+            if (!state.equals(EMPTY_VALUE_TEXT)) {
                 if (unit.isRepairUnit()
                         && mViewModel.getRepairStatesNames().getValue()!=null
                         && mViewModel.getRepairStateIdList().getValue()!=null) {
@@ -158,7 +175,13 @@ public class RecognizeDialog extends BaseDialog{
                 state_id = "";
             }
 
-            //отличается здесь
+            String name = devices.getSelectedItem().toString().equals(EMPTY_VALUE_TEXT)?mDevNameText.getText().toString():devices.getSelectedItem().toString();
+            name = getRightValue(unit.getName(), name);
+            name = getIdByName(name, mViewModel.getDeviceNameList().getValue(), mViewModel.getDeviceIdList().getValue());
+
+            String serial = eSerial.getText().toString().equals("")?mSerialText.getText().toString():eSerial.getText().toString();
+            serial = getRightValue(unit.getSerial(), serial);
+
             String desc = "";
             String type = unit.getType();
             String location = mViewModel.getLocation_id().getValue();
@@ -189,17 +212,11 @@ public class RecognizeDialog extends BaseDialog{
     }
 
     String cutSerialString(String text, String mask) {
-        Log.e(TAG, "♦1♦ cutSerialString: "+text);
         String s = text.substring(text.indexOf(mask));
-        Log.e(TAG, "♦2♦ cutSerialString: "+s);
         s = s.replace(mask, "");
         if (s.startsWith(" ")) s = s.replaceFirst(" ", "");
-        Log.e(TAG, "♦3♦ cutSerialString: "+s);
         s = s.split(" ")[0];
-        Log.e(TAG, "♦4♦ cutSerialString: "+s);
         s = s.trim();
-        Log.e(TAG, "♦5♦ cutSerialString: "+s);
-        Log.e(TAG, "☻☻☻ cutSerialString: "+s);
         return s;
     }
 
@@ -216,19 +233,25 @@ public class RecognizeDialog extends BaseDialog{
 
     String getSerial(TextBlock item) {
         String text = item.getComponents().get(0).getValue();
-        Log.e(TAG, "♦---------------");
-        Log.e(TAG, "getSerial text: "+text);
-        if (text.contains("Serial Na")) return cutSerialString(text, "Serial Na");
-        else if (text.contains("Serial No")) return cutSerialString(text, "Serial No");
-        else if (text.contains("Serial Ne")) return cutSerialString(text, "Serial Ne");
-        else if (text.contains("Serial N")) return cutSerialString(text, "Serial N");
-        else if (text.contains("Serial. N")) return cutSerialString(text, "Serial. N");
-        else if (text.contains("Serial.N")) return cutSerialString(text, "Serial.N");
-        else if (text.contains("SerialN")) return cutSerialString(text, "SerialN");
+        if (text.contains("Serial")) {
+                 if (text.contains("Serial Na")) return cutSerialString(text, "Serial Na");
+            else if (text.contains("Serial No")) return cutSerialString(text, "Serial No");
+            else if (text.contains("Serial Ne")) return cutSerialString(text, "Serial Ne");
+            else if (text.contains("Serial N")) return cutSerialString(text, "Serial N");
+            else if (text.contains("Serial. N")) return cutSerialString(text, "Serial. N");
+            else if (text.contains("Serial.N")) return cutSerialString(text, "Serial.N");
+            else if (text.contains("SerialN")) return cutSerialString(text, "SerialN");
+            else return "";
+        } else if (text.contains("3aB")) {
+                 if (text.contains("3aB. No")) return cutSerialString(text, "3aB. No");
+            else if (text.contains("3aB. Ne")) return cutSerialString(text, "3aB. Ne");
+            else if (text.contains("3aB. Na")) return cutSerialString(text, "3aB. Na");
+            else return "";
+        }
         else return "";
     }
 
-    String getDevName(TextBlock item) {
+    String getDevName_old(TextBlock item) {
 
         String text = item.getValue();
         //todo здесь потом будет ссылка на getDeviceNameLit
@@ -241,7 +264,51 @@ public class RecognizeDialog extends BaseDialog{
         else if (text.contains("USB-DU")) return "USB-DU";
         else if (text.contains("PU2")) return "PU2";
         else if (text.contains("BDKG-05")) return "BDKG-05";
+        else if (text.contains("5AKT-04")) return "BDKG-04";
+        else if (text.contains("5AKT-01")) return "BDKG-01";
         else return "";
+    }
+
+    /**Сделано для распознавания кирилических символов (само распознавание различает только латиницу,
+     * поэтому приходится извращаться). Если распознавание вернуло "5AKT", это значит, что на самом
+     * деле на наклейке было написано "БДКГ"*/
+    String getRightNameByMask(String recognizedText, String mask, String rightName) {
+        String nameDef = "";
+        for (String name : names) {
+            String newName = name.replace(rightName, mask);//BDKG-01 -> 5AKT-01
+            if (recognizedText.contains(newName)){
+                nameDef = name;
+                break;
+            }
+        }
+        return nameDef;
+    }
+
+    /**Чтобы сократить время на поиск имени, проверяем, может оно (имя) вообще не похоже на имя*/
+    boolean isWrongName(String name) {
+        return name.length()<6;
+    }
+
+    String getDevName(TextBlock item) {
+        String nameDef = "";
+        String text = item.getValue();
+        if (isWrongName(text)) return "";
+        Log.e(TAG, "♦ getDevName: "+text);
+
+        if (text.contains("5AKT")) nameDef = getRightNameByMask(text, "5AKT", "BDKG");
+        else if (text.contains("5AKr")) nameDef = getRightNameByMask(text, "5AKr", "BDKG");
+        else if (text.contains("6AKE")) nameDef = getRightNameByMask(text, "6AKE", "BDKG");
+        else if (text.contains("5AKE")) nameDef = getRightNameByMask(text, "5AKE", "BDKG");
+        else if (text.contains("5AKH")) nameDef = getRightNameByMask(text, "5AKH", "BDKN");
+        else {
+            for (String name : names) {
+                if (text.contains(name)){
+                    nameDef = name;
+                    break;
+                }
+            }
+        }
+        return nameDef;
     }
 
     private void startCameraSource() {

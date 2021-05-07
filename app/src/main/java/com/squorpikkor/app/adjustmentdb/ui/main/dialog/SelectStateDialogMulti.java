@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import static com.squorpikkor.app.adjustmentdb.Utils.getIdByName;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_VALUE_TEXT;
 
 public class SelectStateDialogMulti extends BaseDialog {
     private EditText description;
@@ -40,9 +41,11 @@ public class SelectStateDialogMulti extends BaseDialog {
         if (mViewModel.getScannerFoundUnitsList().getValue().get(0).isRepairUnit())
             rightList = mViewModel.getRepairStatesNames().getValue();
         else rightList = mViewModel.getSerialStatesNames().getValue();
+        rightList.add(0, EMPTY_VALUE_TEXT);
 
         //todo заменить ссылку на подписку
         ArrayList<String> nameList = mViewModel.getDeviceNameList().getValue();
+        nameList.add(0, EMPTY_VALUE_TEXT);
 
         Button cancelButton = view.findViewById(R.id.cancel_button);
         Button okButton = view.findViewById(R.id.ok_button);
@@ -89,7 +92,8 @@ public class SelectStateDialogMulti extends BaseDialog {
                     String name;
                     //Если у юнита уже было назначено имя (название устройства), то оно не будет перезаписано
                     if (unitFromList.getName() == null || unitFromList.getName().equals(""))
-                        name = spinnerName;
+//                        name = spinnerName;
+                        name = getIdByName(spinnerName, mViewModel.getDeviceNameList().getValue(), mViewModel.getDeviceIdList().getValue());
                     else name = unitFromList.getName();
                     String innerSerial = unitFromList.getInnerSerial();
                     String serial = unitFromList.getSerial();

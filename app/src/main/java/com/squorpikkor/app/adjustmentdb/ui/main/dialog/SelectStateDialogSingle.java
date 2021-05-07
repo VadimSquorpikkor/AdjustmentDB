@@ -21,6 +21,7 @@ import java.util.Objects;
 import static com.squorpikkor.app.adjustmentdb.Utils.getIdByName;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightValue;
 import static com.squorpikkor.app.adjustmentdb.Utils.isEmptyOrNull;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_VALUE_TEXT;
 
 public class SelectStateDialogSingle extends BaseDialog {
 
@@ -42,13 +43,13 @@ public class SelectStateDialogSingle extends BaseDialog {
             rightList = new ArrayList<>(Objects.requireNonNull(mViewModel.getRepairStatesNames().getValue()));
         else
             rightList = new ArrayList<>(Objects.requireNonNull(mViewModel.getSerialStatesNames().getValue()));
-        rightList.add(0, "");
+        rightList.add(0, EMPTY_VALUE_TEXT);
 
         ArrayList<String> employeeList = new ArrayList<>(Objects.requireNonNull(mViewModel.getEmployeeNamesList().getValue()));
-        employeeList.add(0, "");//Добавляю пустой элемент в начало списка
+        employeeList.add(0, EMPTY_VALUE_TEXT);//Добавляю пустой элемент в начало списка
 
         ArrayList<String> devIdList = new ArrayList<>(Objects.requireNonNull(mViewModel.getDeviceIdList().getValue()));
-        devIdList.add(0, "");
+        devIdList.add(0, EMPTY_VALUE_TEXT);
 
         Button cancelButton = view.findViewById(R.id.cancel_button);
         Button okButton = view.findViewById(R.id.ok_button);
@@ -112,7 +113,7 @@ public class SelectStateDialogSingle extends BaseDialog {
                 String state = "";
                 String state_id = "";
                 if (spinner.getSelectedItem() != null) state = spinner.getSelectedItem().toString();
-                if (!state.equals("")) {
+                if (!state.equals(EMPTY_VALUE_TEXT)) {
                     if (unit.isRepairUnit()
                             && mViewModel.getRepairStatesNames().getValue()!=null
                             && mViewModel.getRepairStateIdList().getValue()!=null) {
@@ -127,6 +128,7 @@ public class SelectStateDialogSingle extends BaseDialog {
                     state_id = "";
                 }
 
+                name = getIdByName(name, mViewModel.getDeviceNameList().getValue(), mViewModel.getDeviceIdList().getValue());
                 String desc = description.getText().toString();
                 String type = unit.getType();
                 String location = mViewModel.getLocation_id().getValue();
