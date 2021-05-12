@@ -8,11 +8,15 @@ public class DEvent {
     private String description;
     private String location;
     private String unit_id;
+    private String id;
 
     public DEvent(Date date, String state, String location) {
         this.date = date;
         this.state = state;
         this.location = location;
+    }
+
+    public DEvent() {
     }
 
     public DEvent(Date date, String state, String description, String location, String unit_id) {
@@ -61,5 +65,13 @@ public class DEvent {
 
     public void setUnit_id(String unit_id) {
         this.unit_id = unit_id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

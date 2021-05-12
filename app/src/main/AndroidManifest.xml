@@ -14,7 +14,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         tools:ignore="AllowBackup">
-        <activity android:name=".ui.main.recognition.RecognizeActivity2" />
         <activity android:name=".UnitInfoActivity" />
         <activity android:name=".ui.main.recognition.RecognizeActivity" />
         <activity

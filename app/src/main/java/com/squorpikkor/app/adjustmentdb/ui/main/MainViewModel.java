@@ -60,6 +60,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
     public static final String TABLE_EVENTS = "events"; //в прошлом states
     public static final String EVENT_DATE = "date";
+    public static final String EVENT_CLOSE_DATE = "close_date";
     public static final String EVENT_DESCRIPTION = "description";
     public static final String EVENT_LOCATION = "location_id";
     public static final String EVENT_STATE = "state_id";
@@ -134,6 +135,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     private final MutableLiveData<Boolean> goToSearchTab;
     private final MutableLiveData<Boolean> restartScanning;
     private final MutableLiveData<Boolean> restartMultiScanning;
+    private final MutableLiveData<DEvent> lastEvent;
 
     private FirebaseUser user;
 
@@ -176,6 +178,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         allStatesIdList = new MutableLiveData<>();
         allStatesNameList = new MutableLiveData<>();
         addAllStatesListener();
+        lastEvent = new MutableLiveData<>();
     }
 
     /**
@@ -203,10 +206,12 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
             String description = unit.getDescription();
             String unit_id = unit.getId();
             String location_id = getLocation_id().getValue();
+            String lastEventId = lastEvent.getValue().getId();
             dbh.addEventToDB(date, state, description, unit_id, location_id);
+            if (lastEventId!=null) dbh.closeEvent(lastEventId);
         }
         //Если есть новое событие, то обновляем дату/время
-        unit.setDate(new Date());
+        if (unit.getDate()==null) unit.setDate(new Date());
         dbh.addUnitToDB(unit);
     }
 
@@ -287,6 +292,9 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
     public void addSelectedUnitListener(String unit_id) {
         dbh.addSelectedUnitListener(unit_id, selectedUnit);
+        DEvent event = new DEvent();
+        dbh.getLastEventFromDB(unit_id, event);
+        lastEvent.setValue(event);
     }
 
 //--------------------------------------------------------------------------------------------------
@@ -387,6 +395,10 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
     public MutableLiveData<ArrayList<String>> getAllStatesNameList() {
         return allStatesNameList;
+    }
+
+    public MutableLiveData<DEvent> getLastEvent() {
+        return lastEvent;
     }
 
     /**По выбранным параметрам получает из БД список юнитов*/

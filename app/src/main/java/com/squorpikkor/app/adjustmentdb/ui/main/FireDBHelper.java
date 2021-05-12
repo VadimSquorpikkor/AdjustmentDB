@@ -19,6 +19,7 @@ import java.util.Map;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_CLOSE_DATE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_DATE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_DESCRIPTION;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_LOCATION;
@@ -89,6 +90,10 @@ class FireDBHelper {
                 .addOnFailureListener(e -> Log.e(TAG, "Error writing document", e));
     }
 
+    /**Добавляет к ивенту дату закрытия события. Дата закрытия — это сегодняшняя дата*/
+    void closeEvent(String event_id) {
+        db.collection(TABLE_EVENTS).document(event_id).update(EVENT_CLOSE_DATE, new Date());
+    }
 
     @SuppressWarnings("SameParameterValue")
     void addStringArrayListener(String table, MutableLiveData<ArrayList<String>> mList, String fieldName) {
@@ -352,6 +357,8 @@ class FireDBHelper {
                 event.setDescription(documentSnapshot.get(EVENT_DESCRIPTION).toString());
                 event.setLocation(documentSnapshot.get(EVENT_LOCATION).toString());
                 event.setUnit_id(documentSnapshot.get(EVENT_UNIT).toString());
+                event.setId(documentSnapshot.getId());
+                Log.e(TAG, "getLastEventFromDB: "+documentSnapshot.getId());
             } else {
                 Log.e(TAG, "Error - " + task.getException());
             }
