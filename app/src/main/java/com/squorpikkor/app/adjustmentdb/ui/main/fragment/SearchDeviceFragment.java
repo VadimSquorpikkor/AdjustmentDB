@@ -23,7 +23,6 @@ import com.squorpikkor.app.adjustmentdb.ui.main.adapter.UnitAdapter;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.ExitAskDialog;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.RecognizeDialog;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SearchUnitParamsDialog;
-import com.squorpikkor.app.adjustmentdb.ui.main.recognition.RecognizeActivity;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -94,7 +93,12 @@ public class SearchDeviceFragment extends Fragment {
             logoImage.setVisibility(View.GONE);
         }
         UnitAdapter unitAdapter = new UnitAdapter(list, mViewModel);
-        unitAdapter.setOnItemClickListener(this::openInfoFragment);
+        unitAdapter.setOnItemClickListener(new UnitAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                SearchDeviceFragment.this.openInfoFragment(position);
+            }
+        });
         foundUnitRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         foundUnitRecycler.setAdapter(unitAdapter);
     }

@@ -2,7 +2,6 @@ package com.squorpikkor.app.adjustmentdb.ui.main.dialog;
 
 import android.Manifest;
 import android.app.Dialog;
-import android.content.ClipData;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,9 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Objects;
 

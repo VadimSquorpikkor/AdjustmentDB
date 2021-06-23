@@ -25,6 +25,7 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_DESCR
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_LOCATION;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_STATE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_UNIT;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_TYPE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_ID;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_LOCATION;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_NAME;
@@ -260,6 +261,16 @@ class FireDBHelper {
                 });
     }
 
+    /**Обертка для getUnitListByParam*/
+    void getRepairUnitListBySerial(MutableLiveData<ArrayList<DUnit>> unitList, String serial) {
+        getUnitListByParam(unitList, UNIT_DEVICE, ANY_VALUE,
+                UNIT_LOCATION, ANY_VALUE,
+                UNIT_EMPLOYEE, ANY_VALUE,
+                UNIT_TYPE, REPAIR_TYPE,
+                UNIT_STATE, ANY_VALUE,
+                UNIT_SERIAL, serial);
+    }
+
     void getUnitListByParam(MutableLiveData<ArrayList<DUnit>> unitList, String param1, String value1, String param2, String value2, String param3, String value3, String param4, String value4, String param5, String value5, String param6, String value6) {
         Query query = db.collection(TABLE_UNITS);
         if (!value1.equals(ANY_VALUE)) query = query.whereEqualTo(param1, value1);
@@ -350,6 +361,8 @@ class FireDBHelper {
             if (task.isSuccessful()) {
                 QuerySnapshot querySnapshot = task.getResult();
                 if (querySnapshot == null) return;
+                if (querySnapshot.getDocuments().size()==0) return;
+
                 DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
                 Timestamp timestamp = (Timestamp) documentSnapshot.get(EVENT_DATE);
                 event.setDate(timestamp.toDate());
