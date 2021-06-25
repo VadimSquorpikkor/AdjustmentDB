@@ -2,32 +2,26 @@ package com.squorpikkor.app.adjustmentdb.ui.main.dialog;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.MutableLiveData;
 import com.squorpikkor.app.adjustmentdb.R;
 import org.jetbrains.annotations.NotNull;
-import java.util.ArrayList;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE_TEXT;
+
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_TYPE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_TYPE;
 
 public class SearchUnitParamsDialog extends BaseDialog {
 
-    RadioButton isSerialRadio;
-    RadioButton isRepairRadio;
-    Spinner devNameSpinner;
-    Spinner locationSpinner;
-    Spinner statesSpinner;
-    Spinner employeeSpinner;
-    Button searchButton;
-    EditText serialEdit;
+    private RadioButton isSerialRadio;
+    private EditText serialEdit;
+    private SpinnerAdapter deviceSpinnerAdapter;
+    private SpinnerAdapter locationSpinnerAdapter;
+    private SpinnerAdapter stateSpinnerAdapter;
+    private SpinnerAdapter employeeSpinnerAdapter;
 
+    //todo сделать список статусов зависимым от выбраной локации (подгружать в диалог статусы по локации). Для "пустой" локации подгружать все статусы
     public SearchUnitParamsDialog() {
     }
 
@@ -39,76 +33,36 @@ public class SearchUnitParamsDialog extends BaseDialog {
         initializeWithVM(R.layout.dialog_search_unit_param);
 
         isSerialRadio = view.findViewById(R.id.radio_button_serial);
-        isRepairRadio = view.findViewById(R.id.radio_button_repair);
-        devNameSpinner = view.findViewById(R.id.spinnerDevName);
-        locationSpinner = view.findViewById(R.id.spinnerLocation);
-        statesSpinner = view.findViewById(R.id.spinnerState);
-        employeeSpinner = view.findViewById(R.id.spinnerEmployee);
-        searchButton = view.findViewById(R.id.show_button);
+        Spinner devNameSpinner = view.findViewById(R.id.spinnerDevName);
+        Spinner locationSpinner = view.findViewById(R.id.spinnerLocation);
+        Spinner statesSpinner = view.findViewById(R.id.spinnerState);
+        Spinner employeeSpinner = view.findViewById(R.id.spinnerEmployee);
+        Button searchButton = view.findViewById(R.id.show_button);
         serialEdit = view.findViewById(R.id.editTextSerial);
 
-        final MutableLiveData<ArrayList<String>> types = mViewModel.getDeviceNameList();
-        types.observe((LifecycleOwner)mContext, this::updateDevNamesSpinner);
+        deviceSpinnerAdapter = new SpinnerAdapter(devNameSpinner, mContext);
+        locationSpinnerAdapter = new SpinnerAdapter(locationSpinner, mContext);
+        stateSpinnerAdapter = new SpinnerAdapter(statesSpinner, mContext);
+        employeeSpinnerAdapter = new SpinnerAdapter(employeeSpinner, mContext);
 
-        final MutableLiveData<ArrayList<String>> locations = mViewModel.getLocationNamesList();
-        locations.observe((LifecycleOwner)mContext, this::updateLocationSpinner);
-
-        final MutableLiveData<ArrayList<String>> employees = mViewModel.getEmployeeNamesList();
-        employees.observe((LifecycleOwner)mContext, this::updateEmployeeSpinner);
-
-        //todo сделать список статусов зависимым от выбраной локации (подгружать в диалог статусы ро локации). Для "пустой" локации подгружать все статусы
-        final MutableLiveData<ArrayList<String>> states = mViewModel.getAllStatesNameList();
-        states.observe((LifecycleOwner)mContext, this::updateStatesSpinner);
+        mViewModel.getDevices().observe(this, deviceSpinnerAdapter::setData);
+        mViewModel.getLocations().observe(this, locationSpinnerAdapter::setData);
+        mViewModel.getStates().observe(this, stateSpinnerAdapter::setData);
+        mViewModel.getEmployees().observe(this, employeeSpinnerAdapter::setData);
 
         searchButton.setOnClickListener(v -> startSearch());
         return dialog;
     }
 
     private void startSearch() {
-        String deviceName = devNameSpinner.getSelectedItem().toString();
-        String location = locationSpinner.getSelectedItem().toString();
-        String state = statesSpinner.getSelectedItem().toString();
-        String employee = employeeSpinner.getSelectedItem().toString();
+        String nameId = deviceSpinnerAdapter.getSelectedNameId();
+        String locationId = locationSpinnerAdapter.getSelectedNameId();
+        String employeeId = employeeSpinnerAdapter.getSelectedNameId();
+        String typeId = isSerialRadio.isChecked()?SERIAL_TYPE:REPAIR_TYPE;
+        String stateId = stateSpinnerAdapter.getSelectedNameId();
         String serial = serialEdit.getText().toString();
-        if (deviceName.equals(ANY_VALUE_TEXT)) deviceName = ANY_VALUE;
-        if (location.equals(ANY_VALUE_TEXT)) location = ANY_VALUE;
-        if (state.equals(ANY_VALUE_TEXT)) state = ANY_VALUE;
-        if (employee.equals(ANY_VALUE_TEXT)) employee = ANY_VALUE;
-        if (serial.equals("")) serial = ANY_VALUE;
-        String type = isSerialRadio.isChecked()?SERIAL_TYPE:REPAIR_TYPE;
-        mViewModel.getUnitListFromBD(deviceName, location, employee, type, state, serial);
+
+        mViewModel.getUnitListFromBD(nameId, locationId, employeeId, typeId, stateId, serial);
         dismiss();
-    }
-
-    private void updateDevNamesSpinner(ArrayList<String> list) {
-        ArrayList<String> newList = new ArrayList<>(list);
-        newList.add(0, ANY_VALUE_TEXT);
-        ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, newList);
-        typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        devNameSpinner.setAdapter(typeAdapter);
-    }
-
-    private void updateLocationSpinner(ArrayList<String> list) {
-        ArrayList<String> newList = new ArrayList<>(list);
-        newList.add(0, ANY_VALUE_TEXT);
-        ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, newList);
-        locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        locationSpinner.setAdapter(locationAdapter);
-    }
-
-    private void updateEmployeeSpinner(ArrayList<String> list) {
-        ArrayList<String> newList = new ArrayList<>(list);
-        newList.add(0, ANY_VALUE_TEXT);
-        ArrayAdapter<String> employeeAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, newList);
-        employeeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        employeeSpinner.setAdapter(employeeAdapter);
-    }
-
-    private void updateStatesSpinner(ArrayList<String> list) {
-        ArrayList<String> newList = new ArrayList<>(list);
-        newList.add(0, ANY_VALUE_TEXT);
-        ArrayAdapter<String> statesAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, newList);
-        statesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        statesSpinner.setAdapter(statesAdapter);
     }
 }

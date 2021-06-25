@@ -8,6 +8,11 @@
     android:padding="15dp"
     android:gravity="center_horizontal">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Новые значения будут добавлены только устройствам без значений. Устройства, у которых уже есть какие-то значения, будут проигнорированы"/>
+
     <LinearLayout style="@style/dialogLinearHorizontal">
         <TextView
             android:id="@+id/dialogNewNameLabel"

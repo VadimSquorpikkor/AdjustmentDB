@@ -1,14 +1,14 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.entities;
 
-class Entity {
+public class Entity {
     String id;
     String nameId;
-    String nameRu;
+    String name;
 
-    public Entity(String id, String nameId, String nameRu) {
+    public Entity(String id, String nameId, String name) {
         this.id = id;
         this.nameId = nameId;
-        this.nameRu = nameRu;
+        this.name = name;
     }
 
     public String getId() {
@@ -19,11 +19,11 @@ class Entity {
         return nameId;
     }
 
-    public String getNameRu() {
-        return nameRu;
+    public String getName() {
+        return name;
     }
 
-    public void setNameRu(String nameRu) {
-        this.nameRu = nameRu;
+    public void setName(String name) {
+        this.name = name;
     }
 }

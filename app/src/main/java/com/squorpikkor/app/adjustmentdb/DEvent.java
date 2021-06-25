@@ -19,12 +19,13 @@ public class DEvent {
     public DEvent() {
     }
 
-    public DEvent(Date date, String state, String description, String location, String unit_id) {
+    public DEvent(Date date, String state, String description, String location, String unit_id, String id) {
         this.date = date;
         this.state = state;
         this.description = description;
         this.location = location;
         this.unit_id = unit_id;
+        this.id = id;
     }
 
     public Date getDate() {

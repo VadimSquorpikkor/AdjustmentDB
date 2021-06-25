@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.StatesAdapter;
 import java.util.ArrayList;
-import static com.squorpikkor.app.adjustmentdb.Utils.getRightValue;
 
 public class UnitInfoActivity extends AppCompatActivity {
 

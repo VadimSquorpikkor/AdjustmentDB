@@ -11,6 +11,11 @@ import androidx.lifecycle.ViewModel;
 import com.google.firebase.auth.FirebaseUser;
 import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
+import com.squorpikkor.app.adjustmentdb.ui.main.entities.Device;
+import com.squorpikkor.app.adjustmentdb.ui.main.entities.Employee;
+import com.squorpikkor.app.adjustmentdb.ui.main.entities.Entity;
+import com.squorpikkor.app.adjustmentdb.ui.main.entities.Location;
+import com.squorpikkor.app.adjustmentdb.ui.main.entities.State;
 import com.squorpikkor.app.adjustmentdb.ui.main.scanner.ScannerDataShow;
 import com.squorpikkor.app.adjustmentdb.ui.main.scanner.Scanner;
 
@@ -22,6 +27,26 @@ import io.grpc.android.BuildConfig;
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.Utils.getIdByName;
 import static com.squorpikkor.app.adjustmentdb.ui.main.scanner.Encrypter.decodeMe;
+
+/**
+ * Принцип хранения/загрузки данных
+ * 1. Данные загружаются из БД; сущности (локация, статус, сотрудник, устройство) не имеют имен, только идентификаторы имени
+ * 2. Сами имена для всех сущностей хранятся в отдельной таблице "names", у каждого имени есть варианты на других языках
+ * (исключая имена устройств — для них только варианты на русском и английском)
+ * 3. В приложении есть соответствующие массивы объектов для каждого вида сущностей: locations, states, employees, devices.
+ * В объекте хранятся и имена, и их идентификаторы (и ещё разные данные)
+ * 4. Эти массивы заполняются только при сработке соответствующих лисенеров, каждый из которых отслеживает изменения в
+ * соответствующей сущности таблице в БД ("devices", "locations", "employees", "states"). Таким образов данные в массивы
+ * загружаются из БД только при изменении данных (лисенер для локаций срабатывает только при изменениях в таблице "locations",
+ * на другие не обращает внимания) или при старте приложения — загрузке страницы (срабатывают все лисенеры)
+ * 4. Массивы играют роль словарей и источников данных, из них формируются спиннеры, с их помощью переводятся идентификаторы
+ * в имена и обратно, это всё происходит БЕЗ обращения в БД
+ * 5. Для заполнения спинеров данными, получения идентификаторов по выбранным пунктам и др, осуществляется через SpinnerAdapter
+ * 6. В load методах в массивы загружаются объекты с данными из таблицы, в самих методах используется квази JOIN, чтобы
+ * после получения идентификаторов имен сразу же получить из таблицы "names" имена на нужном языке
+ * 7. При загрузке юнитов и событий JOIN уже не нужен, данные для имен берутся через метод mViewModel.getLocationMameById(id)
+ * */
+
 
 /**
  * Локация — это название местонахождения устройства: участок регулировки, сборки и т.д.
@@ -39,6 +64,9 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.scanner.Encrypter.decodeM
  */
 public class MainViewModel extends ViewModel implements ScannerDataShow {
 //--------------------------------------------------------------------------------------------------
+public static final String TABLE_NAMES = "names";
+
+
     //Новые стринги для новой БД:
     public static final String TABLE_UNITS = "units";
     public static final String UNIT_DATE = "date";
@@ -46,6 +74,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     public static final String UNIT_DEVICE = "device_id"; //todo возможно в имени стринга и не нужен "_ID", только в значении
     public static final String UNIT_EMPLOYEE = "employee_id";
     public static final String UNIT_ID = "id";
+    public static final String UNIT_EVENT_ID = "event_id";
     public static final String UNIT_INNER_SERIAL = "inner_serial";
     public static final String UNIT_LOCATION = "location_id";
     public static final String UNIT_SERIAL = "serial";
@@ -54,6 +83,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
     public static final String TABLE_STATES = "states"; //в прошлом profile
     public static final String STATE_ID = "id";
+    public static final String STATE_NAME_ID = "name_id";
     public static final String STATE_LOCATION = "location_id";
     public static final String STATE_NAME = "name";
     public static final String STATE_TYPE = "type_id";
@@ -69,17 +99,21 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     public static final String TABLE_EMPLOYEES = "employees"; //в прошлом users
     public static final String EMPLOYEE_EMAIL = "email"; //email нельзя использовать в качестве id, так как у пользователя может поменяться email, и тогда при необходимости выбрать устройства пользователя нужно будет искать и по старому email и по новому
     public static final String EMPLOYEE_ID = "id";
+    public static final String EMPLOYEE_NAME_ID = "name_id";
     public static final String EMPLOYEE_LOCATION = "location_id";
     public static final String EMPLOYEE_NAME = "name";
 
     public static final String TABLE_LOCATIONS = "locations";
     public static final String LOCATION_ID = "id";
-    public static final String LOCATION_NAME = "name";
+    public static final String LOCATION_NAME_ID = "name_id";
+    public static final String LOCATION_NAME = "name";//deprecated
 
     public static final String TABLE_DEVICES = "devices";
     public static final String DEVICE_ID = "id";
+    public static final String DEVICE_NAME_ID = "name_id";
     public static final String DEVICE_NAME = "name";
     public static final String DEVICE_TYPE = "type";
+
 
     public static final String TYPE_ANY = "any_type";
     public static final String TYPE_REPAIR = "repair_type";
@@ -107,21 +141,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     public static final String BACK_PRESS_MULTI = "back_press_multi";
 
     private final FireDBHelper dbh;
-    private final MutableLiveData<ArrayList<DUnit>> serialUnitsList;
     private final MutableLiveData<DUnit> selectedUnit;
-
-    private final MutableLiveData<ArrayList<String>> deviceNameList;
-    private final MutableLiveData<ArrayList<String>> deviceIdList;
-    private final MutableLiveData<ArrayList<String>> serialStateIdList;
-    private final MutableLiveData<ArrayList<String>> repairStateIdList;
-    private final MutableLiveData<ArrayList<String>> serialStatesNames;
-    private final MutableLiveData<ArrayList<String>> repairStatesNames;
-    private final MutableLiveData<ArrayList<String>> employeeNamesList;
-    private final MutableLiveData<ArrayList<String>> employeeIdList;
-    private final MutableLiveData<ArrayList<String>> locationNamesList;
-    private final MutableLiveData<ArrayList<String>> locationIdList;
-    private final MutableLiveData<ArrayList<String>> allStatesIdList;
-    private final MutableLiveData<ArrayList<String>> allStatesNameList;
 
     private final MutableLiveData<ArrayList<DEvent>> unitStatesList;
     private final MutableLiveData<ArrayList<DUnit>> scannerFoundUnitsList;
@@ -144,40 +164,122 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
     private int position;
 
+//----------------------------------------------------
+    //Для новой архитектуры
+
+    private ArrayList<String> getNames(ArrayList<? extends Entity> list) {
+        if (list==null||list.size()==0)return new ArrayList<>();
+        ArrayList<String> newList = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            newList.add(list.get(i).getName());
+        }
+        return newList;
+    }
+
+    private String getNameByIdPrivate(ArrayList<? extends Entity> list, String id) {
+        if (list==null||list.size()==0||id==null||id.equals("")) return id;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getId().equals(id)) return list.get(i).getName();
+        }
+        return id;
+    }
+
+    private ArrayList<String> getNameIds(ArrayList<? extends Entity> list) {
+        if (list==null||list.size()==0)return new ArrayList<>();
+        ArrayList<String> newList = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            newList.add(list.get(i).getNameId());
+        }
+        return newList;
+    }
+
+    //todo 1. главный вопрос: всё таки грузить отдельно статусы, локации, сотрудники, устройства
+    // в каждый отдельный лист или сразу качать весь "names"?
+
+    MutableLiveData<ArrayList<Location>> locations;
+    MutableLiveData<ArrayList<Device>> devices;
+    MutableLiveData<ArrayList<Employee>> employees;
+    MutableLiveData<ArrayList<State>> states;
+
+    MutableLiveData<ArrayList<DUnit>> foundUnitsList;
+
+    public MutableLiveData<ArrayList<Location>> getLocations() {
+        return locations;
+    }
+    public MutableLiveData<ArrayList<Device>> getDevices() {
+        return devices;
+    }
+    public MutableLiveData<ArrayList<Employee>> getEmployees() {
+        return employees;
+    }
+    public MutableLiveData<ArrayList<State>> getStates() {
+        return states;
+    }
+
+
+    /**Из списка локаций выбирает список их имен*/
+    public ArrayList<String> getLocationNames() {
+        return getNames(locations.getValue());
+    }
+    public ArrayList<String> getDeviceNames() {
+        return getNames(devices.getValue());
+    }
+    public ArrayList<String> getEmployeeNames() {
+        return getNames(employees.getValue());
+    }
+    public ArrayList<String> getStateNames() {
+        return getNames(states.getValue());
+    }
+
+    //todo вообще можно сделать частью DEvent (event.getName(mViewModel)) надо подумать
+    public String getLocationNameById(String id) {
+        return getNameByIdPrivate(locations.getValue(), id);
+    }
+    public String getDeviceNameById(String id) {
+        return getNameByIdPrivate(devices.getValue(), id);
+    }
+    public String getEmployeeNameById(String id) {
+        return getNameByIdPrivate(employees.getValue(), id);
+    }
+    public String getStateNameById(String id) {
+        return getNameByIdPrivate(states.getValue(), id);
+    }
+
+    public MutableLiveData<ArrayList<DUnit>> getFoundUnitsList() {
+        return foundUnitsList;
+    }
+
+    void addListeners() {
+        dbh.locationListener(locations);
+        dbh.deviceListener(devices);
+        dbh.employeeListener(employees);
+        dbh.stateListener(states);
+    }
+//----------------------------------------------------
+
     public MainViewModel() {
-        serialUnitsList = new MutableLiveData<>();
-        selectedUnit = new MutableLiveData<>();
         dbh = new FireDBHelper();
-        deviceNameList = new MutableLiveData<>();
-        serialStateIdList = new MutableLiveData<>();
-        repairStateIdList = new MutableLiveData<>();
+
+        locations = new MutableLiveData<>();
+        devices = new MutableLiveData<>();
+        employees = new MutableLiveData<>();
+        states = new MutableLiveData<>();
+
+        foundUnitsList = new MutableLiveData<>();
+        foundUnitsList = new MutableLiveData<>();
+        addListeners();
+        selectedUnit = new MutableLiveData<>();
         unitStatesList = new MutableLiveData<>();
         scannerFoundUnitsList = new MutableLiveData<>();
         location_id = new MutableLiveData<>();
         locationName = new MutableLiveData<>();
         barcodeText = new MutableLiveData<>();
-        addDeviceNameListener();
-        serialStatesNames = new MutableLiveData<>();
-        repairStatesNames = new MutableLiveData<>();
         email = new MutableLiveData<>();
         userImage = new MutableLiveData<>();
         startExit = new MutableLiveData<>();
         goToSearchTab = new MutableLiveData<>();
         restartScanning = new MutableLiveData<>();
         restartMultiScanning = new MutableLiveData<>();
-        employeeNamesList = new MutableLiveData<>();
-        addEmployeeNamesListener();
-        deviceIdList = new MutableLiveData<>();
-        addDeviceIdListener();
-        locationNamesList = new MutableLiveData<>();
-        locationIdList = new MutableLiveData<>();
-        addLocationNamesListener();
-        addLocationIdListener();
-        employeeIdList = new MutableLiveData<>();
-        addEmployeeIdListener();
-        allStatesIdList = new MutableLiveData<>();
-        allStatesNameList = new MutableLiveData<>();
-        addAllStatesListener();
         lastEvent = new MutableLiveData<>();
     }
 
@@ -188,89 +290,15 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     //todo не совсем верно, здесь выбираем не профиль(раньше профиль == локация), а список доступных статусов, или список доступных профилей(в новом понимании, дурацкое название)
     public void setStatesForLocation(String locationId) {
         getLocationNameByLocationId(locationId);
-        addSerialStateNamesListener();
-        addRepairStateNamesListener();
     }
 
-    /**
-     * Сохраняет DUnit в БД в соответствующую таблицу
-     */
-    public void saveDUnitToDB(DUnit unit) {
-        // В коллекцию статусов текущего устройства добавляем статус: описание+дата (добавляем
-        // коллекцию в коллекцию). Если поля статуса оставить пустым, то статус не будет добавлне
-        // (нужно, наример, если необходимо просто добавить серийный номер, никакого статуса в этом
-        // случае быть не может)
-        if (!unit.getState().equals("")) {
-            Date date = new Date();
-            String state = unit.getState();
-            String description = unit.getDescription();
-            String unit_id = unit.getId();
-            String location_id = getLocation_id().getValue();
-            String lastEventId = lastEvent.getValue().getId();
-            dbh.addEventToDB(date, state, description, unit_id, location_id);
-            if (lastEventId!=null) dbh.closeEvent(lastEventId);
-        }
-        //Если есть новое событие, то обновляем дату/время
-        if (unit.getDate()==null) unit.setDate(new Date());
+    public void closeEvent(String event_id) {
+        dbh.closeEvent(event_id); // если создан новый ивент, то старый закрываем
+    }
+
+    public void saveUnitAndEvent(DUnit unit, DEvent event) {
         dbh.addUnitToDB(unit);
-    }
-
-    /**
-     * Если статус не задан, то присваиваем старый статус (который был до этого),
-     * при этом новый event не создается;
-     * если статус задан, сохраняем по старой схеме (с сохранением event)
-     */
-    public void saveDUnitToDB(DUnit unit, String oldState) {
-        if (unit.getState().equals("")) {
-            unit.setState(oldState);
-            dbh.addUnitToDB(unit);
-        } else {
-            saveDUnitToDB(unit);
-        }
-    }
-
-//----- LISTENERS ----------------------------------------------------------------------------------
-
-
-    //todo ВСЕ парные лисенеры (Name / Id) переделать в один лисенер, который будет отслеживать одну таблицу, а заполнять изменения в два MutableLiveData.
-    // Типа так:
-    void addAllStatesListener() {
-        dbh.getListIdsAndListNames(TABLE_STATES, allStatesIdList, STATE_ID, allStatesNameList, STATE_NAME);
-    }
-
-    /**
-     * Слушатель для таблицы имен приборов
-     */
-    void addDeviceNameListener() {
-        dbh.addStringArrayListener(TABLE_DEVICES, deviceNameList, DEVICE_NAME);
-    }
-
-    void addDeviceIdListener() {
-        dbh.addStringArrayListener(TABLE_DEVICES, deviceIdList, DEVICE_ID);
-    }
-
-    void addLocationNamesListener() {
-        dbh.addStringArrayListener(TABLE_LOCATIONS, locationNamesList, LOCATION_NAME);
-    }
-
-    void addLocationIdListener() {
-        dbh.addStringArrayListener(TABLE_LOCATIONS, locationIdList, LOCATION_ID);
-    }
-
-    /**
-     * Слушатель для таблицы названий статусов серийных приборов. При событии, serialStatesList
-     * получает список серийных статусов или статусов общих для обоих типов. В текущей локации
-     */
-    void addSerialStateNamesListener() {
-        dbh.getListOfStates(getLocation_id().getValue(), TYPE_SERIAL, serialStateIdList, serialStatesNames);
-    }
-
-    /**
-     * Слушатель для таблицы названий статусов ремонтных приборов. При событии, repairStatesList
-     * получает список ремонтных статусов или статусов общих для обоих типов. В текущей локации
-     */
-    void addRepairStateNamesListener() {
-        dbh.getListOfStates(getLocation_id().getValue(), TYPE_REPAIR, repairStateIdList, repairStatesNames);
+        dbh.addEventToDB(event);
     }
 
     /**
@@ -282,48 +310,23 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         dbh.addSelectedUnitStatesListener(unit_id, unitStatesList);
     }
 
-    void addEmployeeNamesListener() {
-        dbh.getStringArrayFromDB(TABLE_EMPLOYEES, employeeNamesList, EMPLOYEE_NAME);
-    }
-
-    void addEmployeeIdListener() {
-        dbh.getStringArrayFromDB(TABLE_EMPLOYEES, employeeIdList, EMPLOYEE_ID);
-    }
-
+    //todo переделать для (String unit_id, String event_id), а лучше под (DUnit unit), сделать один метод вместо 2
     public void addSelectedUnitListener(String unit_id) {
         dbh.addSelectedUnitListener(unit_id, selectedUnit);
         DEvent event = new DEvent();
-        dbh.getLastEventFromDB(unit_id, event);
+        dbh.getLastEventFromDB(unit_id, event);//todo переделать: надо брать по id ивента (а не юнита), т.е. брать конкретный, а не брать все и перебирать из найденных
+        lastEvent.setValue(event);
+    }
+
+    //todo переделать для (String unit_id, String event_id), а лучше под (DUnit unit), сделать один метод вместо 2
+    public void addSelectedUnitListener(String unit_id, String event_id) {
+        dbh.addSelectedUnitListener(unit_id, selectedUnit);
+        DEvent event = new DEvent();
+        dbh.getLastEventFromDB_new(event_id, event);
         lastEvent.setValue(event);
     }
 
 //--------------------------------------------------------------------------------------------------
-
-    /**
-     * Список названий статусов серийных приборов
-     */
-    public MutableLiveData<ArrayList<String>> getSerialStateIdList() {
-        return serialStateIdList;
-    }
-
-    /**
-     * Список названий статусов ремонтных приборов
-     */
-    public MutableLiveData<ArrayList<String>> getRepairStateIdList() {
-        return repairStateIdList;
-    }
-
-    public MutableLiveData<ArrayList<String>> getSerialStatesNames() {
-        return serialStatesNames;
-    }
-
-    public MutableLiveData<ArrayList<String>> getRepairStatesNames() {
-        return repairStatesNames;
-    }
-
-    public MutableLiveData<ArrayList<DUnit>> getSerialUnitsList() {
-        return serialUnitsList;
-    }
 
     public MutableLiveData<ArrayList<DEvent>> getUnitStatesList() {
         return unitStatesList;
@@ -365,53 +368,18 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         return restartMultiScanning;
     }
 
-    public MutableLiveData<ArrayList<String>> getEmployeeNamesList() {
-        return employeeNamesList;
-    }
-
-    public MutableLiveData<ArrayList<String>> getDeviceIdList() {
-        return deviceIdList;
-    }
-
-    public MutableLiveData<ArrayList<String>> getDeviceNameList() {
-        return deviceNameList;
-    }
-
-    public MutableLiveData<ArrayList<String>> getLocationNamesList() {
-        return locationNamesList;
-    }
-
-    public MutableLiveData<ArrayList<String>> getLocationIdList() {
-        return locationIdList;
-    }
-
-    public MutableLiveData<ArrayList<String>> getEmployeeIdList() {
-        return employeeIdList;
-    }
-
-    public MutableLiveData<ArrayList<String>> getAllStatesIdList() {
-        return allStatesIdList;
-    }
-
-    public MutableLiveData<ArrayList<String>> getAllStatesNameList() {
-        return allStatesNameList;
-    }
-
     public MutableLiveData<DEvent> getLastEvent() {
         return lastEvent;
     }
 
-    /**По выбранным параметрам получает из БД список юнитов*/
-    public void getUnitListFromBD(String deviceName, String location, String employee, String type, String state, String serial) {
-        Log.e(TAG, "♦ deviceName - "+deviceName+" location - "+location+" employee - "+employee+" type - "+type);
-        //Если параметр не "any", то имя параметра переводим в его идентификатор ("Диагностика" -> "adj_r_diagnostica")
-        //Если "any", то так и оставляем
-        if (!deviceName.equals(ANY_VALUE)) deviceName = getIdByName(deviceName, deviceNameList.getValue(), deviceIdList.getValue());
-        if (!location.equals(ANY_VALUE)) location = getIdByName(location, locationNamesList.getValue(), locationIdList.getValue());
-        if (!state.equals(ANY_VALUE)) state = getIdByName(state, allStatesNameList.getValue(), allStatesIdList.getValue());
-        if (!employee.equals(ANY_VALUE)) employee = getIdByName(employee, employeeNamesList.getValue(), employeeIdList.getValue());
+    //todo переименовать на startSearch
+    public void getUnitListFromBD(String deviceNameId, String locationId, String employeeId, String typeId, String stateId, String serial) {
+        Log.e(TAG, "♦ deviceName - "+deviceNameId+" location - "+locationId+" employee - "+employeeId+" type - "+typeId);
+        //Если поле номера пустое, то ищем по параметрам, если поле содержит значение, то ищем по этому значению, игнорируя
+        // все остальные параметры. Т.е. ищем или по параметрам, или по номеру
+        if (serial.equals("")) dbh.getUnitList(foundUnitsList, deviceNameId, locationId, employeeId, typeId, stateId, ANY_VALUE);
+        else dbh.getUnitList(foundUnitsList, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, serial);
 
-        dbh.getUnitListByParam(serialUnitsList, UNIT_DEVICE, deviceName, UNIT_LOCATION, location, UNIT_EMPLOYEE, employee, UNIT_TYPE, type, UNIT_STATE, state, UNIT_SERIAL, serial);
     }
 
     public void restartMultiScanning() {
@@ -438,6 +406,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         selectedUnit.setValue(newUnit);
     }
 
+    /***/
     public void getEventForThisUnit(String unit_id) {
         dbh.getEventsFromDB(unit_id, unitStatesList);
     }
@@ -497,6 +466,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
     @Override
     public void addUnitToCollection(String s) {
+        Log.e(TAG, "***STRING"+s);
         DUnit unit = getDUnitFromString(s);
         if (unit != null) {
             if (scannerFoundUnitsList.getValue() == null) scannerFoundUnitsList.setValue(new ArrayList<>());
@@ -521,7 +491,8 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
             // беруться из БД (getRepairUnitById), если этого блока в БД нет (новый), то данные для
             // блока берутся из QR-кода
             updateSelectedUnit(unit);
-            addSelectedUnitListener(unit.getId());
+//            addSelectedUnitListener(unit.getId());
+            addSelectedUnitListener(unit.getId(), unit.getEventId());
             getEventForThisUnit(unit.getId());
         }
     }
@@ -548,12 +519,12 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
             // Если это ремонт:
             if (name.equals(REPAIR_UNIT)) {
                 id = "r_" + ar[1];
-                return new DUnit(id, "", "", "", "", "", REPAIR_TYPE, location);
+                return new DUnit(id, "", "", "", REPAIR_TYPE);
             }
             // Если это серия:
             else {
                 id = name + "_" + innerSerial;
-                return new DUnit(id, name, innerSerial, "", "", "", SERIAL_TYPE, location);
+                return new DUnit(id, name, innerSerial, "", SERIAL_TYPE);
             }
 
             // Если строка некорректная, возвращаю null

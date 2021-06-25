@@ -57,35 +57,17 @@ public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolde
     @Override
     public void onBindViewHolder(@NonNull DUnitViewHolder holder, int position) {
         DUnit unit = units.get(position);
-//        String serial = unit.getSerial();
-//        String innerSerial = unit.getInnerSerial();
 
-//        insertValueOrGone(name, holder.tName);
-//        insertValueOrGone(serial, holder.tSerial, "№ %s");
-//        insertValueOrGone(innerSerial, holder.tInnerSerial, "(вн. %s)");
-//        insertValueOrGone(state, holder.tState);
-
-
-        String state = getNameById(unit.getState(), mViewModel.getAllStatesNameList().getValue(), Objects.requireNonNull(mViewModel.getAllStatesIdList().getValue()));
-        String name = getNameById(unit.getName(), mViewModel.getDeviceNameList().getValue(), Objects.requireNonNull(mViewModel.getDeviceIdList().getValue()));
-
-        holder.tState.setText(state);
-        holder.tName.setText(name);
+        holder.tName.setText(mViewModel.getDeviceNameById(unit.getName()));
+        holder.tState.setText(mViewModel.getStateNameById(unit.getState()));
         holder.tSerial.setText(String.format("№ %s", Utils.getRightValue(unit.getSerial())));
         if (unit.getInnerSerial()==null||unit.getInnerSerial().equals(""))holder.tInnerSerial.setText("");
         else holder.tInnerSerial.setText(String.format("(вн. %s)", unit.getInnerSerial()));
 
-//        ArrayList<String> statesNames = unit.isSerialUnit()?mViewModel.getSerialStatesNames().getValue():mViewModel.getRepairStatesNames().getValue();
-//        ArrayList<String> statesId = unit.isSerialUnit()?mViewModel.getSerialStateIdList().getValue():mViewModel.getRepairStateIdList().getValue();
-//        holder.tState.setText(getNameById(unit.getState(), statesNames, statesId));
-
         if (unit.getDate()!=null){
-//            holder.tDate.setVisibility(View.VISIBLE);
             holder.tDate.setText(getRightDateAndTime(unit.getDate().getTime()));
-//            int days = daysPassed(unit.getDate());
             holder.tDatePassed.setText(String.format("%s д.", daysPassed(unit.getDate())));
         } else {
-//            holder.tDate.setVisibility(View.GONE);
             holder.tDate.setText(EMPTY_VALUE);
             holder.tDatePassed.setText("");
         }

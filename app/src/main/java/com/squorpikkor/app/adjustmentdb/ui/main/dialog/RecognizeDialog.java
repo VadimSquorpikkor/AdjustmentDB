@@ -23,6 +23,7 @@ import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
+import com.squorpikkor.app.adjustmentdb.ui.main.entities.Device;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -78,30 +79,36 @@ public class RecognizeDialog extends BaseDialog{
         DUnit unit = mViewModel.getSelectedUnit().getValue();
 
         //Загружается тот список, тип прибора который загружен — ремонт или серия
-        ArrayList<String> rightList;
-        if (mViewModel.getSelectedUnit().getValue()!=null && mViewModel.getSelectedUnit().getValue().isRepairUnit())
-            rightList = new ArrayList<>(Objects.requireNonNull(mViewModel.getRepairStatesNames().getValue()));
-        else
-            rightList = new ArrayList<>(Objects.requireNonNull(mViewModel.getSerialStatesNames().getValue()));
-        rightList.add(0, EMPTY_VALUE_TEXT);
+//        ArrayList<String> rightList;
+//        if (mViewModel.getSelectedUnit().getValue()!=null && mViewModel.getSelectedUnit().getValue().isRepairUnit())
+//            rightList = new ArrayList<>(Objects.requireNonNull(mViewModel.getRepairStatesNames().getValue()));
+//        else
+//            rightList = new ArrayList<>(Objects.requireNonNull(mViewModel.getSerialStatesNames().getValue()));
+//        rightList.add(0, EMPTY_VALUE_TEXT);
 
-        ArrayList<String> devIdList = new ArrayList<>(Objects.requireNonNull(mViewModel.getDeviceIdList().getValue()));
-        devIdList.add(0, EMPTY_VALUE_TEXT);
+//        ArrayList<String> devIdList = new ArrayList<>(Objects.requireNonNull(mViewModel.getDeviceIdList().getValue()));
+//        devIdList.add(0, EMPTY_VALUE_TEXT);
 
         view.findViewById(R.id.cancel_button).setOnClickListener(v -> dismiss());
         view.findViewById(R.id.ok_button).setOnClickListener(v -> saveData(unit));
 
         setVisibility(unit);
 
-        ArrayAdapter<String> stateAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, rightList);
-        stateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        states.setAdapter(stateAdapter);
 
-        ArrayAdapter<String> deviceAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, devIdList);
-        deviceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        devices.setAdapter(deviceAdapter);
 
-        names = new ArrayList<>(mViewModel.getDeviceNameList().getValue());
+
+//        ArrayAdapter<String> stateAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, rightList);
+//        stateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        states.setAdapter(stateAdapter);
+
+//        ArrayAdapter<String> deviceAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, devIdList);
+//        deviceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        devices.setAdapter(deviceAdapter);
+
+//        names = new ArrayList<>(mViewModel.getDeviceNameList().getValue());
+        ArrayList<String> names = mViewModel.getDeviceNames();
+
+
         //сортировка по длине имени в обратном порядке, чтобы сразу искался "6130С" и только потом "6130"
         Collections.sort(names, Collections.reverseOrder());
 
@@ -157,24 +164,24 @@ public class RecognizeDialog extends BaseDialog{
             String state_id = "";
             if (states.getSelectedItem() != null) state = states.getSelectedItem().toString();
 
-            if (!state.equals(EMPTY_VALUE_TEXT)) {
-                if (unit.isRepairUnit()
-                        && mViewModel.getRepairStatesNames().getValue()!=null
-                        && mViewModel.getRepairStateIdList().getValue()!=null) {
-                    state_id = getIdByName(state, mViewModel.getRepairStatesNames().getValue(), mViewModel.getRepairStateIdList().getValue());
-                }
-                if (unit.isSerialUnit()
-                        && mViewModel.getSerialStatesNames().getValue()!=null
-                        && mViewModel.getSerialStateIdList().getValue()!=null) {
-                    state_id = getIdByName(state, mViewModel.getSerialStatesNames().getValue(), mViewModel.getSerialStateIdList().getValue());
-                }
-            } else {
-                state_id = "";
-            }
+//            if (!state.equals(EMPTY_VALUE_TEXT)) {
+//                if (unit.isRepairUnit()
+//                        && mViewModel.getRepairStatesNames().getValue()!=null
+//                        && mViewModel.getRepairStateIdList().getValue()!=null) {
+//                    state_id = getIdByName(state, mViewModel.getRepairStatesNames().getValue(), mViewModel.getRepairStateIdList().getValue());
+//                }
+//                if (unit.isSerialUnit()
+//                        && mViewModel.getSerialStatesNames().getValue()!=null
+//                        && mViewModel.getSerialStateIdList().getValue()!=null) {
+//                    state_id = getIdByName(state, mViewModel.getSerialStatesNames().getValue(), mViewModel.getSerialStateIdList().getValue());
+//                }
+//            } else {
+//                state_id = "";
+//            }
 
-            String name = devices.getSelectedItem().toString().equals(EMPTY_VALUE_TEXT)?mDevNameText.getText().toString():devices.getSelectedItem().toString();
-            name = getRightValue(unit.getName(), name);
-            name = getIdByName(name, mViewModel.getDeviceNameList().getValue(), mViewModel.getDeviceIdList().getValue());
+//            String name = devices.getSelectedItem().toString().equals(EMPTY_VALUE_TEXT)?mDevNameText.getText().toString():devices.getSelectedItem().toString();
+//            name = getRightValue(unit.getName(), name);
+//            name = getIdByName(name, mViewModel.getDeviceNameList().getValue(), mViewModel.getDeviceIdList().getValue());
 
             String serial = eSerial.getText().toString().equals("")?mSerialText.getText().toString():eSerial.getText().toString();
             serial = getRightValue(unit.getSerial(), serial);
@@ -183,7 +190,7 @@ public class RecognizeDialog extends BaseDialog{
             String type = unit.getType();
             String location = mViewModel.getLocation_id().getValue();
             Date date = unit.getDate();
-            mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state_id, desc, type, location, date), unit.getState());
+//            mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state_id, desc, type, location, date), unit.getState());
         }
         dismiss();
     }

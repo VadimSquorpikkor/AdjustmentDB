@@ -4,18 +4,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
-
 import java.util.ArrayList;
-import java.util.Objects;
-
-import static com.squorpikkor.app.adjustmentdb.Utils.getNameById;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightValue;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_UNIT;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_UNIT;
@@ -43,7 +37,7 @@ public class FoundUnitAdapter extends RecyclerView.Adapter<FoundUnitAdapter.Foun
     public void onBindViewHolder(@NonNull FoundViewHolder holder, int position) {
         DUnit unit = units.get(position);
         String type = unit.isRepairUnit()?REPAIR_UNIT:SERIAL_UNIT;
-        String name = getNameById(unit.getName(), mViewModel.getDeviceNameList().getValue(), Objects.requireNonNull(mViewModel.getDeviceIdList().getValue()));
+        String name = mViewModel.getDeviceNameById(unit.getName());
         String serial = getRightValue(unit.getSerial());
         String innerSerial = getRightValue(unit.getInnerSerial());
         String id = getRightValue(unit.getId());

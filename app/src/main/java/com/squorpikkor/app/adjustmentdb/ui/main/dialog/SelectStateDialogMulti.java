@@ -2,11 +2,11 @@ package com.squorpikkor.app.adjustmentdb.ui.main.dialog;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 
@@ -14,14 +14,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Date;
-
-import static com.squorpikkor.app.adjustmentdb.Utils.getIdByName;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_VALUE_TEXT;
 
 public class SelectStateDialogMulti extends BaseDialog {
-    private EditText description;
-    private Spinner spinner;
-    private Spinner devSpinner;
+    private EditText descriptionEdit;
+    private String location;
+
+    private SpinnerAdapter stateSpinnerAdapter;
+    private SpinnerAdapter deviceSpinnerAdapter;
 
     public SelectStateDialogMulti() {
     }
@@ -33,85 +34,58 @@ public class SelectStateDialogMulti extends BaseDialog {
 
         initializeWithVM(R.layout.dialog_select_states_multi);
 
+        location = mViewModel.getLocation_id().getValue();
+
         ArrayList<DUnit> unitList = mViewModel.getScannerFoundUnitsList().getValue();
-        DUnit unit = unitList != null ? unitList.get(0) : null;
+        DUnit unit = unitList != null ? unitList.get(0) : null;//todo переименовать -> firstUnit
 
-        //Загружается тот список, тип прибора который загружен — ремонт или серия
-        ArrayList<String> rightList;
-        if (mViewModel.getScannerFoundUnitsList().getValue().get(0).isRepairUnit())
-            rightList = mViewModel.getRepairStatesNames().getValue();
-        else rightList = mViewModel.getSerialStatesNames().getValue();
-        rightList.add(0, EMPTY_VALUE_TEXT);
+        Spinner stateSpinner = view.findViewById(R.id.state_spinner);
+        Spinner deviceSpinner = view.findViewById(R.id.name_spinner);
 
-        //todo заменить ссылку на подписку
-        ArrayList<String> nameList = mViewModel.getDeviceNameList().getValue();
-        nameList.add(0, EMPTY_VALUE_TEXT);
+        deviceSpinnerAdapter = new SpinnerAdapter(deviceSpinner, mContext);
+        stateSpinnerAdapter = new SpinnerAdapter(stateSpinner, mContext);
+
+        mViewModel.getDevices().observe(this, list -> deviceSpinnerAdapter.setData(list, EMPTY_VALUE_TEXT));
+        mViewModel.getStates().observe(this, list -> stateSpinnerAdapter.setDataByTypeAndLocation(list, unit.getType(), location, EMPTY_VALUE_TEXT));
 
         Button cancelButton = view.findViewById(R.id.cancel_button);
         Button okButton = view.findViewById(R.id.ok_button);
-        description = view.findViewById(R.id.description);
-        spinner = view.findViewById(R.id.state_spinner);
-        devSpinner = view.findViewById(R.id.name_spinner);
+        descriptionEdit = view.findViewById(R.id.description);
 
         cancelButton.setOnClickListener(view -> dismiss());
 
         okButton.setOnClickListener(view -> {
-            if (unit != null) {
-                String state = "";
-                String state_id = "";
-                String type = unit.getType();
-                String spinnerName = "";
-                if (spinner.getSelectedItem() != null) state = spinner.getSelectedItem().toString();
-                if (devSpinner.getSelectedItem() != null)
-                    spinnerName = devSpinner.getSelectedItem().toString();
-            /*int position;
-            if (unit.isRepairUnit()){
-                position = mViewModel.getRepairStatesNames().getValue().indexOf(state);
-                state_id = mViewModel.getRepairStateIdList().getValue().get(position);
-            }
-            if (unit.isSerialUnit()){
-                position = mViewModel.getSerialStatesNames().getValue().indexOf(state);
-                state_id = mViewModel.getSerialStateIdList().getValue().get(position);
-            }*/
-                if (unit.isRepairUnit()
-                        && mViewModel.getRepairStatesNames().getValue() != null
-                        && mViewModel.getRepairStateIdList().getValue() != null) {
-                    state_id = getIdByName(state, mViewModel.getRepairStatesNames().getValue(), mViewModel.getRepairStateIdList().getValue());
-                }
-                if (unit.isSerialUnit()
-                        && mViewModel.getSerialStatesNames().getValue() != null
-                        && mViewModel.getSerialStateIdList().getValue() != null) {
-                    state_id = getIdByName(state, mViewModel.getSerialStatesNames().getValue(), mViewModel.getSerialStateIdList().getValue());
-                }
-                String desc = description.getText().toString();
-                String location = mViewModel.getLocation_id().getValue();
-
-                for (int i = 0; i < unitList.size(); i++) {
-                    DUnit unitFromList = unitList.get(i);
-                    String id = unitFromList.getId();
-                    String name;
-                    //Если у юнита уже было назначено имя (название устройства), то оно не будет перезаписано
-                    if (unitFromList.getName() == null || unitFromList.getName().equals(""))
-//                        name = spinnerName;
-                        name = getIdByName(spinnerName, mViewModel.getDeviceNameList().getValue(), mViewModel.getDeviceIdList().getValue());
-                    else name = unitFromList.getName();
-                    String innerSerial = unitFromList.getInnerSerial();
-                    String serial = unitFromList.getSerial();
-                    Date date = unitFromList.getDate();
-                    mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state_id, desc, type, location, date));
-                }
+            for (int i = 0; i < unitList.size(); i++) {
+                DUnit dUnit = unitList.get(i);
+                mViewModel.closeEvent(dUnit.getEventId());
+                DEvent newEvent = getNewEvent(dUnit);
+                updateUnitData(dUnit, newEvent);
+                mViewModel.saveUnitAndEvent(dUnit, newEvent);
             }
             dismiss();
         });
 
-        ArrayAdapter<String> stateAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, rightList);
-        stateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(stateAdapter);
-
-        ArrayAdapter<String> nameAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, nameList);
-        nameAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        devSpinner.setAdapter(nameAdapter);
-
         return dialog;
+    }
+
+    private void updateUnitData(DUnit unit, DEvent newEvent) {
+        String eventId = newEvent==null?null:newEvent.getId();
+        String newNameId = deviceSpinnerAdapter.getSelectedNameId();
+        String newStateId = stateSpinnerAdapter.getSelectedNameId();//todo потом этого не будет
+
+        if (unit.getName().equals("") && !newNameId.equals(ANY_VALUE)) unit.setName(newNameId);
+        if (unit.getDate()==null) unit.setDate(new Date());
+        if (unit.getState().equals("") && !newStateId.equals(ANY_VALUE)) unit.setState(newStateId);
+        if (eventId!=null&&!eventId.equals("")) unit.setEventId(eventId);
+    }
+
+    private DEvent getNewEvent(DUnit unit) {
+        //Если в спиннере статуса стоит "-не выбрано-", то значит нового события не будет, тогда возвращаем null
+        String stateId = stateSpinnerAdapter.getSelectedNameId();
+        String description = descriptionEdit.getText().toString();
+        String eventId = unit.getId()+"_"+new Date().getTime();
+
+        if (stateId.equals(ANY_VALUE)) return null;
+        else return new DEvent(new Date(), stateId, description, location, unit.getId(), eventId);
     }
 }

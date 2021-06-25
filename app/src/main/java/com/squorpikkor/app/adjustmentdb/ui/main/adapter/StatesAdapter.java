@@ -4,18 +4,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
-
 import java.util.ArrayList;
-import java.util.Objects;
-
-import static com.squorpikkor.app.adjustmentdb.Utils.getNameById;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightDate;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightTime;
 
@@ -47,12 +41,8 @@ public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesView
     public void onBindViewHolder(@NonNull StatesAdapter.StatesViewHolder holder, int position) {
         DEvent event = events.get(position);
 
-        String state = getNameById(event.getState(), mViewModel.getAllStatesNameList().getValue(), Objects.requireNonNull(mViewModel.getAllStatesIdList().getValue()));
-        String location = getNameById(event.getLocation(),mViewModel.getLocationNamesList().getValue(),
-                mViewModel.getLocationIdList().getValue());
-
-        holder.tState.setText(state);
-        holder.tLocation.setText(location);
+        holder.tState.setText(mViewModel.getStateNameById(event.getState()));
+        holder.tLocation.setText(mViewModel.getLocationNameById(event.getLocation()));
         long time = event.getDate().getTime();
         holder.tDate.setText(String.format("%s\n%s", getRightDate(time), getRightTime(time)));
     }

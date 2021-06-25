@@ -9,7 +9,7 @@ public class DUnit {
 
     //todo сейчас последнее событие сохраняется в юните, что не правильно, надо хранить все события
     // в событиях и только. При чтении юнита нужно загружать из коллекции событий последнее.
-    // Поэтому нужно сделать загрузку последнего события и убрать из юнита поля: state, description, location, date
+    // Поэтому нужно сделать загрузку последнего события и убрать из юнита поля: state, description, location
 
     private String id; //"0001"
     private String name; //БДКГ-02
@@ -17,36 +17,41 @@ public class DUnit {
     private String serial; //132.002
     private String type; //"Ремонтный"
     private String state; //"На линейке"
-    private String description;
-    private String location;
+//    private String description;
+//    private String location;
     private String employee; //Фамилия ответственного
 
-    Date date;
+    private String eventId;
+
+
+    Date date; //todo сейчас это дата последнего ивента, надо переделать на дату начала ремонта/серии (т.е. при создании юнита сохраняется дата его создания)
 
 
     public DUnit() {
     }
 
-    public DUnit(String id, String name, String innerSerial, String serial, String state, String description, String type, String location) {
+//    public DUnit(String id, String name, String innerSerial, String serial, String state, String description, String type, String location) {
+    public DUnit(String id, String name, String innerSerial, String serial, String type) {
         this.id = id;
         this.name = name;
         this.innerSerial = innerSerial;
         this.serial = serial;
         this.type = type;
-        this.state = state;
-        this.description = description;
-        this.location = location;
+//        this.state = state;
+//        this.description = description;
+//        this.location = location;
     }
 
-    public DUnit(String id, String name, String innerSerial, String serial, String state, String description, String type, String location, Date date) {
+//    public DUnit(String id, String name, String innerSerial, String serial, String state, String description, String type, String location, Date date) {
+    public DUnit(String id, String name, String innerSerial, String serial, String type, Date date) {
         this.id = id;
         this.name = name;
         this.innerSerial = innerSerial;
         this.serial = serial;
         this.type = type;
-        this.state = state;
-        this.description = description;
-        this.location = location;
+//        this.state = state;
+//        this.description = description;
+//        this.location = location;
         this.date = date;
     }
 
@@ -115,22 +120,22 @@ public class DUnit {
     }
 
     /**Описание (необязательный параметр)*/
-    public String getDescription() {
-        return description;
-    }
+//    public String getDescription() {
+//        return description;
+//    }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+//    public void setDescription(String description) {
+//        this.description = description;
+//    }
 
     /**Имя последней локации (местонахождения) устройства*/
-    public String getLocation() {
-        return location;
-    }
+//    public String getLocation() {
+//        return location;
+//    }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
+//    public void setLocation(String location) {
+//        this.location = location;
+//    }
 
     /**Фамилия ответственного*/
     public String getEmployee() {
@@ -147,5 +152,13 @@ public class DUnit {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 }
