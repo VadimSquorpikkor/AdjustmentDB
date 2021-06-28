@@ -8,20 +8,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.FoundUnitAdapter;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialogMulti;
 import java.util.ArrayList;
-import java.util.Objects;
 
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_MULTI;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_MULTI_STATES;
@@ -45,7 +42,7 @@ public class MultiScanFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_multi_scan, container, false);
-        mViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity())).get(MainViewModel.class);
+        mViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
         nextButton = view.findViewById(R.id.button_next);
         recyclerFoundUnits = view.findViewById(R.id.recyclerViewFound);
@@ -76,11 +73,11 @@ public class MultiScanFragment extends Fragment {
 
         nextButton.setOnClickListener(v -> {
             SelectStateDialogMulti dialog = new SelectStateDialogMulti();
-            dialog.show(requireFragmentManager(), null);
+            dialog.show(getParentFragmentManager(), null);
         });
 
         final MutableLiveData<Boolean> restartMultiScanning = mViewModel.getRestartMultiScanning();
-        restartMultiScanning.observe(this, this::restartMultiScanning);
+        restartMultiScanning.observe(getViewLifecycleOwner(), this::restartMultiScanning);
 
         mViewModel.startMultiScanner(getActivity(), surfaceView);
 

@@ -31,6 +31,7 @@ class BaseDialog extends DialogFragment {
     }
 
     /**Добавляет диалогу лэйаут и задает параметры*/
+    @SuppressWarnings("unused")
     public void initialize(int layout) {
         dialog = new AlertDialog.Builder(mContext).create();
         Window window = dialog.getWindow();

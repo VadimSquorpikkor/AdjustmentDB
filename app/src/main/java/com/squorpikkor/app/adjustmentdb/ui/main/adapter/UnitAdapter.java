@@ -4,21 +4,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.Utils;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
-
 import java.util.ArrayList;
-import java.util.Objects;
-
 import static com.squorpikkor.app.adjustmentdb.Utils.EMPTY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.Utils.daysPassed;
-import static com.squorpikkor.app.adjustmentdb.Utils.getNameById;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightDateAndTime;
 
 public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolder>{

@@ -62,6 +62,7 @@ public class SpinnerAdapter {
 
     /**Метод работает только для типов State
      * Метод делает спинер, но в отличии от setData отбирает статусы по типу и локации*/
+    @SuppressWarnings("unused")
     public void setDataByTypeAndLocation(ArrayList<State> list, String typeId, String locationId) {
         this.ids = getNameIdsByTypeAndLocation(list, typeId, locationId);
         this.names = getNamesByTypeAndLocation(list, typeId, locationId);

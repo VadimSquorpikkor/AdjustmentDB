@@ -1,13 +1,10 @@
 package com.squorpikkor.app.adjustmentdb;
 
 import android.annotation.SuppressLint;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.EmptyStackException;
 
 public class Utils {
 
@@ -40,33 +37,6 @@ public class Utils {
     /**Возвращает true: если null, если "", если "null" */
     public static boolean isEmptyOrNull(String s) {
         return s == null || s.equals("") || s.equals("null");
-    }
-
-    /**Заменяет имя на его идентификатор (переводчик)
-     * @param name имя ("Диагностика")
-     * @param nameList лист имен
-     * @param idList лист идентификаторов
-     * @return id ("adj_r_diagnostica")
-     */
-    public static String getIdByName(String name, ArrayList<String> nameList, ArrayList<String> idList) {
-        int position = nameList.indexOf(name);
-        return idList.get(position);
-    }
-
-    /**Заменяет идентификатор на его имя (переводчик). Если id не найден, то возвращает "- - -"
-     * @param id имя ("adj_r_diagnostica")
-     * @param nameList лист имен
-     * @param idList лист идентификаторов
-     * @return name ("Диагностика")
-     */
-    public static String getNameById(String id, ArrayList<String> nameList, ArrayList<String> idList) {
-        if (nameList==null||idList==null){
-            Log.e("TAG", "☻ nameList==null||idList==null");
-            return EMPTY_VALUE;
-        }
-        int position = idList.indexOf(id);
-        if (position==-1)return EMPTY_VALUE;
-        else return nameList.get(position);
     }
 
     @SuppressLint("SimpleDateFormat")

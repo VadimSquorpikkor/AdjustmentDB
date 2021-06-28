@@ -149,6 +149,7 @@ public static final String TABLE_NAMES = "names";
     private final MutableLiveData<Boolean> restartScanning;
     private final MutableLiveData<Boolean> restartMultiScanning;
     private final MutableLiveData<DEvent> lastEvent;
+    private final MutableLiveData<Boolean> isWrongQR;
 
     private FirebaseUser user;
 
@@ -183,9 +184,6 @@ public static final String TABLE_NAMES = "names";
         }
         return newList;
     }
-
-    //todo 1. главный вопрос: всё таки грузить отдельно статусы, локации, сотрудники, устройства
-    // в каждый отдельный лист или сразу качать весь "names"?
 
     MutableLiveData<ArrayList<Location>> locations;
     MutableLiveData<ArrayList<Device>> devices;
@@ -288,6 +286,7 @@ public static final String TABLE_NAMES = "names";
         restartScanning = new MutableLiveData<>();
         restartMultiScanning = new MutableLiveData<>();
         lastEvent = new MutableLiveData<>();
+        isWrongQR = new MutableLiveData<>();
     }
 
     public void closeEvent(String event_id) {
@@ -368,6 +367,10 @@ public static final String TABLE_NAMES = "names";
 
     public MutableLiveData<DEvent> getLastEvent() {
         return lastEvent;
+    }
+
+    public MutableLiveData<Boolean> getIsWrongQR() {
+        return isWrongQR;
     }
 
     //todo переименовать на startSearch
@@ -481,7 +484,11 @@ public static final String TABLE_NAMES = "names";
 //            addSelectedUnitListener(unit.getId());
             addSelectedUnitListener(unit.getId(), unit.getEventId());
             getEventForThisUnit(unit.getId());
-        }
+        } else sayWrongQr();
+    }
+
+    private void sayWrongQr() {
+        /*if (isWrongQR.getValue()!=null && !isWrongQR.getValue()) */isWrongQR.setValue(true);
     }
 
     public void selectUnit(String unit_id) {
@@ -492,8 +499,8 @@ public static final String TABLE_NAMES = "names";
     @Override
     public DUnit getDUnitFromString(String s) {
         s = decodeMe(s);
+        Log.e(TAG, "******** "+s);
         barcodeText.setValue(s);
-        /////txtBarcodeValue.setVisibility(View.VISIBLE);
         String[] ar = s.split(SPLIT_SYMBOL);
         if (ar.length == 2) {
             //Для серии: имя+внутренний_серийный (БДКГ-02 1234), id = БДКГ-02_1234
@@ -509,12 +516,21 @@ public static final String TABLE_NAMES = "names";
             }
             // Если это серия:
             else {
-                id = name + "_" + innerSerial;
-                return new DUnit(id, name, innerSerial, "", SERIAL_TYPE);
+                if (devices.getValue()!=null && idInList(name, devices.getValue())) {
+                    id = name + "_" + innerSerial;
+                    return new DUnit(id, name, innerSerial, "", SERIAL_TYPE);
+                } else return null;
             }
 
             // Если строка некорректная, возвращаю null
         } else return null;
+    }
+
+    private boolean idInList(String name, ArrayList<? extends Entity> list) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getNameId().equals(name)) return true;
+        }
+        return false;
     }
 }
 

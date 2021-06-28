@@ -9,34 +9,24 @@ import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
-import com.squorpikkor.app.adjustmentdb.ui.main.entities.Device;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Objects;
-
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
-import static com.squorpikkor.app.adjustmentdb.Utils.getIdByName;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightValue;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_VALUE_TEXT;
 
 public class RecognizeDialog extends BaseDialog{
 
@@ -205,7 +195,7 @@ public class RecognizeDialog extends BaseDialog{
 
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             try {
-                if (ActivityCompat.checkSelfPermission(Objects.requireNonNull(getActivity()), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                     return;
                 }
                 mCameraSource.start(mCameraView.getHolder());
@@ -318,14 +308,14 @@ public class RecognizeDialog extends BaseDialog{
     private void startCameraSource() {
 
         //Create the TextRecognizer
-        final TextRecognizer textRecognizer = new TextRecognizer.Builder(Objects.requireNonNull(getActivity())).build();
+        final TextRecognizer textRecognizer = new TextRecognizer.Builder(requireActivity()).build();
 
         if (!textRecognizer.isOperational()) {
             Log.w(TAG, "Detector dependencies not loaded yet");
         } else {
 
             //Initialize camerasource to use high resolution and set Autofocus on.
-            mCameraSource = new CameraSource.Builder(Objects.requireNonNull(getActivity()), textRecognizer)
+            mCameraSource = new CameraSource.Builder(requireActivity(), textRecognizer)
                     .setFacing(CameraSource.CAMERA_FACING_BACK)
                     .setRequestedPreviewSize(1280, 1024)
                     .setAutoFocusEnabled(true)
@@ -341,10 +331,10 @@ public class RecognizeDialog extends BaseDialog{
                 public void surfaceCreated(SurfaceHolder holder) {
                     try {
 
-                        if (ActivityCompat.checkSelfPermission(Objects.requireNonNull(getActivity()),
+                        if (ActivityCompat.checkSelfPermission(requireActivity(),
                                 Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 
-                            ActivityCompat.requestPermissions(Objects.requireNonNull(getActivity()),
+                            ActivityCompat.requestPermissions(requireActivity(),
                                     new String[]{Manifest.permission.CAMERA},
                                     requestPermissionID);
                             return;

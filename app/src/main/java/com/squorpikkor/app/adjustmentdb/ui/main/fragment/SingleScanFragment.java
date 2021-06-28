@@ -1,20 +1,16 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.fragment;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
@@ -24,11 +20,8 @@ import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.StatesAdapter;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.RecognizeDialog;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialogSingle;
-
+import com.squorpikkor.app.adjustmentdb.ui.main.dialog.WrongQRDialog;
 import java.util.ArrayList;
-import java.util.Objects;
-
-import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_SINGLE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_STATES;
 
@@ -40,10 +33,8 @@ public class SingleScanFragment extends Fragment {
     private TextView tInnerSerial;
     private TextView tSerial;
     private TextView tId;
-//    private TextView tLocation;
     private RecyclerView recyclerUnitsStates;
     private ArrayList<DEvent> states;
-//    private String location;//todo надо как observe Mutable, иначе может значение не успеть подгрузиться
     private FloatingActionButton addNewStateButton;
     private FloatingActionButton recognizeButton;
     private SurfaceView surfaceView;
@@ -57,7 +48,7 @@ public class SingleScanFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_single_scan, container, false);
-        mViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity())).get(MainViewModel.class);
+        mViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
         addNewStateButton = view.findViewById(R.id.addNewState);
         addNewStateButton.setVisibility(View.GONE);
@@ -72,48 +63,40 @@ public class SingleScanFragment extends Fragment {
         tInnerSerial = view.findViewById(R.id.textViewInnerSerialValue);
         tSerial = view.findViewById(R.id.textViewSerialValue);
         tId = view.findViewById(R.id.textViewIdValue);
-//        tLocation = view.findViewById(R.id.textLocationValue);
         recyclerUnitsStates = view.findViewById(R.id.recyclerView);
 
         infoLayout = view.findViewById(R.id.db_info_layout);
         addNewStateButton = view.findViewById(R.id.addNewState);
         infoLayout.setVisibility(View.GONE);
 
-        TextView txtBarcodeValue = view.findViewById(R.id.txtBarcodeValue);
-        txtBarcodeValue.setVisibility(View.GONE);
-
         surfaceView = view.findViewById(R.id.surfaceViewS);
         surfaceView.setVisibility(View.INVISIBLE);
 
-        final MutableLiveData<DUnit> selectedUnits = mViewModel.getSelectedUnit();
-        selectedUnits.observe(getViewLifecycleOwner(), s -> {
-            DUnit unit = selectedUnits.getValue();
-//            if (unit!=null) openUnitFragment(unit);
-            if (unit!=null) insertDataToFields(unit);
-        });
-
-        //Отслеживает список событий (время + текст) текущего устройства
-        final MutableLiveData<ArrayList<DEvent>> unitEvents = mViewModel.getUnitStatesList();
-        unitEvents.observe(getViewLifecycleOwner(), s -> {
-            Log.e(TAG, "onCreateView: список статусов mViewModel.getUnitStatesList");
-            this.states = unitEvents.getValue();
-            if (unitEvents.getValue() != null) Log.e(TAG, "onCreateView список статусов: " + unitEvents.getValue().size());
-            StatesAdapter statesAdapter = new StatesAdapter(this.states, mViewModel);
-            recyclerUnitsStates.setLayoutManager(new LinearLayoutManager(getActivity()));
-            recyclerUnitsStates.setAdapter(statesAdapter);
-        });
-
-        final MutableLiveData<Boolean> restartScanning = mViewModel.getRestartScanning();
-        restartScanning.observe(this, this::restartScanning);
+        mViewModel.getIsWrongQR().observe(getViewLifecycleOwner(), this::showWrongDialog);
+        mViewModel.getSelectedUnit().observe(getViewLifecycleOwner(), this::insertDataToFields);
+        mViewModel.getUnitStatesList().observe(getViewLifecycleOwner(), this::updateEvents);
+        mViewModel.getRestartScanning().observe(getViewLifecycleOwner(), this::restartScanning);
 
         mViewModel.startSingleScanner(getActivity(), surfaceView);
-
-//        location = mViewModel.getLocationName().getValue();
 
         return view;
     }
 
+    private void updateEvents(ArrayList<DEvent> events) {
+        states = events;
+        if (events==null)return;
+        StatesAdapter statesAdapter = new StatesAdapter(states, mViewModel);
+        recyclerUnitsStates.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerUnitsStates.setAdapter(statesAdapter);
+    }
 
+    private void showWrongDialog(boolean isWrong) {
+        if (isWrong) {
+            WrongQRDialog dialog = new WrongQRDialog(requireActivity());
+            dialog.show();
+            mViewModel.getIsWrongQR().setValue(false);
+        }
+    }
 
     private void restartScanning(boolean state) {
         if (state) {
@@ -128,15 +111,13 @@ public class SingleScanFragment extends Fragment {
     }
 
     private void insertDataToFields(DUnit unit) {
+        if (unit==null)return;
         addNewStateButton.setVisibility(View.VISIBLE);
         infoLayout.setVisibility(View.VISIBLE);
         surfaceView.setVisibility(View.INVISIBLE);
 
         mViewModel.setBackPressCommand(BACK_PRESS_STATES);
 
-        Log.e(TAG, "insertDataToFields: "+unit.getId());
-        //todo это всё должно браться из viewModel
-        tType.setText("- - -");
         if (unit.isRepairUnit()) tType.setText("Ремонт");
         if (unit.isSerialUnit()) tType.setText("Серия");
         tId.setText(Utils.getRightValue(unit.getId()));
@@ -144,23 +125,18 @@ public class SingleScanFragment extends Fragment {
         tInnerSerial.setText(Utils.getRightValue(unit.getInnerSerial()));
         tSerial.setText(Utils.getRightValue(unit.getSerial()));
         if (unit.isRepairUnit()) recognizeButton.setVisibility(View.VISIBLE);
-        //tLocation.setText(location);
 
         mViewModel.addSelectedUnitStatesListListener(unit.getId());
     }
 
-//    private void openUnitFragment(DUnit unit) {
-//
-//    }
-
     private void openStatesDialog() {
         SelectStateDialogSingle dialog = new SelectStateDialogSingle();
-        dialog.show(requireFragmentManager(), null);
+        dialog.show(getParentFragmentManager(), null);
     }
 
     private void openRecognizeDialog() {
         RecognizeDialog dialog = new RecognizeDialog();
-        dialog.show(requireFragmentManager(), null);
+        dialog.show(getParentFragmentManager(), null);
     }
 
     @Override
