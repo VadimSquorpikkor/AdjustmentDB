@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.SurfaceView;
-
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
 import com.google.firebase.auth.FirebaseUser;
 import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
@@ -18,14 +16,9 @@ import com.squorpikkor.app.adjustmentdb.ui.main.entities.Location;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.State;
 import com.squorpikkor.app.adjustmentdb.ui.main.scanner.ScannerDataShow;
 import com.squorpikkor.app.adjustmentdb.ui.main.scanner.Scanner;
-
 import java.util.ArrayList;
-import java.util.Date;
-
 import io.grpc.android.BuildConfig;
-
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
-import static com.squorpikkor.app.adjustmentdb.Utils.getIdByName;
 import static com.squorpikkor.app.adjustmentdb.ui.main.scanner.Encrypter.decodeMe;
 
 /**
@@ -162,8 +155,6 @@ public static final String TABLE_NAMES = "names";
     Scanner singleScanner;
     Scanner multiScanner;
 
-    private int position;
-
 //----------------------------------------------------
     //Для новой архитектуры
 
@@ -245,6 +236,22 @@ public static final String TABLE_NAMES = "names";
         return getNameByIdPrivate(states.getValue(), id);
     }
 
+    public void setLocationByEmail(String email) {
+        ArrayList<Employee> list = employees.getValue();
+        if (!(list == null || list.size() == 0 || email == null || email.equals(""))) {
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getEMail().equals(email)){
+                    String id = list.get(i).getLocation();
+                    location_id.setValue(id);
+                    locationName.setValue(getLocationNameById(id));
+                    return;
+                }
+            }
+        }
+        location_id.setValue(EMPTY_LOCATION_ID);
+        locationName.setValue(getLocationNameById(EMPTY_LOCATION_NAME));
+    }
+
     public MutableLiveData<ArrayList<DUnit>> getFoundUnitsList() {
         return foundUnitsList;
     }
@@ -281,15 +288,6 @@ public static final String TABLE_NAMES = "names";
         restartScanning = new MutableLiveData<>();
         restartMultiScanning = new MutableLiveData<>();
         lastEvent = new MutableLiveData<>();
-    }
-
-    /**
-     * Выбрать профиль (сборка, регулировка...). При смене профиля обновляем лисенеры для имен
-     * статусов, так как статусы уже другие
-     */
-    //todo не совсем верно, здесь выбираем не профиль(раньше профиль == локация), а список доступных статусов, или список доступных профилей(в новом понимании, дурацкое название)
-    public void setStatesForLocation(String locationId) {
-        getLocationNameByLocationId(locationId);
     }
 
     public void closeEvent(String event_id) {
@@ -379,7 +377,6 @@ public static final String TABLE_NAMES = "names";
         // все остальные параметры. Т.е. ищем или по параметрам, или по номеру
         if (serial.equals("")) dbh.getUnitList(foundUnitsList, deviceNameId, locationId, employeeId, typeId, stateId, ANY_VALUE);
         else dbh.getUnitList(foundUnitsList, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, serial);
-
     }
 
     public void restartMultiScanning() {
@@ -423,15 +420,6 @@ public static final String TABLE_NAMES = "names";
         return locationName;
     }
 
-    public void getLocationIdByEMail(String email) {
-        dbh.getStringValueByParam(TABLE_EMPLOYEES, EMPLOYEE_EMAIL, email, EMPLOYEE_LOCATION, location_id, EMPTY_LOCATION_ID);
-    }
-
-    /***/
-    private void getLocationNameByLocationId(String location_id) {
-        dbh.getStringValueByParam(TABLE_LOCATIONS, LOCATION_ID, location_id, LOCATION_NAME, locationName, EMPTY_LOCATION_NAME);
-    }
-
     public FirebaseUser getFirebaseUser() {
         return user;
     }
@@ -449,7 +437,6 @@ public static final String TABLE_NAMES = "names";
     }
 
     public void startMultiScanner(Activity activity, SurfaceView surfaceView) {
-        Log.e(TAG, "******************************startMultiScanner: ");
         /*if (multiScanner==null)*/
         multiScanner = new Scanner(activity, true, this, surfaceView);
     }
@@ -514,7 +501,6 @@ public static final String TABLE_NAMES = "names";
             String name = ar[0];//это device_id
             String innerSerial = ar[1];
             String id;
-            String location = getLocation_id().getValue();
 
             // Если это ремонт:
             if (name.equals(REPAIR_UNIT)) {
@@ -529,16 +515,6 @@ public static final String TABLE_NAMES = "names";
 
             // Если строка некорректная, возвращаю null
         } else return null;
-    }
-
-    public void setPosition(int position) {
-
-        this.position = position;
-        //selectUnit(serialUnitsList.getValue().get(position));
-    }
-
-    public int getPosition() {
-        return position;
     }
 }
 

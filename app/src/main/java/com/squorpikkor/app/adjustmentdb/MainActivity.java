@@ -102,12 +102,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         final MutableLiveData<Drawable> getImage = mViewModel.getUserImage();
         getImage.observe(this, drawable -> accountImage.setImageDrawable(drawable));
 
-        final MutableLiveData<String> locationId = mViewModel.getLocation_id();
+        /*final MutableLiveData<String> locationId = mViewModel.getLocation_id();
         locationId.observe(this, s -> {
             if (locationId.getValue() != null) {
                 mViewModel.setStatesForLocation(locationId.getValue());
             }
-        });
+        });*/
 
         final MutableLiveData<String> locationName = mViewModel.getLocationName();
         locationName.observe(this, s -> {
@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (user != null && user.getEmail() != null) {
                     emailText.setText(user.getEmail());
 //                    accountImage.setImageDrawable(user.getPhotoUrl());
-                    mViewModel.getLocationIdByEMail(user.getEmail());
+                    mViewModel.setLocationByEmail(user.getEmail());
                     mViewModel.setFirebaseUser(user);
 
                     DrawableTask task = new DrawableTask(mViewModel);
