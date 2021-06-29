@@ -75,7 +75,8 @@ public class SelectStateDialogMulti extends BaseDialog {
 
         if (unit.getName().equals("") && !newNameId.equals(ANY_VALUE)) unit.setName(newNameId);
         if (unit.getDate()==null) unit.setDate(new Date());
-        if (unit.getState().equals("") && !newStateId.equals(ANY_VALUE)) unit.setState(newStateId);
+//        if (unit.getState()!=null && unit.getState().equals("") && !newStateId.equals(ANY_VALUE)) unit.setState(newStateId);
+        if (!newStateId.equals(ANY_VALUE)) unit.setState(newStateId);
         if (eventId!=null&&!eventId.equals("")) unit.setEventId(eventId);
     }
 

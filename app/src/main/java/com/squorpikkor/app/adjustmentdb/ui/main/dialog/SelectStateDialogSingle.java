@@ -133,7 +133,8 @@ public class SelectStateDialogSingle extends BaseDialog {
         if (unit.getInnerSerial().equals("") && !newInner.equals("")) unit.setInnerSerial(newInner);
         if (unit.getSerial().equals("") && !newSerial.equals("")) unit.setSerial(newSerial);
         if (unit.getDate()==null) unit.setDate(new Date());
-        if (unit.getState().equals("") && !newStateId.equals(ANY_VALUE)) unit.setState(newStateId);
+//        if (unit.getState()!=null && unit.getState().equals("") && !newStateId.equals(ANY_VALUE)) unit.setState(newStateId);
+        if (!newStateId.equals(ANY_VALUE)) unit.setState(newStateId);
         if (eventId!=null&&!eventId.equals("")) unit.setEventId(eventId);
     }
 

@@ -38,10 +38,11 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.scanner.Encrypter.decodeM
  * 6. В load методах в массивы загружаются объекты с данными из таблицы, в самих методах используется квази JOIN, чтобы
  * после получения идентификаторов имен сразу же получить из таблицы "names" имена на нужном языке
  * 7. При загрузке юнитов и событий JOIN уже не нужен, данные для имен берутся через метод mViewModel.getLocationMameById(id)
- * */
-
-
-/**
+ *
+ *
+ *
+ *
+ *
  * Локация — это название местонахождения устройства: участок регулировки, сборки и т.д.
  * У каждого участка свой набор возможных статусов: у регулировки есть диагностика, настройка и другие,
  * при этом пользователь не может назначить для устройства статус, которого нет у текущей локации.
@@ -94,17 +95,14 @@ public static final String TABLE_NAMES = "names";
     public static final String EMPLOYEE_ID = "id";
     public static final String EMPLOYEE_NAME_ID = "name_id";
     public static final String EMPLOYEE_LOCATION = "location_id";
-    public static final String EMPLOYEE_NAME = "name";
 
     public static final String TABLE_LOCATIONS = "locations";
     public static final String LOCATION_ID = "id";
     public static final String LOCATION_NAME_ID = "name_id";
-    public static final String LOCATION_NAME = "name";//deprecated
 
     public static final String TABLE_DEVICES = "devices";
     public static final String DEVICE_ID = "id";
     public static final String DEVICE_NAME_ID = "name_id";
-    public static final String DEVICE_NAME = "name";
     public static final String DEVICE_TYPE = "type";
 
 
@@ -124,7 +122,6 @@ public static final String TABLE_NAMES = "names";
     public static final String ANY_VALUE = "any_value";
     public static final String ANY_VALUE_TEXT = "- любой -";//"- любой -"
     public static final String EMPTY_VALUE_TEXT = "- не выбран -";//"- не выбран -"
-    public static final String EXTRA_POSITION = "position";
 //--------------------------------------------------------------------------------------------------
 
     public static final String BACK_PRESS_SEARCH = "back_press_search";
@@ -461,6 +458,7 @@ public static final String TABLE_NAMES = "names";
         if (unit != null) {
             if (scannerFoundUnitsList.getValue() == null) scannerFoundUnitsList.setValue(new ArrayList<>());
             scannerFoundUnitsList.getValue().add(unit);
+            scannerFoundUnitsList.setValue(scannerFoundUnitsList.getValue());//update
             getThisListUnitFromDB(unit, scannerFoundUnitsList);
         }
     }
@@ -488,7 +486,7 @@ public static final String TABLE_NAMES = "names";
     }
 
     private void sayWrongQr() {
-        /*if (isWrongQR.getValue()!=null && !isWrongQR.getValue()) */isWrongQR.setValue(true);
+        isWrongQR.setValue(true);
     }
 
     public void selectUnit(String unit_id) {

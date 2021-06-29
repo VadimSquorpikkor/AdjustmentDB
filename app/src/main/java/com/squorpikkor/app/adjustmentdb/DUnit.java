@@ -1,5 +1,7 @@
 package com.squorpikkor.app.adjustmentdb;
 
+import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
+
 import java.util.Date;
 
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_TYPE;
@@ -17,6 +19,7 @@ public class DUnit {
     private String eventId;
     private Date date; //todo сейчас это дата последнего ивента, надо переделать на дату начала ремонта/серии (т.е. при создании юнита сохраняется дата его создания)
 
+//    private DEvent event;
 
     public DUnit() {
     }
@@ -36,6 +39,11 @@ public class DUnit {
         this.serial = serial;
         this.type = type;
         this.date = date;
+    }
+
+    public void addNewEvent(DEvent newEvent, MainViewModel model) {
+//        String oldEventId = this.eventId;
+//        model.
     }
 
     /**Возвращает true, если это ремонтное устройство*/
