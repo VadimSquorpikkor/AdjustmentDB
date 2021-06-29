@@ -39,7 +39,7 @@
         <TextView
             android:id="@+id/dialogEmployeeLabel"
             style="@style/dialogLinearText"
-            android:text="@string/add_employee"/>
+            android:text="@string/add_employee_doted"/>
 
         <Spinner
             android:id="@+id/employee_spinner"

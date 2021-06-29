@@ -18,6 +18,7 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
+import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
-import static com.squorpikkor.app.adjustmentdb.Utils.getRightValue;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_VALUE_TEXT;
 
 public class RecognizeDialog extends BaseDialog{
 
@@ -34,10 +36,18 @@ public class RecognizeDialog extends BaseDialog{
     TextView mSerialText;
     TextView mDevNameText;
     CameraSource mCameraSource;
-    Spinner devices;
-    Spinner states;
+
+    Spinner deviceSpinner;
+    Spinner stateSpinner;
+    Spinner employeeSpinner;
+    SpinnerAdapter deviceSpinnerAdapter;
+    SpinnerAdapter stateSpinnerAdapter;
+    SpinnerAdapter employeeSpinnerAdapter;
+
     EditText eSerial;
     ArrayList<String> names;
+
+    String location;
 
     boolean nameIsEmpty = true;
     boolean serialIsEmpty = true;
@@ -53,6 +63,9 @@ public class RecognizeDialog extends BaseDialog{
         super.onCreate(savedInstanceState);
         initializeWithVM(R.layout.dialog_recognize_device);
 
+        location = mViewModel.getLocation_id().getValue();
+        DUnit unit = mViewModel.getSelectedUnit().getValue();
+
         mCameraView = view.findViewById(R.id.surface_for_recognize);
         mSerialText = view.findViewById(R.id.recognized_serial);
         mDevNameText = view.findViewById(R.id.recognized_name);
@@ -61,46 +74,29 @@ public class RecognizeDialog extends BaseDialog{
         mSerialText.setOnClickListener(v -> mSerialText.setText(""));
         mDevNameText.setOnClickListener(v -> mDevNameText.setText(""));
 
-        devices = view.findViewById(R.id.newName);
-        states = view.findViewById(R.id.state_spinner);
+        deviceSpinner = view.findViewById(R.id.newName);
+        stateSpinner = view.findViewById(R.id.state_spinner);
+        employeeSpinner = view.findViewById(R.id.employee_spinner);
+
+        deviceSpinnerAdapter = new SpinnerAdapter(deviceSpinner, mContext);
+        stateSpinnerAdapter = new SpinnerAdapter(stateSpinner, mContext);
+        employeeSpinnerAdapter = new SpinnerAdapter(employeeSpinner, mContext);
+
+        mViewModel.getDevices().observe(this, list -> {
+            deviceSpinnerAdapter.setData(list, EMPTY_VALUE_TEXT);
+            names = mViewModel.getDeviceNamesRuAndEn();
+            //сортировка по длине имени в обратном порядке, чтобы сразу искался "6130С" и только потом "6130"
+            Collections.sort(names, Collections.reverseOrder());
+        });
+        mViewModel.getStates().observe(this, list -> stateSpinnerAdapter.setDataByTypeAndLocation(list, unit.getType(), location, EMPTY_VALUE_TEXT));
+        mViewModel.getEmployees().observe(this, list -> employeeSpinnerAdapter.setData(list, EMPTY_VALUE_TEXT));
 
         startCameraSource();
-
-        DUnit unit = mViewModel.getSelectedUnit().getValue();
-
-        //Загружается тот список, тип прибора который загружен — ремонт или серия
-//        ArrayList<String> rightList;
-//        if (mViewModel.getSelectedUnit().getValue()!=null && mViewModel.getSelectedUnit().getValue().isRepairUnit())
-//            rightList = new ArrayList<>(Objects.requireNonNull(mViewModel.getRepairStatesNames().getValue()));
-//        else
-//            rightList = new ArrayList<>(Objects.requireNonNull(mViewModel.getSerialStatesNames().getValue()));
-//        rightList.add(0, EMPTY_VALUE_TEXT);
-
-//        ArrayList<String> devIdList = new ArrayList<>(Objects.requireNonNull(mViewModel.getDeviceIdList().getValue()));
-//        devIdList.add(0, EMPTY_VALUE_TEXT);
 
         view.findViewById(R.id.cancel_button).setOnClickListener(v -> dismiss());
         view.findViewById(R.id.ok_button).setOnClickListener(v -> saveData(unit));
 
         setVisibility(unit);
-
-
-
-
-//        ArrayAdapter<String> stateAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, rightList);
-//        stateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        states.setAdapter(stateAdapter);
-
-//        ArrayAdapter<String> deviceAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item, devIdList);
-//        deviceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        devices.setAdapter(deviceAdapter);
-
-//        names = new ArrayList<>(mViewModel.getDeviceNameList().getValue());
-        ArrayList<String> names = mViewModel.getDeviceNames();
-
-
-        //сортировка по длине имени в обратном порядке, чтобы сразу искался "6130С" и только потом "6130"
-        Collections.sort(names, Collections.reverseOrder());
 
         return dialog;
     }
@@ -109,6 +105,7 @@ public class RecognizeDialog extends BaseDialog{
      * Если у юнита уже задан серийный номер, то все поля с серийным скрываем
      * Если у юнита уже задан и номер, и имя, то скрываем все поля И ОКНО КАМЕРЫ */
     void setVisibility(DUnit unit) {
+        if (unit==null) return;
         nameIsEmpty = unit.getName().equals("");
         serialIsEmpty = unit.getSerial().equals("");
         if (!nameIsEmpty && !serialIsEmpty) {
@@ -141,48 +138,44 @@ public class RecognizeDialog extends BaseDialog{
 
     }
 
-    //todo надо сделать не через создание нового юнита, а через присваивание параметров уже существующему юниту, затем этот старый юнит сохранять
-    //todo Дублирование кода (чуть различаются) — SelectStateDialogSingle
+    private void saveData(DUnit unit) {
+        if (unit==null)return;
+        mViewModel.closeEvent(unit.getEventId());
+        DEvent newEvent = getNewEvent(unit.getId());
+        updateUnitData(unit, newEvent);
+        mViewModel.saveUnitAndEvent(unit, newEvent);
+        dismiss();
+    }
+
     /**Сохранение юнита с выбранными параметрами. Логика: если имя и/или серийный не выбраны, то
      * юниту будут присвоены распознанные значения. Если параметры выбрать руками, то распознанные
      * значения будут проигнорированы, юнит будет сохранен с параметрами выбранными вручную*/
-    private void saveData(DUnit unit) {
-        if (unit != null) {
-            String id = unit.getId();
-            String innerSerial = unit.getInnerSerial();
-            String state = "";
-            String state_id = "";
-            if (states.getSelectedItem() != null) state = states.getSelectedItem().toString();
+    private void updateUnitData(DUnit unit, DEvent newEvent) {
+        String eventId = newEvent==null?null:newEvent.getId();
 
-//            if (!state.equals(EMPTY_VALUE_TEXT)) {
-//                if (unit.isRepairUnit()
-//                        && mViewModel.getRepairStatesNames().getValue()!=null
-//                        && mViewModel.getRepairStateIdList().getValue()!=null) {
-//                    state_id = getIdByName(state, mViewModel.getRepairStatesNames().getValue(), mViewModel.getRepairStateIdList().getValue());
-//                }
-//                if (unit.isSerialUnit()
-//                        && mViewModel.getSerialStatesNames().getValue()!=null
-//                        && mViewModel.getSerialStateIdList().getValue()!=null) {
-//                    state_id = getIdByName(state, mViewModel.getSerialStatesNames().getValue(), mViewModel.getSerialStateIdList().getValue());
-//                }
-//            } else {
-//                state_id = "";
-//            }
+        String name_id = mViewModel.getDeviceNameId(mDevNameText.getText().toString());//получить id из имени
+        String newNameId = deviceSpinnerAdapter.getSelectedNameId().equals(ANY_VALUE)?name_id:deviceSpinnerAdapter.getSelectedNameId();
+        String newSerial = eSerial.getText().toString().equals("")?mSerialText.getText().toString():eSerial.getText().toString();
 
-//            String name = devices.getSelectedItem().toString().equals(EMPTY_VALUE_TEXT)?mDevNameText.getText().toString():devices.getSelectedItem().toString();
-//            name = getRightValue(unit.getName(), name);
-//            name = getIdByName(name, mViewModel.getDeviceNameList().getValue(), mViewModel.getDeviceIdList().getValue());
+        String newStateId = stateSpinnerAdapter.getSelectedNameId();//todo потом этого не будет
+        String employee = employeeSpinnerAdapter.getSelectedNameId();
 
-            String serial = eSerial.getText().toString().equals("")?mSerialText.getText().toString():eSerial.getText().toString();
-            serial = getRightValue(unit.getSerial(), serial);
+        if (unit.getName()==null||unit.getName().equals("") && !newNameId.equals(ANY_VALUE)) unit.setName(newNameId);
+        if (unit.getSerial()==null||unit.getSerial().equals("") && !newSerial.equals("")) unit.setSerial(newSerial);
+        if (unit.getDate()==null) unit.setDate(new Date());
+        if (!newStateId.equals(ANY_VALUE)) unit.setState(newStateId);
+        if (eventId!=null&&!eventId.equals("")) unit.setEventId(eventId);
+        if (!employee.equals(ANY_VALUE)) unit.setEmployee(employee);
+    }
 
-            String desc = "";
-            String type = unit.getType();
-            String location = mViewModel.getLocation_id().getValue();
-            Date date = unit.getDate();
-//            mViewModel.saveDUnitToDB(new DUnit(id, name, innerSerial, serial, state_id, desc, type, location, date), unit.getState());
-        }
-        dismiss();
+    private DEvent getNewEvent(String unitId) {
+        //Если в спиннере статуса стоит "-не выбрано-", то значит нового события не будет, тогда возвращаем null
+        String stateId = stateSpinnerAdapter.getSelectedNameId();
+        String description = "";  //descriptionEdit.getText().toString();
+        String eventId = unitId+"_"+new Date().getTime();
+
+        if (stateId.equals(ANY_VALUE)) return null;
+        else return new DEvent(new Date(), stateId, description, location, unitId, eventId);
     }
 
     @Override

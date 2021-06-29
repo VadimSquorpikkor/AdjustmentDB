@@ -10,6 +10,11 @@
     android:padding="15dp"
     android:gravity="center_horizontal">
 
+    <TextView android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:text="@string/manual_params_description"
+        />
+
     <LinearLayout style="@style/dialogLinearHorizontal">
         <TextView
             android:id="@+id/dialogNewNameLabel"
@@ -44,6 +49,17 @@
 
         <Spinner
             android:id="@+id/state_spinner"
+            style="@style/dialogLinearEdit"/>
+    </LinearLayout>
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <TextView
+            android:id="@+id/dialogEmployeeLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/add_employee_doted"/>
+
+        <Spinner
+            android:id="@+id/employee_spinner"
             style="@style/dialogLinearEdit"/>
     </LinearLayout>
 

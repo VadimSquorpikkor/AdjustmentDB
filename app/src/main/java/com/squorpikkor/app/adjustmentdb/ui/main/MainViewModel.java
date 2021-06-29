@@ -103,6 +103,7 @@ public static final String TABLE_NAMES = "names";
     public static final String TABLE_DEVICES = "devices";
     public static final String DEVICE_ID = "id";
     public static final String DEVICE_NAME_ID = "name_id";
+    public static final String DEVICE_NAME_RU = "name_id";
     public static final String DEVICE_TYPE = "type";
 
 
@@ -173,6 +174,14 @@ public static final String TABLE_NAMES = "names";
         return id;
     }
 
+    private String getNameIdByNamePrivate(ArrayList<? extends Entity> list, String name) {
+        if (list==null||list.size()==0||name==null||name.equals("")) return name;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getName().equals(name)) return list.get(i).getNameId();
+        }
+        return name;
+    }
+
     private ArrayList<String> getNameIds(ArrayList<? extends Entity> list) {
         if (list==null||list.size()==0)return new ArrayList<>();
         ArrayList<String> newList = new ArrayList<>();
@@ -210,6 +219,15 @@ public static final String TABLE_NAMES = "names";
     public ArrayList<String> getDeviceNames() {
         return getNames(devices.getValue());
     }
+    public ArrayList<String> getDeviceNamesRuAndEn() {
+        if (devices.getValue()==null||devices.getValue().size()==0)return new ArrayList<>();
+        ArrayList<String> newList = new ArrayList<>();
+        for (int i = 0; i < devices.getValue().size(); i++) {
+            if (devices.getValue().get(i).getName()!=null) newList.add(devices.getValue().get(i).getName());
+            if (devices.getValue().get(i).getEngName()!=null) newList.add(devices.getValue().get(i).getEngName());
+        }
+        return newList;
+    }
     public ArrayList<String> getEmployeeNames() {
         return getNames(employees.getValue());
     }
@@ -223,6 +241,17 @@ public static final String TABLE_NAMES = "names";
     }
     public String getDeviceNameById(String id) {
         return getNameByIdPrivate(devices.getValue(), id);
+    }
+    public String getDeviceNameIdByName(String name) {
+        return getNameIdByNamePrivate(devices.getValue(), name);
+    }
+    public String getDeviceNameId(String name) {
+        //todo упростить (devices.getValue()->list)
+        if (devices.getValue()==null||devices.getValue().size()==0||name==null||name.equals("")) return name;
+        for (int i = 0; i < devices.getValue().size(); i++) {
+            if (devices.getValue().get(i).getName().equals(name)||devices.getValue().get(i).getEngName().equals(name)) return devices.getValue().get(i).getNameId();
+        }
+        return name;
     }
     public String getEmployeeNameById(String id) {
         return getNameByIdPrivate(employees.getValue(), id);

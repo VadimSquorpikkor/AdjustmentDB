@@ -142,7 +142,19 @@ class FireDBHelper {
                 //JOIN------------------------------------------------------------------
                 db.collection(TABLE_NAMES).document(nameId).get()
                         .addOnCompleteListener(task1 -> {
-                            device.setName(getStringFromSnapshot(task1, nameId));
+                            String ru = "";
+                            String en = "";
+                            if (task1.isSuccessful()) {
+                                DocumentSnapshot documentSnapshot = task1.getResult();
+                                if (documentSnapshot != null && documentSnapshot.exists()) {
+                                    ru = documentSnapshot.get("ru").toString();
+                                    en = documentSnapshot.get("en").toString();
+                                    Log.e(TAG, "deviceListener: "+ru+" "+en);
+                                }
+                            }
+
+                            if (!ru.equals("")) device.setName(ru);
+                            if (!en.equals("")) device.setEngName(en);
                             data.setValue(data.getValue());
                         });
                 newDevices.add(device);
@@ -164,11 +176,15 @@ class FireDBHelper {
                 Employee employee = new Employee(id, nameId, name, eMail, location);
 
                 //JOIN------------------------------------------------------------------
-                db.collection(TABLE_NAMES).document(nameId).get()
-                        .addOnCompleteListener(task1 -> {
-                            employee.setName(getStringFromSnapshot(task1, nameId));
-                            data.setValue(data.getValue());
-                        });
+                // Закоментировано, так как всё равно для русского варианта имен (а employees
+                // используется только в AdjustmentDB, а значит ТОЛЬКО в русском варианте слов)
+                // name_id ВСЕГДА == name, поэтому JOIN делает только лишнюю работу
+//                db.collection(TABLE_NAMES).document(nameId).get()
+//                        .addOnCompleteListener(task1 -> {
+//                            employee.setName(getStringFromSnapshot(task1, nameId));
+//                            data.setValue(data.getValue());
+//                        });
+
                 newEmployees.add(employee);
             }
             data.setValue(newEmployees);
