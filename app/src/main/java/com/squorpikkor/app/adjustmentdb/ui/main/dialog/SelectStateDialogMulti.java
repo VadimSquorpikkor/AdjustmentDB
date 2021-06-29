@@ -23,6 +23,7 @@ public class SelectStateDialogMulti extends BaseDialog {
 
     private SpinnerAdapter stateSpinnerAdapter;
     private SpinnerAdapter deviceSpinnerAdapter;
+    private SpinnerAdapter employeeSpinnerAdapter;
 
     public SelectStateDialogMulti() {
     }
@@ -41,12 +42,15 @@ public class SelectStateDialogMulti extends BaseDialog {
 
         Spinner stateSpinner = view.findViewById(R.id.state_spinner);
         Spinner deviceSpinner = view.findViewById(R.id.name_spinner);
+        Spinner employeeSpinner = view.findViewById(R.id.employee_spinner);
 
         deviceSpinnerAdapter = new SpinnerAdapter(deviceSpinner, mContext);
         stateSpinnerAdapter = new SpinnerAdapter(stateSpinner, mContext);
+        employeeSpinnerAdapter = new SpinnerAdapter(employeeSpinner, mContext);
 
         mViewModel.getDevices().observe(this, list -> deviceSpinnerAdapter.setData(list, EMPTY_VALUE_TEXT));
         mViewModel.getStates().observe(this, list -> stateSpinnerAdapter.setDataByTypeAndLocation(list, unit.getType(), location, EMPTY_VALUE_TEXT));
+        mViewModel.getEmployees().observe(this, list -> employeeSpinnerAdapter.setData(list, EMPTY_VALUE_TEXT));
 
         Button cancelButton = view.findViewById(R.id.cancel_button);
         Button okButton = view.findViewById(R.id.ok_button);
@@ -58,7 +62,7 @@ public class SelectStateDialogMulti extends BaseDialog {
             for (int i = 0; i < unitList.size(); i++) {
                 DUnit dUnit = unitList.get(i);
                 mViewModel.closeEvent(dUnit.getEventId());
-                DEvent newEvent = getNewEvent(dUnit);
+                DEvent newEvent = getNewEvent(dUnit.getId());
                 updateUnitData(dUnit, newEvent);
                 mViewModel.saveUnitAndEvent(dUnit, newEvent);
             }
@@ -72,21 +76,22 @@ public class SelectStateDialogMulti extends BaseDialog {
         String eventId = newEvent==null?null:newEvent.getId();
         String newNameId = deviceSpinnerAdapter.getSelectedNameId();
         String newStateId = stateSpinnerAdapter.getSelectedNameId();//todo потом этого не будет
+        String employee = employeeSpinnerAdapter.getSelectedNameId();
 
         if (unit.getName().equals("") && !newNameId.equals(ANY_VALUE)) unit.setName(newNameId);
         if (unit.getDate()==null) unit.setDate(new Date());
-//        if (unit.getState()!=null && unit.getState().equals("") && !newStateId.equals(ANY_VALUE)) unit.setState(newStateId);
         if (!newStateId.equals(ANY_VALUE)) unit.setState(newStateId);
         if (eventId!=null&&!eventId.equals("")) unit.setEventId(eventId);
+        if (!employee.equals(ANY_VALUE)) unit.setEmployee(employee);
     }
 
-    private DEvent getNewEvent(DUnit unit) {
+    private DEvent getNewEvent(String unitId) {
         //Если в спиннере статуса стоит "-не выбрано-", то значит нового события не будет, тогда возвращаем null
         String stateId = stateSpinnerAdapter.getSelectedNameId();
         String description = descriptionEdit.getText().toString();
-        String eventId = unit.getId()+"_"+new Date().getTime();
+        String eventId = unitId+"_"+new Date().getTime();
 
         if (stateId.equals(ANY_VALUE)) return null;
-        else return new DEvent(new Date(), stateId, description, location, unit.getId(), eventId);
+        else return new DEvent(new Date(), stateId, description, location, unitId, eventId);
     }
 }

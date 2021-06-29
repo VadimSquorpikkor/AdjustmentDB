@@ -12,7 +12,6 @@ import com.squorpikkor.app.adjustmentdb.Utils;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import java.util.ArrayList;
 import static com.squorpikkor.app.adjustmentdb.Utils.EMPTY_VALUE;
-import static com.squorpikkor.app.adjustmentdb.Utils.daysPassed;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightDateAndTime;
 
 public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolder>{
@@ -57,14 +56,10 @@ public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolde
         holder.tSerial.setText(String.format("№ %s", Utils.getRightValue(unit.getSerial())));
         if (unit.getInnerSerial()==null||unit.getInnerSerial().equals(""))holder.tInnerSerial.setText("");
         else holder.tInnerSerial.setText(String.format("(вн. %s)", unit.getInnerSerial()));
+        holder.tDatePassed.setText(String.format("%s д.", unit.daysPassed()));
 
-        if (unit.getDate()!=null){
-            holder.tDate.setText(getRightDateAndTime(unit.getDate().getTime()));
-            holder.tDatePassed.setText(String.format("%s д.", daysPassed(unit.getDate())));
-        } else {
-            holder.tDate.setText(EMPTY_VALUE);
-            holder.tDatePassed.setText("");
-        }
+        if (unit.getDate()!=null) holder.tDate.setText(getRightDateAndTime(unit.getDate().getTime()));
+        else holder.tDate.setText(EMPTY_VALUE);
     }
 
     /**Просто возвращает кол-во элементов в массиве*/

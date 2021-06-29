@@ -47,5 +47,7 @@
     <string name="tap_description">Чтобы очистить распознанное значение, нужно тапнуть по нему</string>
     <string name="name_already_recognized">У устройства уже есть имя</string>
     <string name="serial_already_recognized">У устройства уже есть серийный номер</string>
+    <string name="days_in_work">Дней в работе</string>
+    <string name="add_employee">Добавить ответственного</string>
 
 </resources>

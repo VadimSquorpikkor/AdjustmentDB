@@ -33,6 +33,8 @@ public class SingleScanFragment extends Fragment {
     private TextView tInnerSerial;
     private TextView tSerial;
     private TextView tId;
+    private TextView tEmployee;
+    private TextView tDaysPassed;
     private RecyclerView recyclerUnitsStates;
     private ArrayList<DEvent> states;
     private FloatingActionButton addNewStateButton;
@@ -63,6 +65,8 @@ public class SingleScanFragment extends Fragment {
         tInnerSerial = view.findViewById(R.id.textViewInnerSerialValue);
         tSerial = view.findViewById(R.id.textViewSerialValue);
         tId = view.findViewById(R.id.textViewIdValue);
+        tEmployee = view.findViewById(R.id.textViewEmployeeValue);
+        tDaysPassed = view.findViewById(R.id.textDaysPassedValue);
         recyclerUnitsStates = view.findViewById(R.id.recyclerView);
 
         infoLayout = view.findViewById(R.id.db_info_layout);
@@ -125,6 +129,8 @@ public class SingleScanFragment extends Fragment {
         tInnerSerial.setText(Utils.getRightValue(unit.getInnerSerial()));
         tSerial.setText(Utils.getRightValue(unit.getSerial()));
         if (unit.isRepairUnit()) recognizeButton.setVisibility(View.VISIBLE);
+        if (unit.getEmployee()!=null) tEmployee.setText(unit.getEmployee());
+        tDaysPassed.setText(String.valueOf(unit.daysPassed()));
 
         mViewModel.addSelectedUnitStatesListListener(unit.getId());
     }

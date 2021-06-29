@@ -60,16 +60,6 @@ public class Utils {
         return formatter.format(time_stamp_server);
     }
 
-    public static int daysPassed(Date startDate) {
-        return daysPassed(startDate, new Date());
-
-    }
-
-    public static int daysPassed(Date startDate, Date endDate) {
-        return ((int)((endDate.getTime()/(24*60*60*1000))
-                -(int)(startDate.getTime()/(24*60*60*1000))));
-    }
-
     @SuppressWarnings({"unused", "RedundantSuppression"})
     public static void insertValueOrGone(String value, TextView view) {
         if (isEmptyOrNull(value)) {

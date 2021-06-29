@@ -7,13 +7,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-
 import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.util.Date;
 
 import static com.squorpikkor.app.adjustmentdb.Utils.isEmptyOrNull;
@@ -113,7 +110,7 @@ public class SelectStateDialogSingle extends BaseDialog {
 
         okButton.setOnClickListener(view -> {
             mViewModel.closeEvent(unit.getEventId());
-            DEvent newEvent = getNewEvent(unit);
+            DEvent newEvent = getNewEvent(unit.getId());
             updateUnitData(unit, newEvent);
             mViewModel.saveUnitAndEvent(unit, newEvent);
             dismiss();
@@ -128,24 +125,25 @@ public class SelectStateDialogSingle extends BaseDialog {
         String newInner = innerEdit.getText().toString();
         String newSerial = serialEdit.getText().toString();
         String newStateId = stateSpinnerAdapter.getSelectedNameId();//todo потом этого не будет
+        String employee = employeeSpinnerAdapter.getSelectedNameId();
 
         if (unit.getName().equals("") && !newNameId.equals(ANY_VALUE)) unit.setName(newNameId);
         if (unit.getInnerSerial().equals("") && !newInner.equals("")) unit.setInnerSerial(newInner);
         if (unit.getSerial().equals("") && !newSerial.equals("")) unit.setSerial(newSerial);
         if (unit.getDate()==null) unit.setDate(new Date());
-//        if (unit.getState()!=null && unit.getState().equals("") && !newStateId.equals(ANY_VALUE)) unit.setState(newStateId);
         if (!newStateId.equals(ANY_VALUE)) unit.setState(newStateId);
         if (eventId!=null&&!eventId.equals("")) unit.setEventId(eventId);
+        if (!employee.equals(ANY_VALUE)) unit.setEmployee(employee);
     }
 
-    private DEvent getNewEvent(DUnit unit) {
+    private DEvent getNewEvent(String unitId) {
         //Если в спиннере статуса стоит "-не выбрано-", то значит нового события не будет, тогда возвращаем null
         String stateId = stateSpinnerAdapter.getSelectedNameId();
         String description = descriptionEdit.getText().toString();
-        String eventId = unit.getId()+"_"+new Date().getTime();
+        String eventId = unitId+"_"+new Date().getTime();
 
         if (stateId.equals(ANY_VALUE)) return null;
-        else return new DEvent(new Date(), stateId, description, location, unit.getId(), eventId);
+        else return new DEvent(new Date(), stateId, description, location, unitId, eventId);
     }
 
 }

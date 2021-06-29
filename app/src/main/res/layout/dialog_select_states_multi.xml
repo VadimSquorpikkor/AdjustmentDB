@@ -35,6 +35,17 @@
             style="@style/dialogLinearEdit"/>
     </LinearLayout>
 
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <TextView
+            android:id="@+id/dialogEmployeeLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/add_employee"/>
+
+        <Spinner
+            android:id="@+id/employee_spinner"
+            style="@style/dialogLinearEdit"/>
+    </LinearLayout>
+
     <EditText
         android:id="@+id/description"
         style="@style/dialogEditText"

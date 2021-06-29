@@ -1,5 +1,7 @@
 package com.squorpikkor.app.adjustmentdb;
 
+import android.util.Log;
+
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 
 import java.util.Date;
@@ -17,9 +19,10 @@ public class DUnit {
     private String state; //"На линейке"
     private String employee; //Фамилия ответственного
     private String eventId;
-    private Date date; //todo сейчас это дата последнего ивента, надо переделать на дату начала ремонта/серии (т.е. при создании юнита сохраняется дата его создания)
+    private Date date;
+    private Date closeDate;
 
-//    private DEvent event;
+    private DEvent event;
 
     public DUnit() {
     }
@@ -41,9 +44,32 @@ public class DUnit {
         this.date = date;
     }
 
-    public void addNewEvent(DEvent newEvent, MainViewModel model) {
+    public void closeUnit() {
+        this.closeDate = new Date();
+    }
+
+    //Если юнит завершен, то у него появляется дата закрытия
+    public boolean isComplete() {
+        return this.closeDate!=null;
+    }
+
+    /**Сколько дней юнит находится в серии/ремонте. Если юнит не закрыт, то считается количество
+     * дней от начала ремонта/серии до сегодняшнего дня, если юнит закрыт — до дня закрытия*/
+    public int daysPassed() {
+        if (this.date==null) return 0;
+        Date end = closeDate==null?new Date():closeDate;
+        return (int)((end.getTime()-this.date.getTime())/(1000*60*60*24));
+    }
+
+    public void addNewEvent(DEvent newEvent) {
 //        String oldEventId = this.eventId;
-//        model.
+//        model.closeEvent(oldEventId);
+
+
+    }
+
+    public Date getCloseDate() {
+        return closeDate;
     }
 
     /**Возвращает true, если это ремонтное устройство*/
@@ -116,6 +142,7 @@ public class DUnit {
     }
 
     public void setEmployee(String employee) {
+        Log.e("TAG", "♦♦♦♦♦ !!! setEmployee: "+employee);
         this.employee = employee;
     }
 
