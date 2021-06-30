@@ -130,6 +130,7 @@ public static final String TABLE_NAMES = "names";
     public static final String BACK_PRESS_STATES = "back_press_states";
     public static final String BACK_PRESS_MULTI_STATES = "back_press_multi_states";
     public static final String BACK_PRESS_MULTI = "back_press_multi";
+    public static final String BACK_PRESS_INFO_FRAGMENT = "back_press_info";
 
     private final FireDBHelper dbh;
     private final MutableLiveData<DUnit> selectedUnit;
@@ -146,8 +147,10 @@ public static final String TABLE_NAMES = "names";
     private final MutableLiveData<Boolean> goToSearchTab;
     private final MutableLiveData<Boolean> restartScanning;
     private final MutableLiveData<Boolean> restartMultiScanning;
+    private final MutableLiveData<Boolean> backToRecycler;
     private final MutableLiveData<DEvent> lastEvent;
     private final MutableLiveData<Boolean> isWrongQR;
+    private final MutableLiveData<Integer> position;
 
     private FirebaseUser user;
 
@@ -307,12 +310,17 @@ public static final String TABLE_NAMES = "names";
         barcodeText = new MutableLiveData<>();
         email = new MutableLiveData<>();
         userImage = new MutableLiveData<>();
+
         startExit = new MutableLiveData<>();
         goToSearchTab = new MutableLiveData<>();
         restartScanning = new MutableLiveData<>();
         restartMultiScanning = new MutableLiveData<>();
+        backToRecycler = new MutableLiveData<>();
+        backToRecycler.setValue(false);
+
         lastEvent = new MutableLiveData<>();
         isWrongQR = new MutableLiveData<>();
+        position = new MutableLiveData<>();
     }
 
     public void closeEvent(String event_id) {
@@ -333,15 +341,6 @@ public static final String TABLE_NAMES = "names";
         dbh.addSelectedUnitStatesListener(unit_id, unitStatesList);
     }
 
-    //todo переделать для (String unit_id, String event_id), а лучше под (DUnit unit), сделать один метод вместо 2
-    public void addSelectedUnitListener(String unit_id) {
-        dbh.addSelectedUnitListener(unit_id, selectedUnit);
-        DEvent event = new DEvent();
-        dbh.getLastEventFromDB(unit_id, event);//todo переделать: надо брать по id ивента (а не юнита), т.е. брать конкретный, а не брать все и перебирать из найденных
-        lastEvent.setValue(event);
-    }
-
-    //todo переделать для (String unit_id, String event_id), а лучше под (DUnit unit), сделать один метод вместо 2
     public void addSelectedUnitListener(String unit_id, String event_id) {
         dbh.addSelectedUnitListener(unit_id, selectedUnit);
         DEvent event = new DEvent();
@@ -375,6 +374,7 @@ public static final String TABLE_NAMES = "names";
         userImage.setValue(img);
     }
 
+//--------------- BACK PRESS -----------------------------------------------------------------------
     public MutableLiveData<Boolean> getStartExit() {
         return startExit;
     }
@@ -391,6 +391,8 @@ public static final String TABLE_NAMES = "names";
         return restartMultiScanning;
     }
 
+
+    //--------------------------------------------------------------------------------------------------
     public MutableLiveData<DEvent> getLastEvent() {
         return lastEvent;
     }
@@ -420,12 +422,26 @@ public static final String TABLE_NAMES = "names";
         this.backPressCommand = backPressCommand;
     }
 
+    public String getBackPressCommand() {
+        return backPressCommand;
+    }
+
     public void getBack() {
+        if (backPressCommand==null) return;
+
+        startExit.setValue(false);
+        goToSearchTab.setValue(false);
+        restartScanning.setValue(false);
+        backToRecycler.setValue(false);
+
+        //todo switch case
+
         if (backPressCommand.equals(BACK_PRESS_SEARCH)) startExit.setValue(true);
-        if (backPressCommand.equals(BACK_PRESS_SINGLE)) goToSearchTab.setValue(true);
-        if (backPressCommand.equals(BACK_PRESS_MULTI)) goToSearchTab.setValue(true);
-        if (backPressCommand.equals(BACK_PRESS_STATES)) restartScanning.setValue(true);
-        if (backPressCommand.equals(BACK_PRESS_MULTI_STATES)) restartMultiScanning();
+        else if (backPressCommand.equals(BACK_PRESS_SINGLE)) goToSearchTab.setValue(true);
+        else if (backPressCommand.equals(BACK_PRESS_MULTI)) goToSearchTab.setValue(true);
+        else if (backPressCommand.equals(BACK_PRESS_STATES)) restartScanning.setValue(true);
+        else if (backPressCommand.equals(BACK_PRESS_MULTI_STATES)) restartMultiScanning();
+        else if (backPressCommand.equals(BACK_PRESS_INFO_FRAGMENT)) backToRecycler.setValue(true);
     }
 
     public void updateSelectedUnit(DUnit newUnit) {
@@ -435,6 +451,10 @@ public static final String TABLE_NAMES = "names";
     /***/
     public void getEventForThisUnit(String unit_id) {
         dbh.getEventsFromDB(unit_id, unitStatesList);
+    }
+
+    public MutableLiveData<Integer> getPosition() {
+        return position;
     }
 
     public String getVersion() {
@@ -518,8 +538,8 @@ public static final String TABLE_NAMES = "names";
         isWrongQR.setValue(true);
     }
 
-    public void selectUnit(String unit_id) {
-        addSelectedUnitListener(unit_id);
+    public void selectUnit(String unit_id, String event_id) {
+        addSelectedUnitListener(unit_id, event_id);
         getEventForThisUnit(unit_id);
     }
 

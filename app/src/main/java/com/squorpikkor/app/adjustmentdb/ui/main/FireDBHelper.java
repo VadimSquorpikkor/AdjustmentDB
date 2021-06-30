@@ -446,9 +446,9 @@ class FireDBHelper {
     }
 
     /**Новый вариант — выборка по id документа, т.е. берется сразу конкретный документ*/
-    void getLastEventFromDB_new(String id, DEvent event) {
-        if (id == null) return;
-        db.collection(TABLE_EVENTS).document(id)
+    void getLastEventFromDB_new(String event_id, DEvent event) {
+        if (event_id == null) return;
+        db.collection(TABLE_EVENTS).document(event_id)
         .get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
@@ -463,33 +463,6 @@ class FireDBHelper {
                 }
             } else {
                 Log.d(TAG, "get failed with ", task.getException());
-            }
-        });
-    }
-
-    /**Deprecated. Старый вариант, событие искалось в БД перебором всех событий по id юнита и бралось самое свежее по дате*/
-    void getLastEventFromDB(String unit_id, DEvent event) {
-        db.collection(TABLE_EVENTS)
-                .whereEqualTo(EVENT_UNIT, unit_id)
-                .orderBy(EVENT_DATE, Query.Direction.DESCENDING)
-                .limit(1)
-                .get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                QuerySnapshot querySnapshot = task.getResult();
-                if (querySnapshot == null) return;
-                if (querySnapshot.getDocuments().size()==0) return;
-
-                DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
-                Timestamp timestamp = (Timestamp) documentSnapshot.get(EVENT_DATE);
-                event.setDate(timestamp.toDate());
-                event.setState(documentSnapshot.get(EVENT_STATE).toString());
-                event.setDescription(documentSnapshot.get(EVENT_DESCRIPTION).toString());
-                event.setLocation(documentSnapshot.get(EVENT_LOCATION).toString());
-                event.setUnit_id(documentSnapshot.get(EVENT_UNIT).toString());
-                event.setId(documentSnapshot.getId());
-                Log.e(TAG, "getLastEventFromDB: "+documentSnapshot.getId());
-            } else {
-                Log.e(TAG, "Error - " + task.getException());
             }
         });
     }

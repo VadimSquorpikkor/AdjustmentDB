@@ -32,7 +32,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         fragmentMap = new HashMap<Integer, Fragment>() {
             {
                 put(0, SingleScanParent.newInstance());
-                put(1, SearchDeviceFragment.newInstance());
+                put(1, SearchParent.newInstance());
+//                put(1, SearchDeviceFragment.newInstance());
                 put(2, MultiScanParent.newInstance());
             }
         };

@@ -24,6 +24,7 @@ public class UnitInfoActivity extends AppCompatActivity {
     TextView employee;
     RecyclerView events;
     public static final String EXTRA_UNIT_ID = "extra_unit_id";
+    public static final String EXTRA_EVENT_ID = "extra_event_id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +41,10 @@ public class UnitInfoActivity extends AppCompatActivity {
         events = findViewById(R.id.recyclerView2);
 
         String unit_id = this.getIntent().getStringExtra(EXTRA_UNIT_ID);
+        String event_id = this.getIntent().getStringExtra(EXTRA_EVENT_ID);
         mViewModel.addSelectedUnitStatesListListener(unit_id);
 
-        mViewModel.selectUnit(unit_id);
+        mViewModel.selectUnit(unit_id, event_id);
 
         final MutableLiveData<DUnit> selectedUnits = mViewModel.getSelectedUnit();
         selectedUnits.observe(this, this::insertDataToFields);

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
@@ -32,6 +33,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squorpikkor.app.adjustmentdb.ui.main.DrawableTask;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
+import com.squorpikkor.app.adjustmentdb.ui.main.fragment.UnitInfoFragment;
 import com.squorpikkor.app.adjustmentdb.ui.main.fragment_cradle.SectionsPagerAdapter;
 import com.squorpikkor.app.adjustmentdb.ui.main.fragment_cradle.ZoomOutPageTransformer;
 
@@ -45,6 +47,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.squorpikkor.app.adjustmentdb.BuildConfig.VERSION_NAME;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_INFO_FRAGMENT;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -243,6 +246,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        //Если кликнуть в SearchFragment на пункт списка и открыть UnitInfoFragment,
+        // то нажатие на кнопку "назад" будет работать в обычном режиме, значит при нажатии будет
+        // закрываться UnitInfoFragment и возвращаться к SearchFragment
+        // Если открыть ScanFragment при открытом UnitInfoFragment, то нажатие "назад" вернёт на UnitInfoFragment(!)
+
+        //if (mViewModel.getBackPressCommand().equals(BACK_PRESS_INFO_FRAGMENT)) {
+        Fragment f = getSupportFragmentManager().findFragmentById(R.id.child_fragment_container_3);
+        if(viewPager.getCurrentItem()==1 && f instanceof UnitInfoFragment){//если во втором пейджере И в открытом UnitInfoFragment
+            return super.onKeyDown(keyCode, event);
+        }
+        //Иначе нажатие перехватывается и кнопка "назад" уже работает по-разному от ситуации
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             mViewModel.getBack();
         }
