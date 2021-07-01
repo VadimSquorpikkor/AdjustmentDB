@@ -1,5 +1,7 @@
 # AdjustmentDB   
 
+* <b>1.55 - 01/07/21</b>
+1. Добавлен горизонтальный лэйаут для fragment_single_scan и fragment_unit_info
 * <b>1.54 - 30/06/21</b>
 1. Удален один из двух перегруженных методов addSelectedUnitListener
 2. SearchFragment теперь вложен внутрь SearchParent

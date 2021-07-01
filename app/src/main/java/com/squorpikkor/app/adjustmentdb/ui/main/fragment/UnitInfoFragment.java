@@ -52,7 +52,7 @@ public class UnitInfoFragment extends Fragment {
         mViewModel.getFoundUnitsList().observe(getViewLifecycleOwner(), this::updateFoundUnit);
         mViewModel.getUnitStatesList().observe(getViewLifecycleOwner(), this::updateAdapter);
 
-        tType = view.findViewById(R.id.textViewType111);
+        tType = view.findViewById(R.id.textViewType);
         tName = view.findViewById(R.id.textViewName);
         tInnerSerial = view.findViewById(R.id.textViewInnerSerialValue);
         tSerial = view.findViewById(R.id.textViewSerialValue);

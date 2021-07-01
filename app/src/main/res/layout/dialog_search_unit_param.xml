@@ -58,7 +58,6 @@
             android:background="@drawable/edit_text_field"
             android:inputType="textPersonName"
             tools:text="12345"
-            android:text="777"
             android:importantForAutofill="no"
             tools:ignore="LabelFor" />
 

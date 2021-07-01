@@ -103,17 +103,11 @@ public static final String TABLE_NAMES = "names";
     public static final String TABLE_DEVICES = "devices";
     public static final String DEVICE_ID = "id";
     public static final String DEVICE_NAME_ID = "name_id";
-    public static final String DEVICE_NAME_RU = "name_id";
-    public static final String DEVICE_TYPE = "type";
-
-
-    public static final String TYPE_ANY = "any_type";
-    public static final String TYPE_REPAIR = "repair_type";
-    public static final String TYPE_SERIAL = "serial_type";
 
     public static final String EMPTY_LOCATION_ID = "empty_location_id";
     public static final String EMPTY_LOCATION_NAME = "Локация не найдена";
 //--------------------------------------------------------------------------------------------------
+    public static final String TYPE_ANY = "any_type";
     public static final String SERIAL_TYPE = "serial_type";
     public static final String REPAIR_TYPE = "repair_type";
 
@@ -250,9 +244,11 @@ public static final String TABLE_NAMES = "names";
     }
     public String getDeviceNameId(String name) {
         //todo упростить (devices.getValue()->list)
-        if (devices.getValue()==null||devices.getValue().size()==0||name==null||name.equals("")) return name;
-        for (int i = 0; i < devices.getValue().size(); i++) {
-            if (devices.getValue().get(i).getName().equals(name)||devices.getValue().get(i).getEngName().equals(name)) return devices.getValue().get(i).getNameId();
+        ArrayList<Device> list = devices.getValue();
+        if (list==null||list.size()==0||name==null||name.equals("")) return name;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getName().equals(name)
+                    ||list.get(i).getEngName().equals(name)) return list.get(i).getNameId();
         }
         return name;
     }
@@ -391,31 +387,6 @@ public static final String TABLE_NAMES = "names";
         return restartMultiScanning;
     }
 
-
-    //--------------------------------------------------------------------------------------------------
-    public MutableLiveData<DEvent> getLastEvent() {
-        return lastEvent;
-    }
-
-    public MutableLiveData<Boolean> getIsWrongQR() {
-        return isWrongQR;
-    }
-
-    //todo переименовать на startSearch
-    public void getUnitListFromBD(String deviceNameId, String locationId, String employeeId, String typeId, String stateId, String serial) {
-        Log.e(TAG, "♦ deviceName - "+deviceNameId+" location - "+locationId+" employee - "+employeeId+" type - "+typeId);
-        //Если поле номера пустое, то ищем по параметрам, если поле содержит значение, то ищем по этому значению, игнорируя
-        // все остальные параметры. Т.е. ищем или по параметрам, или по номеру
-        if (serial.equals("")) dbh.getUnitList(foundUnitsList, deviceNameId, locationId, employeeId, typeId, stateId, ANY_VALUE);
-        else dbh.getUnitList(foundUnitsList, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, serial);
-    }
-
-    public void restartMultiScanning() {
-        scannerFoundUnitsList.setValue(new ArrayList<>());
-        restartMultiScanning.postValue(true);
-        multiScanner.clearFoundedBarcodes();
-    }
-
     private String backPressCommand;
 
     public void setBackPressCommand(String backPressCommand) {
@@ -442,6 +413,29 @@ public static final String TABLE_NAMES = "names";
         else if (backPressCommand.equals(BACK_PRESS_STATES)) restartScanning.setValue(true);
         else if (backPressCommand.equals(BACK_PRESS_MULTI_STATES)) restartMultiScanning();
         else if (backPressCommand.equals(BACK_PRESS_INFO_FRAGMENT)) backToRecycler.setValue(true);
+    }
+//--------------------------------------------------------------------------------------------------
+    public MutableLiveData<DEvent> getLastEvent() {
+        return lastEvent;
+    }
+
+    public MutableLiveData<Boolean> getIsWrongQR() {
+        return isWrongQR;
+    }
+
+    //todo переименовать на startSearch
+    public void getUnitListFromBD(String deviceNameId, String locationId, String employeeId, String typeId, String stateId, String serial) {
+        Log.e(TAG, "♦ deviceName - "+deviceNameId+" location - "+locationId+" employee - "+employeeId+" type - "+typeId);
+        //Если поле номера пустое, то ищем по параметрам, если поле содержит значение, то ищем по этому значению, игнорируя
+        // все остальные параметры. Т.е. ищем или по параметрам, или по номеру
+        if (serial.equals("")) dbh.getUnitList(foundUnitsList, deviceNameId, locationId, employeeId, typeId, stateId, ANY_VALUE);
+        else dbh.getUnitList(foundUnitsList, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, serial);
+    }
+
+    public void restartMultiScanning() {
+        scannerFoundUnitsList.setValue(new ArrayList<>());
+        restartMultiScanning.postValue(true);
+        multiScanner.clearFoundedBarcodes();
     }
 
     public void updateSelectedUnit(DUnit newUnit) {
