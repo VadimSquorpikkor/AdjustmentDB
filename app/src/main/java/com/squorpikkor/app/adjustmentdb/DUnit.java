@@ -6,6 +6,7 @@ import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 
 import java.util.Date;
 
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_TYPE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_TYPE;
 
@@ -16,13 +17,12 @@ public class DUnit {
     private String innerSerial; //№12345
     private String serial; //132.002
     private String type; //"Ремонтный"
-    private String state; //"На линейке"
     private String employee; //Фамилия ответственного
-    private String eventId;
+    private String eventId; //todo event_id есть в event, но с другой стороны id нужно хранить в БД. Надо подумать (ведь можно использовать unit.getEvent().getId() )
     private Date date;
     private Date closeDate;
 
-    private DEvent event;
+    private DEvent lastEvent;
 
     public DUnit() {
     }
@@ -44,6 +44,16 @@ public class DUnit {
         this.date = date;
     }
 
+    public DEvent getLastEvent() {
+        return lastEvent;
+    }
+
+    public void setLastEvent(DEvent lastEvent) {
+        if (lastEvent!=null) Log.e("TAG", "setLastEvent: "+lastEvent.getId());
+        else Log.e("TAG", "setLastEvent: NULL");
+        this.lastEvent = lastEvent;
+    }
+
     public void closeUnit() {
         this.closeDate = new Date();
     }
@@ -61,11 +71,27 @@ public class DUnit {
         return (int)((end.getTime()-this.date.getTime())/(1000*60*60*24));
     }
 
-    public void addNewEvent(DEvent newEvent) {
-//        String oldEventId = this.eventId;
-//        model.closeEvent(oldEventId);
+    public void addNewEvent(MainViewModel model, String state, String description, String location) {
+        Log.e("TAG", "addNewEvent: lastEvent = "+lastEvent);
+
+        DEvent newEvent = getNewEvent(state, description, location);
+        if (newEvent==null||newEvent.getId()==null||newEvent.getId().equals("")) return;
+
+        if (lastEvent!=null) lastEvent.closeEvent(model);//если это первое событие, то lastEvent будет равен null
+        eventId = newEvent.getId();
+        lastEvent = newEvent;
 
 
+        //todo убрать if (eventId!=null&&!eventId.equals("")) unit.setEventId(eventId); из selectState
+        //model.saveUnitAndEvent(unit, newEvent);//todo переделать под model.saveUnit(unit) ведь event есть в самом юните, зачем передавать отдельно?
+    }
+
+    private DEvent getNewEvent(String stateId, String description, String location) {
+        //Если в спиннере статуса стоит "-не выбрано-", то значит нового события не будет, тогда возвращаем null
+        String eventId = this.id+"_"+new Date().getTime();
+
+        if (stateId.equals(ANY_VALUE)) return null;
+        else return new DEvent(new Date(), stateId, description, location, this.id, eventId);
     }
 
     public Date getCloseDate() {
@@ -80,15 +106,6 @@ public class DUnit {
     /**Возвращает true, если это серийное устройство*/
     public boolean isSerialUnit() {
         return type.equals(SERIAL_TYPE);
-    }
-
-    /**Имя последнего статуса устройства*/
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
     }
 
     /**Имя устройства (БДКГ-02)*/

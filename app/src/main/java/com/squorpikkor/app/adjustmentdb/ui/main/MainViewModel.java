@@ -127,8 +127,8 @@ public static final String TABLE_NAMES = "names";
     public static final String BACK_PRESS_INFO_FRAGMENT = "back_press_info";
 
     private final FireDBHelper dbh;
-    private final MutableLiveData<DUnit> selectedUnit;
 
+    private final MutableLiveData<DUnit> selectedUnit;//todo из трёх должен остаться только scannerFoundUnitsList
     private final MutableLiveData<ArrayList<DEvent>> unitStatesList;
     private final MutableLiveData<ArrayList<DUnit>> scannerFoundUnitsList;
 
@@ -193,6 +193,7 @@ public static final String TABLE_NAMES = "names";
     MutableLiveData<ArrayList<Employee>> employees;
     MutableLiveData<ArrayList<State>> states;
 
+    /**Юниты, которые были найдены поиском по БД по параметрам*/
     MutableLiveData<ArrayList<DUnit>> foundUnitsList;
 
     public MutableLiveData<ArrayList<Location>> getLocations() {
@@ -337,11 +338,14 @@ public static final String TABLE_NAMES = "names";
         dbh.addSelectedUnitStatesListener(unit_id, unitStatesList);
     }
 
-    public void addSelectedUnitListener(String unit_id, String event_id) {
-        dbh.addSelectedUnitListener(unit_id, selectedUnit);
-        DEvent event = new DEvent();
-        dbh.getLastEventFromDB_new(event_id, event);
-        lastEvent.setValue(event);
+    public void addSelectedUnitListener(String unit_id) {
+        dbh.listenerForUnitWithLastEvent(unit_id, selectedUnit);
+//        dbh.addSelectedUnitListener(unit_id, selectedUnit);
+//        DEvent event = new DEvent();
+//        dbh.getLastEventFromDB_new(event_id, event);
+//        selectedUnit.getValue().setLastEvent(event);
+//        selectedUnit.setValue(selectedUnit.getValue());//update //todo а нужен ли?
+//        lastEvent.setValue(event);//todo deprecated
     }
 
 //--------------------------------------------------------------------------------------------------
@@ -523,18 +527,13 @@ public static final String TABLE_NAMES = "names";
             // блока берутся из QR-кода
             updateSelectedUnit(unit);
 //            addSelectedUnitListener(unit.getId());
-            addSelectedUnitListener(unit.getId(), unit.getEventId());
+            addSelectedUnitListener(unit.getId());
             getEventForThisUnit(unit.getId());
         } else sayWrongQr();
     }
 
     private void sayWrongQr() {
         isWrongQR.setValue(true);
-    }
-
-    public void selectUnit(String unit_id, String event_id) {
-        addSelectedUnitListener(unit_id, event_id);
-        getEventForThisUnit(unit_id);
     }
 
     @Override

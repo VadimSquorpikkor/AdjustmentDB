@@ -18,7 +18,6 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
-import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import org.jetbrains.annotations.NotNull;
@@ -139,43 +138,28 @@ public class RecognizeDialog extends BaseDialog{
     }
 
     private void saveData(DUnit unit) {
-        if (unit==null)return;
-        mViewModel.closeEvent(unit.getEventId());
-        DEvent newEvent = getNewEvent(unit.getId());
-        updateUnitData(unit, newEvent);
-        mViewModel.saveUnitAndEvent(unit, newEvent);
+        updateUnitData(unit);
+        mViewModel.saveUnitAndEvent(unit, unit.getLastEvent());
         dismiss();
     }
 
     /**Сохранение юнита с выбранными параметрами. Логика: если имя и/или серийный не выбраны, то
      * юниту будут присвоены распознанные значения. Если параметры выбрать руками, то распознанные
      * значения будут проигнорированы, юнит будет сохранен с параметрами выбранными вручную*/
-    private void updateUnitData(DUnit unit, DEvent newEvent) {
-        String eventId = newEvent==null?null:newEvent.getId();
-
+    private void updateUnitData(DUnit unit) {
         String name_id = mViewModel.getDeviceNameId(mDevNameText.getText().toString());//получить id из имени
         String newNameId = deviceSpinnerAdapter.getSelectedNameId().equals(ANY_VALUE)?name_id:deviceSpinnerAdapter.getSelectedNameId();
         String newSerial = eSerial.getText().toString().equals("")?mSerialText.getText().toString():eSerial.getText().toString();
 
-        String newStateId = stateSpinnerAdapter.getSelectedNameId();//todo потом этого не будет
+        String newStateId = stateSpinnerAdapter.getSelectedNameId();
         String employee = employeeSpinnerAdapter.getSelectedNameId();
+        String description = "";
 
         if (unit.getName()==null||unit.getName().equals("") && !newNameId.equals(ANY_VALUE)) unit.setName(newNameId);
         if (unit.getSerial()==null||unit.getSerial().equals("") && !newSerial.equals("")) unit.setSerial(newSerial);
         if (unit.getDate()==null) unit.setDate(new Date());
-        if (!newStateId.equals(ANY_VALUE)) unit.setState(newStateId);
-        if (eventId!=null&&!eventId.equals("")) unit.setEventId(eventId);
+        if (!newStateId.equals(ANY_VALUE)) unit.addNewEvent(mViewModel, newStateId, description, location);
         if (!employee.equals(ANY_VALUE)) unit.setEmployee(employee);
-    }
-
-    private DEvent getNewEvent(String unitId) {
-        //Если в спиннере статуса стоит "-не выбрано-", то значит нового события не будет, тогда возвращаем null
-        String stateId = stateSpinnerAdapter.getSelectedNameId();
-        String description = "";  //descriptionEdit.getText().toString();
-        String eventId = unitId+"_"+new Date().getTime();
-
-        if (stateId.equals(ANY_VALUE)) return null;
-        else return new DEvent(new Date(), stateId, description, location, unitId, eventId);
     }
 
     @Override

@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-
-import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 
@@ -39,6 +37,7 @@ public class SelectStateDialogMulti extends BaseDialog {
 
         ArrayList<DUnit> unitList = mViewModel.getScannerFoundUnitsList().getValue();
         DUnit unit = unitList != null ? unitList.get(0) : null;//todo переименовать -> firstUnit
+        String unitType = unit==null?null:unit.getType();
 
         Spinner stateSpinner = view.findViewById(R.id.state_spinner);
         Spinner deviceSpinner = view.findViewById(R.id.name_spinner);
@@ -49,7 +48,7 @@ public class SelectStateDialogMulti extends BaseDialog {
         employeeSpinnerAdapter = new SpinnerAdapter(employeeSpinner, mContext);
 
         mViewModel.getDevices().observe(this, list -> deviceSpinnerAdapter.setData(list, EMPTY_VALUE_TEXT));
-        mViewModel.getStates().observe(this, list -> stateSpinnerAdapter.setDataByTypeAndLocation(list, unit.getType(), location, EMPTY_VALUE_TEXT));
+        mViewModel.getStates().observe(this, list -> stateSpinnerAdapter.setDataByTypeAndLocation(list, unitType, location, EMPTY_VALUE_TEXT));
         mViewModel.getEmployees().observe(this, list -> employeeSpinnerAdapter.setData(list, EMPTY_VALUE_TEXT));
 
         Button cancelButton = view.findViewById(R.id.cancel_button);
@@ -57,41 +56,30 @@ public class SelectStateDialogMulti extends BaseDialog {
         descriptionEdit = view.findViewById(R.id.description);
 
         cancelButton.setOnClickListener(view -> dismiss());
-
-        okButton.setOnClickListener(view -> {
-            for (int i = 0; i < unitList.size(); i++) {
-                DUnit dUnit = unitList.get(i);
-                mViewModel.closeEvent(dUnit.getEventId());
-                DEvent newEvent = getNewEvent(dUnit.getId());
-                updateUnitData(dUnit, newEvent);
-                mViewModel.saveUnitAndEvent(dUnit, newEvent);
-            }
-            dismiss();
-        });
+        okButton.setOnClickListener(view -> saveUnits(unitList));
 
         return dialog;
     }
 
-    private void updateUnitData(DUnit unit, DEvent newEvent) {
-        String eventId = newEvent==null?null:newEvent.getId();
+    private void saveUnits(ArrayList<DUnit> unitList) {
+        if (unitList==null||unitList.size()==0) return;
+        for (int i = 0; i < unitList.size(); i++) {
+            DUnit dUnit = unitList.get(i);
+            updateUnitData(dUnit);
+            mViewModel.saveUnitAndEvent(dUnit, dUnit.getLastEvent());
+        }
+        dismiss();
+    }
+
+    private void updateUnitData(DUnit unit) {
         String newNameId = deviceSpinnerAdapter.getSelectedNameId();
-        String newStateId = stateSpinnerAdapter.getSelectedNameId();//todo потом этого не будет
+        String newStateId = stateSpinnerAdapter.getSelectedNameId();
         String employee = employeeSpinnerAdapter.getSelectedNameId();
+        String description = descriptionEdit.getText().toString();
 
         if (unit.getName().equals("") && !newNameId.equals(ANY_VALUE)) unit.setName(newNameId);
         if (unit.getDate()==null) unit.setDate(new Date());
-        if (!newStateId.equals(ANY_VALUE)) unit.setState(newStateId);
-        if (eventId!=null&&!eventId.equals("")) unit.setEventId(eventId);
+        if (!newStateId.equals(ANY_VALUE)) unit.addNewEvent(mViewModel, newStateId, description, location);
         if (!employee.equals(ANY_VALUE)) unit.setEmployee(employee);
-    }
-
-    private DEvent getNewEvent(String unitId) {
-        //Если в спиннере статуса стоит "-не выбрано-", то значит нового события не будет, тогда возвращаем null
-        String stateId = stateSpinnerAdapter.getSelectedNameId();
-        String description = descriptionEdit.getText().toString();
-        String eventId = unitId+"_"+new Date().getTime();
-
-        if (stateId.equals(ANY_VALUE)) return null;
-        else return new DEvent(new Date(), stateId, description, location, unitId, eventId);
     }
 }

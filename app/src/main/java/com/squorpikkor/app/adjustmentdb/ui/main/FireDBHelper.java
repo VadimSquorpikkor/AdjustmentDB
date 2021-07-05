@@ -282,7 +282,7 @@ class FireDBHelper {
         data.put(UNIT_EVENT_ID, unit.getEventId());
         data.put(UNIT_INNER_SERIAL, unit.getInnerSerial());
         data.put(UNIT_SERIAL, unit.getSerial());
-        data.put(UNIT_STATE, unit.getState());//todo надо будет УБРАТЬ!!!! когда уберу getState из unit
+//        data.put(UNIT_STATE, unit.getState());//todo надо будет УБРАТЬ!!!! когда уберу getState из unit
         data.put(UNIT_TYPE, unit.getType());
         data.put(UNIT_DATE, unit.getDate());
         db.collection(TABLE_UNITS)
@@ -334,10 +334,14 @@ class FireDBHelper {
                         unit.setEventId(String.valueOf(documentSnapshot.get(UNIT_EVENT_ID)));
                         unit.setInnerSerial(String.valueOf(documentSnapshot.get(UNIT_INNER_SERIAL)));
                         unit.setSerial(String.valueOf(documentSnapshot.get(UNIT_SERIAL)));
-                        unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
+//                        unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
                         unit.setType(String.valueOf(documentSnapshot.get(UNIT_TYPE)));
                         Timestamp timestamp = (Timestamp) documentSnapshot.get(UNIT_DATE);
                         if (timestamp!=null)unit.setDate(timestamp.toDate());
+
+                        //JOIN------------------------------------------------------------------
+                        getLastEventFromDB_new2_forMulti(list, unit);
+
 
                         list.setValue(newList.getValue());
                     } else {
@@ -367,7 +371,7 @@ class FireDBHelper {
                             unit.setEventId(String.valueOf(documentSnapshot.get(UNIT_EVENT_ID)));
                             unit.setInnerSerial(String.valueOf(documentSnapshot.get(UNIT_INNER_SERIAL)));
                             unit.setSerial(String.valueOf(documentSnapshot.get(UNIT_SERIAL)));
-                            unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
+//                            unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
                             unit.setType(String.valueOf(documentSnapshot.get(UNIT_TYPE)));
                             Timestamp timestamp = (Timestamp) documentSnapshot.get(UNIT_DATE);
                             if (timestamp!=null)unit.setDate(timestamp.toDate());
@@ -417,7 +421,7 @@ class FireDBHelper {
                             unit.setEventId(String.valueOf(document.get(UNIT_EVENT_ID)));
                             unit.setInnerSerial(String.valueOf(document.get(UNIT_INNER_SERIAL)));
                             unit.setSerial(String.valueOf(document.get(UNIT_SERIAL)));
-                            unit.setState(String.valueOf(document.get(UNIT_STATE)));
+//                            unit.setState(String.valueOf(document.get(UNIT_STATE)));
                             unit.setType(String.valueOf(document.get(UNIT_TYPE)));
                             Timestamp timestamp = (Timestamp) document.get(UNIT_DATE);
                             if (timestamp!=null)unit.setDate(timestamp.toDate());
@@ -438,10 +442,96 @@ class FireDBHelper {
             getEventsFromDB(unit_id, unitStatesList);
         });
     }
-
     void addSelectedUnitListener(String unit_id, MutableLiveData<DUnit> mUnit) {
         db.collection(TABLE_UNITS).document(unit_id).addSnapshotListener((queryDocumentSnapshots, error) -> {
             getUnitById_EXP(unit_id, mUnit);
+        });
+    }
+
+    /*void listenerForUnitWithLastEvent(String unit_id, MutableLiveData<DUnit> mUnit) {
+        addSelectedUnitListener_NEW(unit_id, mUnit);
+
+    }*/
+
+    void listenerForUnitWithLastEvent(String unit_id, MutableLiveData<DUnit> mUnit) {
+        db.collection(TABLE_UNITS).document(unit_id).addSnapshotListener((queryDocumentSnapshots, error) -> {
+            if (queryDocumentSnapshots != null && queryDocumentSnapshots.exists()) { //TODO обязательно везде добавить эту строку, иначе если документа НЕ СУЩЕСТВУЕТ в БД, то всё равно будет создан объект с полями (String)"null" (не null, а именно "null")
+
+                DUnit unit = new DUnit();
+                unit.setName(String.valueOf(queryDocumentSnapshots.get(UNIT_DEVICE)));
+                unit.setEmployee(String.valueOf(queryDocumentSnapshots.get(UNIT_EMPLOYEE)));
+                unit.setId(String.valueOf(queryDocumentSnapshots.get(UNIT_ID)));
+                unit.setEventId(String.valueOf(queryDocumentSnapshots.get(UNIT_EVENT_ID)));
+                unit.setInnerSerial(String.valueOf(queryDocumentSnapshots.get(UNIT_INNER_SERIAL)));
+                unit.setSerial(String.valueOf(queryDocumentSnapshots.get(UNIT_SERIAL)));
+//                unit.setState(String.valueOf(queryDocumentSnapshots.get(UNIT_STATE)));
+                unit.setType(String.valueOf(queryDocumentSnapshots.get(UNIT_TYPE)));
+                Timestamp timestamp = (Timestamp) queryDocumentSnapshots.get(UNIT_DATE);
+                if (timestamp != null) unit.setDate(timestamp.toDate());
+                mUnit.setValue(unit);
+
+                //JOIN------------------------------------------------------------------
+                getLastEventFromDB_new2(mUnit);
+//            DEvent event = new DEvent();
+//            getLastEventFromDB_new(unit.getEventId(), event);
+//            unit.setLastEvent(event);
+            } else {
+                Log.e(TAG, "☻ ТАКОГО ЮНИТА НЕТ В БД!");
+            }
+        });
+    }
+
+    //TODO !!!
+    // объединить getLastEventFromDB_new2 и getLastEventFromDB_new2_forMulti, а значит сохранять
+    // результат SingleScan в scannerFoundUnitsList (для single будет состоять из одного элемента)
+
+    void getLastEventFromDB_new2_forMulti(MutableLiveData<ArrayList<DUnit>> units, DUnit unit) {
+        if (units == null) return;//todo mUnit.getValue() == null return ?
+        //DUnit unit = mUnit.getValue();
+        db.collection(TABLE_EVENTS).document(unit.getEventId())
+                .get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    DEvent event = new DEvent();
+                    Timestamp timestamp = (Timestamp) document.get(EVENT_DATE);
+                    event.setDate(timestamp.toDate());
+                    event.setState(document.get(EVENT_STATE).toString());
+                    event.setDescription(document.get(EVENT_DESCRIPTION).toString());
+                    event.setLocation(document.get(EVENT_LOCATION).toString());
+                    event.setUnit_id(document.get(EVENT_UNIT).toString());
+                    event.setId(document.getId());
+                    unit.setLastEvent(event);
+                    units.setValue(units.getValue());//update
+                }
+            } else {
+                Log.d(TAG, "get failed with ", task.getException());
+            }
+        });
+    }
+
+    void getLastEventFromDB_new2(MutableLiveData<DUnit> mUnit) {
+        if (mUnit == null) return;//todo mUnit.getValue() == null return ?
+        DUnit unit = mUnit.getValue();
+        db.collection(TABLE_EVENTS).document(unit.getEventId())
+                .get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    DEvent event = new DEvent();
+                    Timestamp timestamp = (Timestamp) document.get(EVENT_DATE);
+                    event.setDate(timestamp.toDate());
+                    event.setState(document.get(EVENT_STATE).toString());
+                    event.setDescription(document.get(EVENT_DESCRIPTION).toString());
+                    event.setLocation(document.get(EVENT_LOCATION).toString());
+                    event.setUnit_id(document.get(EVENT_UNIT).toString());
+                    event.setId(document.getId());
+                    unit.setLastEvent(event);
+                    mUnit.setValue(mUnit.getValue());//update
+                }
+            } else {
+                Log.d(TAG, "get failed with ", task.getException());
+            }
         });
     }
 

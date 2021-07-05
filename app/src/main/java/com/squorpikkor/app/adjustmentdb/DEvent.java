@@ -1,17 +1,20 @@
 package com.squorpikkor.app.adjustmentdb;
 
+import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
+
 import java.util.Date;
 
 public class DEvent {
-    private Date date;
+    private Date startDate;
+    private Date closeDate;
     private String state;
     private String description;
     private String location;
     private String unit_id;
     private String id;
 
-    public DEvent(Date date, String state, String location) {
-        this.date = date;
+    public DEvent(Date startDate, String state, String location) {
+        this.startDate = startDate;
         this.state = state;
         this.location = location;
     }
@@ -19,8 +22,8 @@ public class DEvent {
     public DEvent() {
     }
 
-    public DEvent(Date date, String state, String description, String location, String unit_id, String id) {
-        this.date = date;
+    public DEvent(Date startDate, String state, String description, String location, String unit_id, String id) {
+        this.startDate = startDate;
         this.state = state;
         this.description = description;
         this.location = location;
@@ -28,12 +31,38 @@ public class DEvent {
         this.id = id;
     }
 
-    public Date getDate() {
-        return date;
+    public void setCloseDate(Date closeDate) {
+        this.closeDate = closeDate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public Date getCloseDate() {
+        return closeDate;
+    }
+
+    //Если ивент завершен, то у него появляется дата закрытия
+    public boolean isComplete() {
+        return this.closeDate!=null;
+    }
+
+    /**Сколько дней длилось событие. Если событие не закрыто, то считается количество
+     * дней от начала события (startDate) до сегодняшнего дня, если закрыто — до дня закрытия*/
+    public int daysPassed() {
+        if (this.startDate ==null) return 0;
+        Date end = closeDate==null?new Date():closeDate;
+        return (int)((end.getTime()-this.startDate.getTime())/(1000*60*60*24));
+    }
+
+    /**Закрывает себя в БД*/
+    public void closeEvent(MainViewModel model) {
+        model.closeEvent(id);
+    }
+
+    public Date getDate() {
+        return startDate;
+    }
+
+    public void setDate(Date startDate) {
+        this.startDate = startDate;
     }
 
     public String getState() {

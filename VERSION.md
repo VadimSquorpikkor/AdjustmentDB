@@ -1,5 +1,10 @@
 # AdjustmentDB   
 
+* <b>1.56 - 05/07/21</b>
+1. Event сделан частью DUnit. Теперь последний ивент загружается из БД вместе с юнитом; обновление и закрытие ивента происходит через методы DUnit
+2. Под новый DUnit переделаны RecognizeDialog, SelectStateDialogSingle, SelectStateDialogMulti 
+3. Обновил getLastEventFromDB
+4. Из Unit'a удален "state" и его геттеры/сеттеры: теперь статус — это параметр только события и никак не связан с юнитом  
 * <b>1.55 - 01/07/21</b>
 1. Добавлен горизонтальный лэйаут для fragment_single_scan и fragment_unit_info
 * <b>1.54 - 30/06/21</b>
