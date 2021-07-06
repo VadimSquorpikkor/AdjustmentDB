@@ -66,7 +66,7 @@ public class SelectStateDialogMulti extends BaseDialog {
         for (int i = 0; i < unitList.size(); i++) {
             DUnit dUnit = unitList.get(i);
             updateUnitData(dUnit);
-            mViewModel.saveUnitAndEvent(dUnit, dUnit.getLastEvent());
+            mViewModel.saveUnitAndEvent(dUnit);
         }
         dismiss();
     }

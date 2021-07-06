@@ -53,7 +53,7 @@ public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolde
 
         holder.tName.setText(mViewModel.getDeviceNameById(unit.getName()));
 //        holder.tState.setText(mViewModel.getStateNameById(unit.getState()));
-        holder.tState.setText(mViewModel.getStateNameById(unit.getLastEvent().getState()));
+        if (unit.getLastEvent()!=null) holder.tState.setText(mViewModel.getStateNameById(unit.getLastEvent().getState()));
         holder.tSerial.setText(String.format("№ %s", Utils.getRightValue(unit.getSerial())));
         if (unit.getInnerSerial()==null||unit.getInnerSerial().equals(""))holder.tInnerSerial.setText("");
         else holder.tInnerSerial.setText(String.format("(вн. %s)", unit.getInnerSerial()));

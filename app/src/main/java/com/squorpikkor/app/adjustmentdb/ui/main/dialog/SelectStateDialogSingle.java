@@ -7,7 +7,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +29,6 @@ public class SelectStateDialogSingle extends BaseDialog {
 
     String location;
     DUnit unit;
-//    DEvent event;
 
     public SelectStateDialogSingle() {
     }
@@ -113,7 +111,7 @@ public class SelectStateDialogSingle extends BaseDialog {
 
     private void saveUnit(DUnit unit) {
         updateUnitData(unit);
-        mViewModel.saveUnitAndEvent(unit, unit.getLastEvent());
+        mViewModel.saveUnitAndEvent(unit);
         dismiss();
     }
 
@@ -129,7 +127,6 @@ public class SelectStateDialogSingle extends BaseDialog {
         if (unit.getInnerSerial().equals("") && !newInner.equals("")) unit.setInnerSerial(newInner);
         if (unit.getSerial().equals("") && !newSerial.equals("")) unit.setSerial(newSerial);
         if (unit.getDate()==null) unit.setDate(new Date());
-        //if (!newStateId.equals(ANY_VALUE)) unit.setState(newStateId);
         if (!newStateId.equals(ANY_VALUE)) unit.addNewEvent(mViewModel, newStateId, description, location);
         if (!employee.equals(ANY_VALUE)) unit.setEmployee(employee);
     }

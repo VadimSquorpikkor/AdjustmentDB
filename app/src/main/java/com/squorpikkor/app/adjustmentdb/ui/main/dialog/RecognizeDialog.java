@@ -64,6 +64,7 @@ public class RecognizeDialog extends BaseDialog{
 
         location = mViewModel.getLocation_id().getValue();
         DUnit unit = mViewModel.getSelectedUnit().getValue();
+        String unitType = unit==null?null:unit.getType();
 
         mCameraView = view.findViewById(R.id.surface_for_recognize);
         mSerialText = view.findViewById(R.id.recognized_serial);
@@ -87,7 +88,7 @@ public class RecognizeDialog extends BaseDialog{
             //сортировка по длине имени в обратном порядке, чтобы сразу искался "6130С" и только потом "6130"
             Collections.sort(names, Collections.reverseOrder());
         });
-        mViewModel.getStates().observe(this, list -> stateSpinnerAdapter.setDataByTypeAndLocation(list, unit.getType(), location, EMPTY_VALUE_TEXT));
+        mViewModel.getStates().observe(this, list -> stateSpinnerAdapter.setDataByTypeAndLocation(list, unitType, location, EMPTY_VALUE_TEXT));
         mViewModel.getEmployees().observe(this, list -> employeeSpinnerAdapter.setData(list, EMPTY_VALUE_TEXT));
 
         startCameraSource();
@@ -139,7 +140,7 @@ public class RecognizeDialog extends BaseDialog{
 
     private void saveData(DUnit unit) {
         updateUnitData(unit);
-        mViewModel.saveUnitAndEvent(unit, unit.getLastEvent());
+        mViewModel.saveUnitAndEvent(unit);
         dismiss();
     }
 
@@ -222,24 +223,6 @@ public class RecognizeDialog extends BaseDialog{
         else return "";
     }
 
-    String getDevName_old(TextBlock item) {
-
-        String text = item.getValue();
-        //todo здесь потом будет ссылка на getDeviceNameLit
-        ArrayList<String> names = new ArrayList<>();
-
-        Log.e(TAG, "♦getDevName: "+text);
-
-        if (text.contains("AT6130C")) return "AT6130C";
-        else if (text.contains("AT6130")) return "AT6130";
-        else if (text.contains("USB-DU")) return "USB-DU";
-        else if (text.contains("PU2")) return "PU2";
-        else if (text.contains("BDKG-05")) return "BDKG-05";
-        else if (text.contains("5AKT-04")) return "BDKG-04";
-        else if (text.contains("5AKT-01")) return "BDKG-01";
-        else return "";
-    }
-
     /**Сделано для распознавания кирилических символов (само распознавание различает только латиницу,
      * поэтому приходится извращаться). Если распознавание вернуло "5AKT", это значит, что на самом
      * деле на наклейке было написано "БДКГ"*/
@@ -299,9 +282,9 @@ public class RecognizeDialog extends BaseDialog{
                     .setRequestedFps(2.0f)
                     .build();
 
-            /**
-             * Add call back to SurfaceView and check if camera permission is granted.
-             * If permission is granted we can start our cameraSource and pass it to surfaceView
+            /*
+              Add call back to SurfaceView and check if camera permission is granted.
+              If permission is granted we can start our cameraSource and pass it to surfaceView
              */
             mCameraView.getHolder().addCallback(new SurfaceHolder.Callback() {
                 @Override
@@ -343,7 +326,7 @@ public class RecognizeDialog extends BaseDialog{
                  * which will then be set to the textView.
                  * */
                 @Override
-                public void receiveDetections(Detector.Detections<TextBlock> detections) {
+                public void receiveDetections(@NotNull Detector.Detections<TextBlock> detections) {
                     final SparseArray<TextBlock> items = detections.getDetectedItems();
                     if (items.size() != 0 ){
 

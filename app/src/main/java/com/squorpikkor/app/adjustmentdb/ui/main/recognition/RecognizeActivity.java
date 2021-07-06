@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class RecognizeActivity extends AppCompatActivity {
-
+//todo Активити не используется
     SurfaceView mCameraView;
     TextView mSerialText;
     TextView mDevNameText;

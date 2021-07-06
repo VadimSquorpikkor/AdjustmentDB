@@ -3,7 +3,6 @@ package com.squorpikkor.app.adjustmentdb.ui.main;
 import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -20,7 +19,6 @@ import com.squorpikkor.app.adjustmentdb.ui.main.entities.Location;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.State;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -34,7 +32,6 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPLOYEE_EM
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPLOYEE_ID;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPLOYEE_LOCATION;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPLOYEE_NAME_ID;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_LOCATION_ID;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_CLOSE_DATE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_DATE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_DESCRIPTION;
@@ -43,10 +40,8 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_STATE
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_UNIT;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.LOCATION_ID;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.LOCATION_NAME_ID;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_TYPE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_ID;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_LOCATION;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_NAME;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_NAME_ID;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_TYPE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_DEVICES;
@@ -54,11 +49,9 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_EMPLO
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_LOCATIONS;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_NAMES;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_STATES;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TYPE_ANY;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_EVENTS;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_UNITS;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_DATE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_DESCRIPTION;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_DEVICE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_EMPLOYEE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_EVENT_ID;
@@ -84,8 +77,6 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_TYPE;
  * метод, загружающий сущности (убрать аналог JOIN)
  * 4. При переходе, вдруг, на другую БД (SQL), будет минимум гемора, просто сделать метод,
  * загружающий объекты*/
-
-
 
 class FireDBHelper {
 
@@ -232,6 +223,7 @@ class FireDBHelper {
     /**В принципе этот метод загружает вариант имени в зависимости от локации телефона, это
      * избыточный функционал, приложением и так будут пользоваться только русскоязычные
      * пользователи. Метод заменен на упрощенный вариант, этот оставил на всякий*/
+    @SuppressWarnings("unused")
     String getStringFromSnapshotMultiLang(Task<DocumentSnapshot> task, String defValue) {
         if (task.isSuccessful()) {
             DocumentSnapshot documentSnapshot = task.getResult();
@@ -260,11 +252,6 @@ class FireDBHelper {
         return defValue;
     }
 
-    /**Тыркает MutableLiveData, чтобы обновил UI*/
-    void updateLiveData(MutableLiveData<Object> data) {
-        data.setValue(data.getValue());
-    }
-
 //--------------------------------------------------------------------------------------------------
 
     public FireDBHelper() {
@@ -272,7 +259,11 @@ class FireDBHelper {
     }
 
     /**Добавляет документ в БД. Если документ не существует, он будет создан. Если документ существует,
-     * его содержимое будет перезаписано вновь предоставленными данными */
+     * его содержимое будет перезаписано вновь предоставленными данными
+     *
+     * Location и State не являются полями юнита и беруться из ивента. Сохранение этих полей в юнит
+     * нужно для поиска юнитов по этим значениям (локация и статус). При загрузке из БД эти поля
+     * игнорируются, таким образом эти 2 поля существуют только внутри БД*/
     //todo переделать на update, если документ существует
     void addUnitToDB(DUnit unit) {
         Map<String, Object> data = new HashMap<>();
@@ -282,9 +273,10 @@ class FireDBHelper {
         data.put(UNIT_EVENT_ID, unit.getEventId());
         data.put(UNIT_INNER_SERIAL, unit.getInnerSerial());
         data.put(UNIT_SERIAL, unit.getSerial());
-//        data.put(UNIT_STATE, unit.getState());//todo надо будет УБРАТЬ!!!! когда уберу getState из unit
         data.put(UNIT_TYPE, unit.getType());
         data.put(UNIT_DATE, unit.getDate());
+        data.put(UNIT_LOCATION, unit.getLastEvent().getLocation());
+        data.put(UNIT_STATE, unit.getLastEvent().getState());
         db.collection(TABLE_UNITS)
                 .document(unit.getId())
 //                .update(data)
@@ -315,78 +307,6 @@ class FireDBHelper {
         db.collection(TABLE_EVENTS).document(event_id).update(EVENT_CLOSE_DATE, new Date());
     }
 
-    void getUnitByIdAndAddToList(String id, MutableLiveData<ArrayList<DUnit>> list, int position) {
-        db.collection(TABLE_UNITS)
-                .whereEqualTo(UNIT_ID, id)//todo переделать под document(id) т.е. брать сразу по id, а не искать совпадение!!!
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        QuerySnapshot querySnapshot = task.getResult();
-                        if (querySnapshot == null || querySnapshot.size() == 0) return;
-                        DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
-                        MutableLiveData<ArrayList<DUnit>> newList = new MutableLiveData<>();
-                        newList.setValue(list.getValue());
-
-                        DUnit unit = newList.getValue().get(position);
-                        unit.setName(String.valueOf(documentSnapshot.get(UNIT_DEVICE)));
-                        unit.setEmployee(String.valueOf(documentSnapshot.get(UNIT_EMPLOYEE)));
-                        unit.setId(String.valueOf(documentSnapshot.get(UNIT_ID)));
-                        unit.setEventId(String.valueOf(documentSnapshot.get(UNIT_EVENT_ID)));
-                        unit.setInnerSerial(String.valueOf(documentSnapshot.get(UNIT_INNER_SERIAL)));
-                        unit.setSerial(String.valueOf(documentSnapshot.get(UNIT_SERIAL)));
-//                        unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
-                        unit.setType(String.valueOf(documentSnapshot.get(UNIT_TYPE)));
-                        Timestamp timestamp = (Timestamp) documentSnapshot.get(UNIT_DATE);
-                        if (timestamp!=null)unit.setDate(timestamp.toDate());
-
-                        //JOIN------------------------------------------------------------------
-                        getLastEventFromDB_new2_forMulti(list, unit);
-
-
-                        list.setValue(newList.getValue());
-                    } else {
-                        Log.e(TAG, "Error getting documents: ", task.getException());
-                    }
-                });
-    }
-
-    /**
-     * Получаем юнит из БД по его идентификатору
-     * @param id id юнита, которого нужно прочитать в БД
-     * @param selectedUnit MutableListData, в который записываем найденный юнит
-     */
-    void getUnitById_EXP(String id, MutableLiveData<DUnit> selectedUnit) {
-        db.collection(TABLE_UNITS)
-                .document(id)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot documentSnapshot = task.getResult();
-                        //todo НЕ РАБОТАЛО С "if (documentSnapshot == null) return" только с "if (documentSnapshot.exists())", нужно проверить у других методов, как там работает
-                        if (documentSnapshot.exists()){
-                            DUnit unit = new DUnit();
-                            unit.setName(String.valueOf(documentSnapshot.get(UNIT_DEVICE)));
-                            unit.setEmployee(String.valueOf(documentSnapshot.get(UNIT_EMPLOYEE)));
-                            unit.setId(String.valueOf(documentSnapshot.get(UNIT_ID)));
-                            unit.setEventId(String.valueOf(documentSnapshot.get(UNIT_EVENT_ID)));
-                            unit.setInnerSerial(String.valueOf(documentSnapshot.get(UNIT_INNER_SERIAL)));
-                            unit.setSerial(String.valueOf(documentSnapshot.get(UNIT_SERIAL)));
-//                            unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
-                            unit.setType(String.valueOf(documentSnapshot.get(UNIT_TYPE)));
-                            Timestamp timestamp = (Timestamp) documentSnapshot.get(UNIT_DATE);
-                            if (timestamp!=null)unit.setDate(timestamp.toDate());
-                            selectedUnit.setValue(unit);
-                        }
-                        else{ Log.e(TAG, "☻ getUnitById_EXP: NOT EXISTS");}
-                        ///if (documentSnapshot == null) return;
-                    } else {
-                        Log.e(TAG, "Error getting documents: ", task.getException());
-                    }
-                });
-    }
-
-
-
     /**Обертка для getUnitListByParam*/
     void getUnitList(MutableLiveData<ArrayList<DUnit>> unitList, String deviceNameId, String locationId, String employeeId, String typeId, String stateId, String serial) {
         getUnitListByParam(unitList,
@@ -414,17 +334,9 @@ class FireDBHelper {
                         if (querySnapshot == null) return;
                         ArrayList<DUnit> list = new ArrayList<>();
                         for (DocumentSnapshot document : task.getResult()) {
-                            DUnit unit = new DUnit();
-                            unit.setName(String.valueOf(document.get(UNIT_DEVICE)));
-                            unit.setEmployee(String.valueOf(document.get(UNIT_EMPLOYEE)));
-                            unit.setId(String.valueOf(document.get(UNIT_ID)));
-                            unit.setEventId(String.valueOf(document.get(UNIT_EVENT_ID)));
-                            unit.setInnerSerial(String.valueOf(document.get(UNIT_INNER_SERIAL)));
-                            unit.setSerial(String.valueOf(document.get(UNIT_SERIAL)));
-//                            unit.setState(String.valueOf(document.get(UNIT_STATE)));
-                            unit.setType(String.valueOf(document.get(UNIT_TYPE)));
-                            Timestamp timestamp = (Timestamp) document.get(UNIT_DATE);
-                            if (timestamp!=null)unit.setDate(timestamp.toDate());
+                            DUnit unit = getDUnitFromSnapshot(document);
+                            //JOIN------------------------------------------------------------------
+                            getLastEventFromDB(unit, unitList);
                             list.add(unit);
                         }
                         unitList.setValue(list);
@@ -438,79 +350,47 @@ class FireDBHelper {
      * событии загружает те, у которых "unit_id" равен id выбранного юнита. Другими словами
      * обновляет события выбранного юнита, если список событий изменился*/
     void addSelectedUnitStatesListener(String unit_id, MutableLiveData<ArrayList<DEvent>> unitStatesList) {
-        db.collection(TABLE_EVENTS).addSnapshotListener((queryDocumentSnapshots, error) -> {
-            getEventsFromDB(unit_id, unitStatesList);
-        });
-    }
-    void addSelectedUnitListener(String unit_id, MutableLiveData<DUnit> mUnit) {
-        db.collection(TABLE_UNITS).document(unit_id).addSnapshotListener((queryDocumentSnapshots, error) -> {
-            getUnitById_EXP(unit_id, mUnit);
-        });
+        db.collection(TABLE_EVENTS).addSnapshotListener((queryDocumentSnapshots, error) -> getEventsFromDB(unit_id, unitStatesList));
     }
 
-    /*void listenerForUnitWithLastEvent(String unit_id, MutableLiveData<DUnit> mUnit) {
-        addSelectedUnitListener_NEW(unit_id, mUnit);
+    private DUnit getDUnitFromSnapshot(DocumentSnapshot documentSnapshots) {
+        DUnit unit = new DUnit();
+        unit.setName(String.valueOf(documentSnapshots.get(UNIT_DEVICE)));
+        unit.setEmployee(String.valueOf(documentSnapshots.get(UNIT_EMPLOYEE)));
+        unit.setId(String.valueOf(documentSnapshots.get(UNIT_ID)));
+        unit.setEventId(String.valueOf(documentSnapshots.get(UNIT_EVENT_ID)));
+        unit.setInnerSerial(String.valueOf(documentSnapshots.get(UNIT_INNER_SERIAL)));
+        unit.setSerial(String.valueOf(documentSnapshots.get(UNIT_SERIAL)));
+        unit.setType(String.valueOf(documentSnapshots.get(UNIT_TYPE)));
+        Timestamp timestamp = (Timestamp) documentSnapshots.get(UNIT_DATE);
+        if (timestamp != null) unit.setDate(timestamp.toDate());
+        return unit;
+    }
 
-    }*/
+    private DEvent getDEventFromSnapshot(DocumentSnapshot documentSnapshots) {
+        DEvent event = new DEvent();
+        Timestamp timestamp = (Timestamp) documentSnapshots.get(EVENT_DATE);
+        event.setDate(timestamp.toDate());
+        event.setState(documentSnapshots.get(EVENT_STATE).toString());
+        event.setDescription(documentSnapshots.get(EVENT_DESCRIPTION).toString());
+        event.setLocation(documentSnapshots.get(EVENT_LOCATION).toString());
+        event.setUnit_id(documentSnapshots.get(EVENT_UNIT).toString());
+        event.setId(documentSnapshots.getId());
+        return event;
+    }
 
     void listenerForUnitWithLastEvent(String unit_id, MutableLiveData<DUnit> mUnit) {
         db.collection(TABLE_UNITS).document(unit_id).addSnapshotListener((queryDocumentSnapshots, error) -> {
             if (queryDocumentSnapshots != null && queryDocumentSnapshots.exists()) { //TODO обязательно везде добавить эту строку, иначе если документа НЕ СУЩЕСТВУЕТ в БД, то всё равно будет создан объект с полями (String)"null" (не null, а именно "null")
-
-                DUnit unit = new DUnit();
-                unit.setName(String.valueOf(queryDocumentSnapshots.get(UNIT_DEVICE)));
-                unit.setEmployee(String.valueOf(queryDocumentSnapshots.get(UNIT_EMPLOYEE)));
-                unit.setId(String.valueOf(queryDocumentSnapshots.get(UNIT_ID)));
-                unit.setEventId(String.valueOf(queryDocumentSnapshots.get(UNIT_EVENT_ID)));
-                unit.setInnerSerial(String.valueOf(queryDocumentSnapshots.get(UNIT_INNER_SERIAL)));
-                unit.setSerial(String.valueOf(queryDocumentSnapshots.get(UNIT_SERIAL)));
-//                unit.setState(String.valueOf(queryDocumentSnapshots.get(UNIT_STATE)));
-                unit.setType(String.valueOf(queryDocumentSnapshots.get(UNIT_TYPE)));
-                Timestamp timestamp = (Timestamp) queryDocumentSnapshots.get(UNIT_DATE);
-                if (timestamp != null) unit.setDate(timestamp.toDate());
+                DUnit unit = getDUnitFromSnapshot(queryDocumentSnapshots);
                 mUnit.setValue(unit);
-
                 //JOIN------------------------------------------------------------------
-                getLastEventFromDB_new2(mUnit);
-//            DEvent event = new DEvent();
-//            getLastEventFromDB_new(unit.getEventId(), event);
-//            unit.setLastEvent(event);
-            } else {
-                Log.e(TAG, "☻ ТАКОГО ЮНИТА НЕТ В БД!");
-            }
+                getLastEventFromDB(mUnit);
+            } else Log.e(TAG, "☻ ТАКОГО ЮНИТА НЕТ В БД!");
         });
     }
 
-    //TODO !!!
-    // объединить getLastEventFromDB_new2 и getLastEventFromDB_new2_forMulti, а значит сохранять
-    // результат SingleScan в scannerFoundUnitsList (для single будет состоять из одного элемента)
-
-    void getLastEventFromDB_new2_forMulti(MutableLiveData<ArrayList<DUnit>> units, DUnit unit) {
-        if (units == null) return;//todo mUnit.getValue() == null return ?
-        //DUnit unit = mUnit.getValue();
-        db.collection(TABLE_EVENTS).document(unit.getEventId())
-                .get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    DEvent event = new DEvent();
-                    Timestamp timestamp = (Timestamp) document.get(EVENT_DATE);
-                    event.setDate(timestamp.toDate());
-                    event.setState(document.get(EVENT_STATE).toString());
-                    event.setDescription(document.get(EVENT_DESCRIPTION).toString());
-                    event.setLocation(document.get(EVENT_LOCATION).toString());
-                    event.setUnit_id(document.get(EVENT_UNIT).toString());
-                    event.setId(document.getId());
-                    unit.setLastEvent(event);
-                    units.setValue(units.getValue());//update
-                }
-            } else {
-                Log.d(TAG, "get failed with ", task.getException());
-            }
-        });
-    }
-
-    void getLastEventFromDB_new2(MutableLiveData<DUnit> mUnit) {
+    void getLastEventFromDB(MutableLiveData<DUnit> mUnit) {
         if (mUnit == null) return;//todo mUnit.getValue() == null return ?
         DUnit unit = mUnit.getValue();
         db.collection(TABLE_EVENTS).document(unit.getEventId())
@@ -518,14 +398,7 @@ class FireDBHelper {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
-                    DEvent event = new DEvent();
-                    Timestamp timestamp = (Timestamp) document.get(EVENT_DATE);
-                    event.setDate(timestamp.toDate());
-                    event.setState(document.get(EVENT_STATE).toString());
-                    event.setDescription(document.get(EVENT_DESCRIPTION).toString());
-                    event.setLocation(document.get(EVENT_LOCATION).toString());
-                    event.setUnit_id(document.get(EVENT_UNIT).toString());
-                    event.setId(document.getId());
+                    DEvent event = getDEventFromSnapshot(document);
                     unit.setLastEvent(event);
                     mUnit.setValue(mUnit.getValue());//update
                 }
@@ -535,21 +408,16 @@ class FireDBHelper {
         });
     }
 
-    /**Новый вариант — выборка по id документа, т.е. берется сразу конкретный документ*/
-    void getLastEventFromDB_new(String event_id, DEvent event) {
-        if (event_id == null) return;
-        db.collection(TABLE_EVENTS).document(event_id)
-        .get().addOnCompleteListener(task -> {
+    void getLastEventFromDB(DUnit unit, MutableLiveData<ArrayList<DUnit>> unitList) {
+        if (unitList == null) return;//todo mUnit.getValue() == null return ?
+        db.collection(TABLE_EVENTS).document(unit.getEventId())
+                .get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
-                    Timestamp timestamp = (Timestamp) document.get(EVENT_DATE);
-                    event.setDate(timestamp.toDate());
-                    event.setState(document.get(EVENT_STATE).toString());
-                    event.setDescription(document.get(EVENT_DESCRIPTION).toString());
-                    event.setLocation(document.get(EVENT_LOCATION).toString());
-                    event.setUnit_id(document.get(EVENT_UNIT).toString());
-                    event.setId(document.getId());
+                    DEvent event = getDEventFromSnapshot(document);
+                    unit.setLastEvent(event);
+                    unitList.setValue(unitList.getValue());//update
                 }
             } else {
                 Log.d(TAG, "get failed with ", task.getException());
@@ -569,11 +437,6 @@ class FireDBHelper {
                     ArrayList<DEvent> newEvents = new ArrayList<>();
                     for (QueryDocumentSnapshot q : querySnapshot) {
                         Timestamp timestamp = (Timestamp) q.get(EVENT_DATE);
-                        /*Log.e(TAG, "1: "+q.get("date"));
-                        Log.e(TAG, "2: "+timestamp.toDate());
-                        Log.e(TAG, "2: "+timestamp.toDate());
-                        Log.e(TAG, "2: "+getRightDate(timestamp.getSeconds()));
-                        Log.e(TAG, "3: "+q.get("state"));*/
                         Date date = timestamp.toDate();
                         String state = q.get(EVENT_STATE).toString();
                         String location = q.get(EVENT_LOCATION).toString();
@@ -585,5 +448,26 @@ class FireDBHelper {
                     Log.e(TAG, "Error - " + task.getException());
                 }
             });
+    }
+
+    /**Отслеживает изменения в юнитах из списка уже найденных сканером устройств. При изменении в
+     * конкретном юните автоматом подгружает этот конкретный юнит вместе с событием и обновляет этот
+     * юнит в списке найденных. Аналог listenerForUnitWithLastEvent для коллекции юнитов
+     *
+     * Надо понимать, что изменения в ивенте не обновляют список*/
+    public void listenerForMultiScanUnitWithLastEvent(MutableLiveData<ArrayList<DUnit>> scannerFoundUnitsList) {
+        for (int i = 0; i < scannerFoundUnitsList.getValue().size(); i++) {
+            DUnit unit = scannerFoundUnitsList.getValue().get(i);
+            int finalI = i;
+            db.collection(TABLE_UNITS).document(unit.getId()).addSnapshotListener((queryDocumentSnapshots, error) -> {
+                if (queryDocumentSnapshots != null && queryDocumentSnapshots.exists()) {
+                    DUnit newUnit = getDUnitFromSnapshot(queryDocumentSnapshots);
+                    scannerFoundUnitsList.getValue().set(finalI, newUnit);
+                    scannerFoundUnitsList.setValue(scannerFoundUnitsList.getValue());
+                    //JOIN------------------------------------------------------------------
+                    getLastEventFromDB(newUnit, scannerFoundUnitsList);
+                } else Log.e(TAG, "☻ ТАКОГО ЮНИТА НЕТ В БД!");
+            });
+        }
     }
 }

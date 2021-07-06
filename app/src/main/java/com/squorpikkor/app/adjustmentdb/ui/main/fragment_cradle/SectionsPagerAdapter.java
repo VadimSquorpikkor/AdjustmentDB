@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import com.squorpikkor.app.adjustmentdb.R;
-import com.squorpikkor.app.adjustmentdb.ui.main.fragment.SearchDeviceFragment;
 import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +32,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             {
                 put(0, SingleScanParent.newInstance());
                 put(1, SearchParent.newInstance());
-//                put(1, SearchDeviceFragment.newInstance());
                 put(2, MultiScanParent.newInstance());
             }
         };

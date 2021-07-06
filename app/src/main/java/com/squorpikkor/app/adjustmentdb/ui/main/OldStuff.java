@@ -9,6 +9,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 
 import java.util.ArrayList;
@@ -100,7 +101,7 @@ class OldStuff {
                         unit.setInnerSerial(String.valueOf(documentSnapshot.get(UNIT_INNER_SERIAL)));
 //                        unit.setLocation(String.valueOf(documentSnapshot.get(UNIT_LOCATION)));
                         unit.setSerial(String.valueOf(documentSnapshot.get(UNIT_SERIAL)));
-                        unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
+//                        unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
                         unit.setType(String.valueOf(documentSnapshot.get(UNIT_TYPE)));
                         Timestamp timestamp = (Timestamp) documentSnapshot.get(UNIT_DATE);
                         if (timestamp!=null)unit.setDate(timestamp.toDate());
@@ -134,7 +135,7 @@ class OldStuff {
                             unit.setInnerSerial(String.valueOf(documentSnapshot.get(UNIT_INNER_SERIAL)));
 //                            unit.setLocation(String.valueOf(documentSnapshot.get(UNIT_LOCATION)));
                             unit.setSerial(String.valueOf(documentSnapshot.get(UNIT_SERIAL)));
-                            unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
+//                            unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
                             unit.setType(String.valueOf(documentSnapshot.get(UNIT_TYPE)));
                             Timestamp timestamp = (Timestamp) documentSnapshot.get(UNIT_DATE);
                             if (timestamp!=null)unit.setDate(timestamp.toDate());
@@ -157,7 +158,7 @@ class OldStuff {
         unit.setInnerSerial(String.valueOf(documentSnapshot.get(UNIT_INNER_SERIAL)));
 //        unit.setLocation(String.valueOf(documentSnapshot.get(UNIT_LOCATION)));
         unit.setSerial(String.valueOf(documentSnapshot.get(UNIT_SERIAL)));
-        unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
+//        unit.setState(String.valueOf(documentSnapshot.get(UNIT_STATE)));
         unit.setType(String.valueOf(documentSnapshot.get(UNIT_TYPE)));
         Timestamp timestamp = (Timestamp) documentSnapshot.get(UNIT_DATE);
         if (timestamp!=null)unit.setDate(timestamp.toDate());
@@ -316,4 +317,115 @@ class OldStuff {
         });
     }
 
+    /**Новый вариант — выборка по id документа, т.е. берется сразу конкретный документ*/
+    void getLastEventFromDB_new(String event_id, DEvent event) {
+        if (event_id == null) return;
+        db.collection(TABLE_EVENTS).document(event_id)
+                .get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Timestamp timestamp = (Timestamp) document.get(EVENT_DATE);
+                    event.setDate(timestamp.toDate());
+                    event.setState(document.get(EVENT_STATE).toString());
+                    event.setDescription(document.get(EVENT_DESCRIPTION).toString());
+                    event.setLocation(document.get(EVENT_LOCATION).toString());
+                    event.setUnit_id(document.get(EVENT_UNIT).toString());
+                    event.setId(document.getId());
+                }
+            } else {
+                Log.d(TAG, "get failed with ", task.getException());
+            }
+        });
+    }
+
+    void addSelectedUnitListener(String unit_id, MutableLiveData<DUnit> mUnit) {
+        db.collection(TABLE_UNITS).document(unit_id).addSnapshotListener((queryDocumentSnapshots, error) -> {
+            getUnitById_EXP(unit_id, mUnit);
+        });
+    }
+
+    /**
+     * Получаем юнит из БД по его идентификатору
+     * @param id id юнита, которого нужно прочитать в БД
+     * @param selectedUnit MutableListData, в который записываем найденный юнит
+     */
+    void getUnitById_EXP(String id, MutableLiveData<DUnit> selectedUnit) {
+        db.collection(TABLE_UNITS)
+                .document(id)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        //todo НЕ РАБОТАЛО С "if (documentSnapshot == null) return" только с "if (documentSnapshot.exists())", нужно проверить у других методов, как там работает
+                        if (documentSnapshot!=null && documentSnapshot.exists()){
+                            DUnit unit = getDUnitFromSnapshot(documentSnapshot);
+                            selectedUnit.setValue(unit);
+                        }
+                        else Log.e(TAG, "☻ getUnitById_EXP: NOT EXISTS");
+                    } else Log.e(TAG, "Error getting documents: ", task.getException());
+                });
+    }
+
+    private DUnit getDUnitFromSnapshot(DocumentSnapshot documentSnapshot) {
+        return null;
+    }
+
+//    Timestamp timestamp = (Timestamp) q.get(EVENT_DATE);
+     /*Log.e(TAG, "1: "+q.get("date"));
+     Log.e(TAG, "2: "+timestamp.toDate());
+     Log.e(TAG, "2: "+timestamp.toDate());
+     Log.e(TAG, "2: "+getRightDate(timestamp.getSeconds()));
+     Log.e(TAG, "3: "+q.get("state"));*/
+
+    /**
+     * Распознанный мультисканером юнит был помещене в коллекцию. Метод получает этот юнит и
+     * проверяет наличие в БД. Если такой есть, то обновляет его данные. Из листа берет размер
+     * листа -1, т.е. позицию этого элемента (когда он только добавлен, то он последний).
+     * В момент когда данные юнита обновлены, он может быть и не последний, но его позиция сохранена
+     */
+    public void getThisListUnitFromDB(DUnit unit, MutableLiveData<ArrayList<DUnit>> list) {
+        getUnitByIdAndAddToList(unit.getId(), list, list.getValue().size() - 1);
+    }
+
+    void getUnitByIdAndAddToList(String id, MutableLiveData<ArrayList<DUnit>> list, int position) {
+        db.collection(TABLE_UNITS)
+                .document(id)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        if (documentSnapshot != null && documentSnapshot.exists()) {
+                            DUnit unit = getDUnitFromSnapshot(documentSnapshot);
+                            list.getValue().set(position, unit);
+                            //JOIN------------------------------------------------------------------
+                            getLastEventFromDB_new2_forMulti(list, unit);
+                            list.setValue(list.getValue());//update
+                        }
+                    } else {
+                        Log.e(TAG, "Error getting documents: ", task.getException());
+                    }
+                });
+    }
+
+    void getLastEventFromDB_new2_forMulti(MutableLiveData<ArrayList<DUnit>> units, DUnit unit) {
+        if (units == null) return;//todo mUnit.getValue() == null return ?
+        db.collection(TABLE_EVENTS).document(unit.getEventId())
+                .get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    DEvent event = getDEventFromSnapshot(document);
+                    unit.setLastEvent(event);
+                    units.setValue(units.getValue());//update
+                }
+            } else {
+                Log.d(TAG, "get failed with ", task.getException());
+            }
+        });
+    }
+
+    private DEvent getDEventFromSnapshot(DocumentSnapshot document) {
+        return null;
+    }
 }

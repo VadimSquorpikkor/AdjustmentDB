@@ -60,11 +60,9 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 //--------------------------------------------------------------------------------------------------
 public static final String TABLE_NAMES = "names";
 
-
     //Новые стринги для новой БД:
     public static final String TABLE_UNITS = "units";
     public static final String UNIT_DATE = "date";
-    public static final String UNIT_DESCRIPTION = "description";
     public static final String UNIT_DEVICE = "device_id"; //todo возможно в имени стринга и не нужен "_ID", только в значении
     public static final String UNIT_EMPLOYEE = "employee_id";
     public static final String UNIT_ID = "id";
@@ -134,15 +132,12 @@ public static final String TABLE_NAMES = "names";
 
     private final MutableLiveData<String> location_id;
     private final MutableLiveData<String> locationName;
-    private final MutableLiveData<String> email;
-    private final MutableLiveData<String> barcodeText;
     private final MutableLiveData<Drawable> userImage;
     private final MutableLiveData<Boolean> startExit;
     private final MutableLiveData<Boolean> goToSearchTab;
     private final MutableLiveData<Boolean> restartScanning;
     private final MutableLiveData<Boolean> restartMultiScanning;
     private final MutableLiveData<Boolean> backToRecycler;
-    private final MutableLiveData<DEvent> lastEvent;
     private final MutableLiveData<Boolean> isWrongQR;
     private final MutableLiveData<Integer> position;
 
@@ -304,8 +299,6 @@ public static final String TABLE_NAMES = "names";
         scannerFoundUnitsList = new MutableLiveData<>();
         location_id = new MutableLiveData<>();
         locationName = new MutableLiveData<>();
-        barcodeText = new MutableLiveData<>();
-        email = new MutableLiveData<>();
         userImage = new MutableLiveData<>();
 
         startExit = new MutableLiveData<>();
@@ -315,7 +308,6 @@ public static final String TABLE_NAMES = "names";
         backToRecycler = new MutableLiveData<>();
         backToRecycler.setValue(false);
 
-        lastEvent = new MutableLiveData<>();
         isWrongQR = new MutableLiveData<>();
         position = new MutableLiveData<>();
     }
@@ -324,28 +316,31 @@ public static final String TABLE_NAMES = "names";
         dbh.closeEvent(event_id); // если создан новый ивент, то старый закрываем
     }
 
-    public void saveUnitAndEvent(DUnit unit, DEvent event) {
+    /**Сохраняет выбранный юнит и его последнее событие*/
+    public void saveUnitAndEvent(DUnit unit) {
+        Log.e(TAG, "saveUnitAndEvent: СОХРАНЕНИЕ");
         dbh.addUnitToDB(unit);
-        dbh.addEventToDB(event);
+        dbh.addEventToDB(unit.getLastEvent());
     }
 
     /**
      * Слушает изменения в коллекции статусов и при новом событии загружает статусы для выбранного
-     * юнита (т.е. только те, которые принадлежат этому юниту)
-     */
+     * юнита (т.е. только те, которые принадлежат этому юниту)*/
     public void addSelectedUnitStatesListListener(String unit_id) {
-        Log.e(TAG, "addSelectedUnitStatesListListener: "+unit_id);
         dbh.addSelectedUnitStatesListener(unit_id, unitStatesList);
     }
 
+    /**Отслеживает изменения в юните найденном синглсканером. При изменении в юните автоматом
+     * подгружает этот юнит вместе с событием и обновляет этот юнит в selectedUnit.*/
     public void addSelectedUnitListener(String unit_id) {
         dbh.listenerForUnitWithLastEvent(unit_id, selectedUnit);
-//        dbh.addSelectedUnitListener(unit_id, selectedUnit);
-//        DEvent event = new DEvent();
-//        dbh.getLastEventFromDB_new(event_id, event);
-//        selectedUnit.getValue().setLastEvent(event);
-//        selectedUnit.setValue(selectedUnit.getValue());//update //todo а нужен ли?
-//        lastEvent.setValue(event);//todo deprecated
+    }
+
+    /**Отслеживает изменения в юнитах из списка уже найденных мультисканером устройств. При
+     * изменении в конкретном юните автоматом подгружает этот конкретный юнит вместе с событием и
+     * обновляет этот юнит в списке найденных scannerFoundUnitsList.*/
+    public void addMultiScanUnitListener() {
+        dbh.listenerForMultiScanUnitWithLastEvent(scannerFoundUnitsList);
     }
 
 //--------------------------------------------------------------------------------------------------
@@ -362,93 +357,12 @@ public static final String TABLE_NAMES = "names";
         return scannerFoundUnitsList;
     }
 
-    public MutableLiveData<String> getEmail() {
-        return email;
-    }
-
     public MutableLiveData<Drawable> getUserImage() {
         return userImage;
     }
 
     public void updateUserImage(Drawable img) {
         userImage.setValue(img);
-    }
-
-//--------------- BACK PRESS -----------------------------------------------------------------------
-    public MutableLiveData<Boolean> getStartExit() {
-        return startExit;
-    }
-
-    public MutableLiveData<Boolean> getGoToSearchTab() {
-        return goToSearchTab;
-    }
-
-    public MutableLiveData<Boolean> getRestartScanning() {
-        return restartScanning;
-    }
-
-    public MutableLiveData<Boolean> getRestartMultiScanning() {
-        return restartMultiScanning;
-    }
-
-    private String backPressCommand;
-
-    public void setBackPressCommand(String backPressCommand) {
-        this.backPressCommand = backPressCommand;
-    }
-
-    public String getBackPressCommand() {
-        return backPressCommand;
-    }
-
-    public void getBack() {
-        if (backPressCommand==null) return;
-
-        startExit.setValue(false);
-        goToSearchTab.setValue(false);
-        restartScanning.setValue(false);
-        backToRecycler.setValue(false);
-
-        //todo switch case
-
-        if (backPressCommand.equals(BACK_PRESS_SEARCH)) startExit.setValue(true);
-        else if (backPressCommand.equals(BACK_PRESS_SINGLE)) goToSearchTab.setValue(true);
-        else if (backPressCommand.equals(BACK_PRESS_MULTI)) goToSearchTab.setValue(true);
-        else if (backPressCommand.equals(BACK_PRESS_STATES)) restartScanning.setValue(true);
-        else if (backPressCommand.equals(BACK_PRESS_MULTI_STATES)) restartMultiScanning();
-        else if (backPressCommand.equals(BACK_PRESS_INFO_FRAGMENT)) backToRecycler.setValue(true);
-    }
-//--------------------------------------------------------------------------------------------------
-    public MutableLiveData<DEvent> getLastEvent() {
-        return lastEvent;
-    }
-
-    public MutableLiveData<Boolean> getIsWrongQR() {
-        return isWrongQR;
-    }
-
-    //todo переименовать на startSearch
-    public void getUnitListFromBD(String deviceNameId, String locationId, String employeeId, String typeId, String stateId, String serial) {
-        Log.e(TAG, "♦ deviceName - "+deviceNameId+" location - "+locationId+" employee - "+employeeId+" type - "+typeId);
-        //Если поле номера пустое, то ищем по параметрам, если поле содержит значение, то ищем по этому значению, игнорируя
-        // все остальные параметры. Т.е. ищем или по параметрам, или по номеру
-        if (serial.equals("")) dbh.getUnitList(foundUnitsList, deviceNameId, locationId, employeeId, typeId, stateId, ANY_VALUE);
-        else dbh.getUnitList(foundUnitsList, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, serial);
-    }
-
-    public void restartMultiScanning() {
-        scannerFoundUnitsList.setValue(new ArrayList<>());
-        restartMultiScanning.postValue(true);
-        multiScanner.clearFoundedBarcodes();
-    }
-
-    public void updateSelectedUnit(DUnit newUnit) {
-        selectedUnit.setValue(newUnit);
-    }
-
-    /***/
-    public void getEventForThisUnit(String unit_id) {
-        dbh.getEventsFromDB(unit_id, unitStatesList);
     }
 
     public MutableLiveData<Integer> getPosition() {
@@ -475,39 +389,91 @@ public static final String TABLE_NAMES = "names";
         this.user = user;
     }
 
-    public MutableLiveData<String> getBarcodeText() {
-        return barcodeText;
-    }
-
     public void startSingleScanner(Activity activity, SurfaceView surfaceView) {
         singleScanner = new Scanner(activity, false, this, surfaceView);
     }
 
     public void startMultiScanner(Activity activity, SurfaceView surfaceView) {
-        /*if (multiScanner==null)*/
         multiScanner = new Scanner(activity, true, this, surfaceView);
     }
 
-    /**
-     * Распознанный мультисканером юнит был помещене в коллекцию. Метод получает этот юнит и
-     * проверяет наличие в БД. Если такой есть, то обновляет его данные. Из листа берет размер
-     * листа -1, т.е. позицию этого элемента (когда он только добавлен, то он последний).
-     * В момент когда данные юнита обновлены, он может быть и не последний, но его позиция сохранена
-     */
-    public void getThisListUnitFromDB(DUnit unit, MutableLiveData<ArrayList<DUnit>> list) {
-        dbh.getUnitByIdAndAddToList(unit.getId(), list, list.getValue().size() - 1);
+    public MutableLiveData<Boolean> getIsWrongQR() {
+        return isWrongQR;
     }
 
+//--------------- BACK PRESS -----------------------------------------------------------------------
+
+    public MutableLiveData<Boolean> getStartExit() {
+        return startExit;
+    }
+
+    public MutableLiveData<Boolean> getGoToSearchTab() {
+        return goToSearchTab;
+    }
+
+    public MutableLiveData<Boolean> getRestartScanning() {
+        return restartScanning;
+    }
+
+    public MutableLiveData<Boolean> getRestartMultiScanning() {
+        return restartMultiScanning;
+    }
+
+    private String backPressCommand;
+
+    public void setBackPressCommand(String backPressCommand) {
+        this.backPressCommand = backPressCommand;
+    }
+
+    public void getBack() {
+        if (backPressCommand==null) return;
+
+        startExit.setValue(false);
+        goToSearchTab.setValue(false);
+        restartScanning.setValue(false);
+        backToRecycler.setValue(false);
+
+        switch (backPressCommand) {
+            case BACK_PRESS_SEARCH: startExit.setValue(true); break;
+            case BACK_PRESS_SINGLE: goToSearchTab.setValue(true); break;
+            case BACK_PRESS_MULTI:
+            case BACK_PRESS_STATES: restartScanning.setValue(true); break;
+            case BACK_PRESS_MULTI_STATES: restartMultiScanning(); break;
+            case BACK_PRESS_INFO_FRAGMENT: backToRecycler.setValue(true); break;
+        }
+    }
+//--------------------------------------------------------------------------------------------------
+
+    //todo переименовать на startSearch
+    public void getUnitListFromBD(String deviceNameId, String locationId, String employeeId, String typeId, String stateId, String serial) {
+        Log.e(TAG, "♦ deviceName - "+deviceNameId+" location - "+locationId+" employee - "+employeeId+" type - "+typeId);
+        //Если поле номера пустое, то ищем по параметрам, если поле содержит значение, то ищем по этому значению, игнорируя
+        // все остальные параметры. Т.е. ищем или по параметрам, или по номеру
+        if (serial.equals("")) dbh.getUnitList(foundUnitsList, deviceNameId, locationId, employeeId, typeId, stateId, ANY_VALUE);
+        else dbh.getUnitList(foundUnitsList, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, serial);
+    }
+
+    public void restartMultiScanning() {
+        scannerFoundUnitsList.setValue(new ArrayList<>());
+        restartMultiScanning.postValue(true);
+        multiScanner.clearFoundedBarcodes();
+    }
+
+    /**Получить список всех событий для выбранного юнита*/
+    public void getEventsForThisUnit(String unit_id) {
+        dbh.getEventsFromDB(unit_id, unitStatesList);
+    }
+
+    /**Результат распознования QR-кода (Стринг) для МУЛЬТИСКАНА передается в этот метод. Из строки получает юнит и добавляет его в scannerFoundUnitsList*/
     @Override
     public void addUnitToCollection(String s) {
-        Log.e(TAG, "***STRING"+s);
         DUnit unit = getDUnitFromString(s);
         if (unit != null) {
             if (scannerFoundUnitsList.getValue() == null) scannerFoundUnitsList.setValue(new ArrayList<>());
             scannerFoundUnitsList.getValue().add(unit);
             scannerFoundUnitsList.setValue(scannerFoundUnitsList.getValue());//update
-            getThisListUnitFromDB(unit, scannerFoundUnitsList);
-        }
+            addMultiScanUnitListener();
+        } else sayWrongQr();
     }
 
     public Scanner getSingleScanner() {
@@ -518,6 +484,7 @@ public static final String TABLE_NAMES = "names";
         return multiScanner;
     }
 
+    /**Результат распознования QR-кода (Стринг) для СИНГЛСКАНА передается в этот метод. Из строки получает юнит*/
     @Override
     public void saveUnit(String s) {
         DUnit unit = getDUnitFromString(s);
@@ -525,10 +492,9 @@ public static final String TABLE_NAMES = "names";
             //Смысл в том, что если отсканированный блок есть в БД, то данные для этого блока
             // беруться из БД (getRepairUnitById), если этого блока в БД нет (новый), то данные для
             // блока берутся из QR-кода
-            updateSelectedUnit(unit);
-//            addSelectedUnitListener(unit.getId());
+            selectedUnit.setValue(unit);
             addSelectedUnitListener(unit.getId());
-            getEventForThisUnit(unit.getId());
+            getEventsForThisUnit(unit.getId());
         } else sayWrongQr();
     }
 
@@ -540,7 +506,6 @@ public static final String TABLE_NAMES = "names";
     public DUnit getDUnitFromString(String s) {
         s = decodeMe(s);
         Log.e(TAG, "******** "+s);
-        barcodeText.setValue(s);
         String[] ar = s.split(SPLIT_SYMBOL);
         if (ar.length == 2) {
             //Для серии: имя+внутренний_серийный (БДКГ-02 1234), id = БДКГ-02_1234

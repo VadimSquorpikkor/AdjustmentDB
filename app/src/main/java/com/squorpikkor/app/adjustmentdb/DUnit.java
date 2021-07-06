@@ -1,11 +1,8 @@
 package com.squorpikkor.app.adjustmentdb;
 
 import android.util.Log;
-
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
-
 import java.util.Date;
-
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_TYPE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_TYPE;
@@ -21,7 +18,6 @@ public class DUnit {
     private String eventId; //todo event_id есть в event, но с другой стороны id нужно хранить в БД. Надо подумать (ведь можно использовать unit.getEvent().getId() )
     private Date date;
     private Date closeDate;
-
     private DEvent lastEvent;
 
     public DUnit() {
@@ -159,7 +155,6 @@ public class DUnit {
     }
 
     public void setEmployee(String employee) {
-        Log.e("TAG", "♦♦♦♦♦ !!! setEmployee: "+employee);
         this.employee = employee;
     }
 

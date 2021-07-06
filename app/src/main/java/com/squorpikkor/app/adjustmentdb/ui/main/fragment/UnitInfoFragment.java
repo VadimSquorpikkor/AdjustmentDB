@@ -68,7 +68,7 @@ public class UnitInfoFragment extends Fragment {
 //        if (position>units.size()) return;
         unit = units.get(position);
         insertDataToFields(unit);
-        mViewModel.getEventForThisUnit(unit.getEventId());
+        mViewModel.getEventsForThisUnit(unit.getEventId());
     }
 
     private void insertDataToFields(DUnit unit) {
