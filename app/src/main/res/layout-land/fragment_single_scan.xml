@@ -184,6 +184,18 @@
             app:layout_constraintTop_toBottomOf="@+id/textViewEmployee"
             tools:text="23" />
 
+            <ImageView
+                android:id="@+id/is_complete"
+                android:layout_width="201dp"
+                android:layout_height="67dp"
+                android:layout_marginTop="56dp"
+                android:layout_marginEnd="8dp"
+                android:rotation="-25"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@mipmap/complete"
+                app:elevation="10dp"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 

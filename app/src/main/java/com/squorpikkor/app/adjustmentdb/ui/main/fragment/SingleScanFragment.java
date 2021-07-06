@@ -1,10 +1,12 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -41,6 +43,7 @@ public class SingleScanFragment extends Fragment {
     private FloatingActionButton recognizeButton;
     private SurfaceView surfaceView;
     private ConstraintLayout infoLayout;
+    private ImageView isCompleteImage;
 
     public static SingleScanFragment newInstance() {
         return new SingleScanFragment();
@@ -68,6 +71,9 @@ public class SingleScanFragment extends Fragment {
         tEmployee = view.findViewById(R.id.textViewEmployeeValue);
         tDaysPassed = view.findViewById(R.id.textDaysPassedValue);
         recyclerUnitsStates = view.findViewById(R.id.recyclerView);
+        isCompleteImage = view.findViewById(R.id.is_complete);
+
+        isCompleteImage.setVisibility(View.GONE);
 
         infoLayout = view.findViewById(R.id.db_info_layout);
         addNewStateButton = view.findViewById(R.id.addNewState);
@@ -131,6 +137,12 @@ public class SingleScanFragment extends Fragment {
         if (unit.isRepairUnit()) recognizeButton.setVisibility(View.VISIBLE);
         if (unit.getEmployee()!=null) tEmployee.setText(unit.getEmployee());
         tDaysPassed.setText(String.valueOf(unit.daysPassed()));
+
+        Log.e("TAG", "unit.closeDate: " + unit.getCloseDate());
+        Log.e("TAG", "unit.isComplete(): " + unit.isComplete());
+
+        if (unit.isComplete()) isCompleteImage.setVisibility(View.VISIBLE);
+        else isCompleteImage.setVisibility(View.GONE);
 
         mViewModel.addSelectedUnitStatesListListener(unit.getId());
     }

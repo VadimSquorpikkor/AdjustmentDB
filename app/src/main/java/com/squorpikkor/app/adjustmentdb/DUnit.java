@@ -76,7 +76,10 @@ public class DUnit {
         if (lastEvent!=null) lastEvent.closeEvent(model);//если это первое событие, то lastEvent будет равен null
         eventId = newEvent.getId();
         lastEvent = newEvent;
-
+        if (lastEvent.getState().equals("rep_r_otpravleno") || lastEvent.getState().equals("rep_r_vydano")) {//TODO сделать через константы
+            closeUnit();
+//            lastEvent.closeEvent(model);//впринципе, если не закрывать, то ивент будет показывать, сколько времени прошло со дня закрытия ремонта/серии
+        }
 
         //todo убрать if (eventId!=null&&!eventId.equals("")) unit.setEventId(eventId); из selectState
         //model.saveUnitAndEvent(unit, newEvent);//todo переделать под model.saveUnit(unit) ведь event есть в самом юните, зачем передавать отдельно?
@@ -92,6 +95,10 @@ public class DUnit {
 
     public Date getCloseDate() {
         return closeDate;
+    }
+
+    public void setCloseDate(Date closeDate) {
+        this.closeDate = closeDate;
     }
 
     /**Возвращает true, если это ремонтное устройство*/

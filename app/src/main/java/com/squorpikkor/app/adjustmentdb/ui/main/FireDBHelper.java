@@ -51,6 +51,7 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_NAMES
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_STATES;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_EVENTS;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_UNITS;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_CLOSE_DATE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_DATE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_DEVICE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_EMPLOYEE;
@@ -275,6 +276,7 @@ class FireDBHelper {
         data.put(UNIT_SERIAL, unit.getSerial());
         data.put(UNIT_TYPE, unit.getType());
         data.put(UNIT_DATE, unit.getDate());
+        if (unit.getCloseDate()!=null) data.put(UNIT_CLOSE_DATE, unit.getCloseDate());
         data.put(UNIT_LOCATION, unit.getLastEvent().getLocation());
         data.put(UNIT_STATE, unit.getLastEvent().getState());
         db.collection(TABLE_UNITS)
@@ -364,6 +366,8 @@ class FireDBHelper {
         unit.setType(String.valueOf(documentSnapshots.get(UNIT_TYPE)));
         Timestamp timestamp = (Timestamp) documentSnapshots.get(UNIT_DATE);
         if (timestamp != null) unit.setDate(timestamp.toDate());
+        Timestamp closeTime = (Timestamp) documentSnapshots.get(UNIT_CLOSE_DATE);
+        if (closeTime != null) unit.setCloseDate(closeTime.toDate());
         return unit;
     }
 
