@@ -131,11 +131,11 @@ public class SingleScanFragment extends Fragment {
         if (unit.isRepairUnit()) tType.setText("Ремонт");
         if (unit.isSerialUnit()) tType.setText("Серия");
         tId.setText(Utils.getRightValue(unit.getId()));
-        tName.setText(Utils.getRightValue(unit.getName()));
+        tName.setText(Utils.getRightValue(mViewModel.getDeviceNameById(unit.getName())));
         tInnerSerial.setText(Utils.getRightValue(unit.getInnerSerial()));
         tSerial.setText(Utils.getRightValue(unit.getSerial()));
         if (unit.isRepairUnit()) recognizeButton.setVisibility(View.VISIBLE);
-        if (unit.getEmployee()!=null) tEmployee.setText(unit.getEmployee());
+        tEmployee.setText(Utils.getRightValue(mViewModel.getEmployeeNameById(unit.getEmployee())));
         tDaysPassed.setText(String.valueOf(unit.daysPassed()));
 
         Log.e("TAG", "unit.closeDate: " + unit.getCloseDate());

@@ -13,7 +13,10 @@ import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import java.util.ArrayList;
 import static com.squorpikkor.app.adjustmentdb.Utils.EMPTY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightDateAndTime;
+import static com.squorpikkor.app.adjustmentdb.Utils.getRightValue;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.IS_COMPLETE;
 
+/**Адаптер для элемента списка устройств, найденных поиском по БД по параметрам*/
 public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolder>{
 
     private final ArrayList<DUnit> units;
@@ -59,8 +62,18 @@ public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolde
         else holder.tInnerSerial.setText(String.format("(вн. %s)", unit.getInnerSerial()));
         holder.tDatePassed.setText(String.format("%s д.", unit.daysPassed()));
 
-        if (unit.getDate()!=null) holder.tDate.setText(getRightDateAndTime(unit.getDate().getTime()));
-        else holder.tDate.setText(EMPTY_VALUE);
+
+
+
+        String dateAndTime = getRightDateAndTime(unit.getDate());
+        String location = unit.getLastEvent()==null?"":unit.getLastEvent().getLocation();
+        String employee = unit.getEmployee();
+        boolean isComplete = unit.isComplete();
+
+        holder.tDate.setText(dateAndTime);
+        holder.tLocation.setText(getRightValue(mViewModel.getLocationNameById(location)));
+        holder.tEmployee.setText(getRightValue(mViewModel.getEmployeeNameById(employee)));
+        holder.tIsComplete.setText(isComplete?IS_COMPLETE:"");
     }
 
     /**Просто возвращает кол-во элементов в массиве*/
@@ -76,6 +89,9 @@ public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolde
         private final TextView tState;
         private final TextView tDate;
         private final TextView tDatePassed;
+        private final TextView tLocation;
+        private final TextView tEmployee;
+        private final TextView tIsComplete;
 
         public DUnitViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -85,6 +101,9 @@ public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolde
             tState = itemView.findViewById(R.id.textState);
             tDate = itemView.findViewById(R.id.textDate);
             tDatePassed = itemView.findViewById(R.id.textDatePassed);
+            tLocation = itemView.findViewById(R.id.textLocation);
+            tEmployee = itemView.findViewById(R.id.textEmployee);
+            tIsComplete = itemView.findViewById(R.id.text_is_complete);
 
             //для работы OnNoteClickListener
             itemView.setOnClickListener(view -> {

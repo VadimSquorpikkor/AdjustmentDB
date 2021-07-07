@@ -47,6 +47,14 @@ public class Utils {
     }
 
     @SuppressLint("SimpleDateFormat")
+    public static String getRightDateAndTime(Date date) {
+        if (date==null) return EMPTY_VALUE;
+        String DATE_PATTERN = "dd.MM.yyyy HH:mm";
+        SimpleDateFormat formatter = new SimpleDateFormat(DATE_PATTERN);
+        return formatter.format(date.getTime());
+    }
+
+    @SuppressLint("SimpleDateFormat")
     public static String getRightDate(long time_stamp_server) {
         String DATE_PATTERN = "dd.MM.yyyy";
         SimpleDateFormat formatter = new SimpleDateFormat(DATE_PATTERN);

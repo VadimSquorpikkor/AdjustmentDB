@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -33,6 +34,7 @@ public class UnitInfoFragment extends Fragment {
     private TextView tEmployee;
     private TextView tDaysPassed;
     private RecyclerView eventRecycler;
+    private ImageView isCompleteImage;
 
     public static UnitInfoFragment newInstance() {
         return new UnitInfoFragment();
@@ -60,6 +62,8 @@ public class UnitInfoFragment extends Fragment {
         tEmployee = view.findViewById(R.id.textViewEmployeeValue);
         tDaysPassed = view.findViewById(R.id.textDaysPassedValue);
         eventRecycler = view.findViewById(R.id.recyclerView);
+        isCompleteImage = view.findViewById(R.id.is_complete);
+        isCompleteImage.setVisibility(View.GONE);
 
         return view;
     }
@@ -77,11 +81,14 @@ public class UnitInfoFragment extends Fragment {
         if (unit.isRepairUnit()) tType.setText("Ремонт");
         if (unit.isSerialUnit()) tType.setText("Серия");
         tId.setText(Utils.getRightValue(unit.getId()));
-        tName.setText(Utils.getRightValue(unit.getName()));
+        tName.setText(Utils.getRightValue(mViewModel.getDeviceNameById(unit.getName())));
         tInnerSerial.setText(Utils.getRightValue(unit.getInnerSerial()));
         tSerial.setText(Utils.getRightValue(unit.getSerial()));
-        if (unit.getEmployee()!=null) tEmployee.setText(unit.getEmployee());
+        tEmployee.setText(Utils.getRightValue(mViewModel.getEmployeeNameById(unit.getEmployee())));
         tDaysPassed.setText(String.valueOf(unit.daysPassed()));
+
+        if (unit.isComplete()) isCompleteImage.setVisibility(View.VISIBLE);
+        else isCompleteImage.setVisibility(View.GONE);
 
         mViewModel.addSelectedUnitStatesListListener(unit.getId());
     }

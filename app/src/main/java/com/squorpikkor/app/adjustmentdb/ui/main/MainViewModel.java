@@ -116,6 +116,7 @@ public static final String TABLE_NAMES = "names";
     public static final String ANY_VALUE = "any_value";
     public static final String ANY_VALUE_TEXT = "- любой -";//"- любой -"
     public static final String EMPTY_VALUE_TEXT = "- не выбран -";//"- не выбран -"
+    public static final String IS_COMPLETE = "ЗАВЕРШЕНО";
 //--------------------------------------------------------------------------------------------------
 
     public static final String BACK_PRESS_SEARCH = "back_press_search";

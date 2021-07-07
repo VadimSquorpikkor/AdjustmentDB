@@ -14,8 +14,19 @@
         android:layout_height="wrap_content"
         android:layout_margin="4dp">
 
+        <TextView
+            android:id="@+id/text_is_complete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/main_orange"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
 
         <TextView
+            android:paddingStart="5dp"
             android:id="@+id/textName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -27,6 +38,7 @@
             />
 
         <TextView
+            android:paddingStart="5dp"
             android:id="@+id/textSerial"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -35,6 +47,7 @@
             android:paddingEnd="10dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textName"
+            app:layout_constraintBottom_toTopOf="@+id/textState"
             />
 
         <TextView
@@ -45,42 +58,70 @@
             android:textColor="@color/main_orange"
             app:layout_constraintStart_toEndOf="@+id/textSerial"
             app:layout_constraintTop_toTopOf="@+id/textSerial"
+            app:layout_constraintBottom_toTopOf="@+id/textState"
             />
 
         <TextView
             android:id="@+id/textDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="9sp"
-            android:textStyle="italic"
-            tools:text="12.04.21"
             android:paddingEnd="10dp"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            android:textStyle="italic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textState"
             app:layout_constraintTop_toBottomOf="@+id/textSerial"
-            />
+            tools:text="12.04.21" />
 
         <TextView
+            android:paddingStart="5dp"
             android:id="@+id/textState"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingEnd="10dp"
             android:textColor="@color/white"
-            android:textSize="9sp"
+            android:textSize="11sp"
             android:textStyle="italic"
-            app:layout_constraintStart_toEndOf="@+id/textDate"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textSerial"
             tools:text="Передано на линейку" />
+
+        <TextView
+            android:paddingEnd="5dp"
+            android:id="@+id/textEmployee"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            android:textStyle="italic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Сериков" />
 
         <TextView
             android:id="@+id/textDatePassed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="4dp"
+            android:textColor="@color/main_orange"
+            app:layout_constraintBottom_toTopOf="@+id/textLocation"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textEmployee"
+            tools:text="5 дней" />
+
+        <TextView
+            android:paddingEnd="5dp"
+            android:id="@+id/textLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            android:textStyle="italic"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="5 дней" />
+            tools:text="участок РИР" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
