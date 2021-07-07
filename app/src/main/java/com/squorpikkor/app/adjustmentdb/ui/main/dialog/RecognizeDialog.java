@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
@@ -29,6 +28,10 @@ import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_VALUE_TEXT;
 
+/**Диалог распознает серийные номера и имя устройства ("БДКГ-02"). Имена распознает на совпадение
+ * со списком устройств (MutableLiveData<ArrayList<Device>> devices), поэтому при добавлении новых
+ * устройств в БД нет необходимости что-то дописывать в коде, RecognizeDialog автоматом будет
+ * получать самую свежую версию списка устройств при каждом добавлении нового устройства в БД*/
 public class RecognizeDialog extends BaseDialog{
 
     SurfaceView mCameraView;
@@ -163,26 +166,6 @@ public class RecognizeDialog extends BaseDialog{
         if (!employee.equals(ANY_VALUE)) unit.setEmployee(employee);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode != requestPermissionID) {
-            Log.d(TAG, "Got unexpected permission result: " + requestCode);
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-            return;
-        }
-
-        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            try {
-                if (ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-                mCameraSource.start(mCameraView.getHolder());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     String cutSerialString(String text, String mask) {
         String s = text.substring(text.indexOf(mask));
         s = s.replace(mask, "");
@@ -274,7 +257,7 @@ public class RecognizeDialog extends BaseDialog{
             Log.w(TAG, "Detector dependencies not loaded yet");
         } else {
 
-            //Initialize camerasource to use high resolution and set Autofocus on.
+            //Initialize camera source to use high resolution and set Autofocus on.
             mCameraSource = new CameraSource.Builder(requireActivity(), textRecognizer)
                     .setFacing(CameraSource.CAMERA_FACING_BACK)
                     .setRequestedPreviewSize(1280, 1024)

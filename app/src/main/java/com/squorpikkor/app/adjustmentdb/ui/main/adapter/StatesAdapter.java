@@ -44,7 +44,9 @@ public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesView
         holder.tState.setText(mViewModel.getStateNameById(event.getState()));
         holder.tLocation.setText(mViewModel.getLocationNameById(event.getLocation()));
         long time = event.getDate().getTime();
-        holder.tDate.setText(String.format("%s\n%s", getRightDate(time), getRightTime(time)));
+        holder.tDate.setText(String.format("%s / %s", getRightDate(time), getRightTime(time)));
+        String daysPassed = String.valueOf(event.daysPassed());
+        holder.tDaysPassed.setText(String.format("Дней в работе: %s", daysPassed));
     }
 
     /**
@@ -59,12 +61,14 @@ public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesView
         private final TextView tDate;
         private final TextView tState;
         private final TextView tLocation;
+        private final TextView tDaysPassed;
 
         public StatesViewHolder(@NonNull View itemView) {
             super(itemView);
             tDate = itemView.findViewById(R.id.date);
             tState = itemView.findViewById(R.id.state);
             tLocation = itemView.findViewById(R.id.location2);
+            tDaysPassed = itemView.findViewById(R.id.days_passed);
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.fragment;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
@@ -137,9 +136,6 @@ public class SingleScanFragment extends Fragment {
         if (unit.isRepairUnit()) recognizeButton.setVisibility(View.VISIBLE);
         tEmployee.setText(Utils.getRightValue(mViewModel.getEmployeeNameById(unit.getEmployee())));
         tDaysPassed.setText(String.valueOf(unit.daysPassed()));
-
-        Log.e("TAG", "unit.closeDate: " + unit.getCloseDate());
-        Log.e("TAG", "unit.isComplete(): " + unit.isComplete());
 
         if (unit.isComplete()) isCompleteImage.setVisibility(View.VISIBLE);
         else isCompleteImage.setVisibility(View.GONE);

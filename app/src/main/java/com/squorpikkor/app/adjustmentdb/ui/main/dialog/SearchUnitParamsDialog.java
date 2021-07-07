@@ -2,6 +2,8 @@ package com.squorpikkor.app.adjustmentdb.ui.main.dialog;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -12,9 +14,11 @@ import org.jetbrains.annotations.NotNull;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_TYPE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_TYPE;
 
+@SuppressWarnings("FieldCanBeLocal")
 public class SearchUnitParamsDialog extends BaseDialog {
 
     private RadioButton isSerialRadio;
+    private RadioButton isRepairRadio;
     private EditText serialEdit;
     private SpinnerAdapter deviceSpinnerAdapter;
     private SpinnerAdapter locationSpinnerAdapter;
@@ -33,6 +37,7 @@ public class SearchUnitParamsDialog extends BaseDialog {
         initializeWithVM(R.layout.dialog_search_unit_param);
 
         isSerialRadio = view.findViewById(R.id.radio_button_serial);
+        isRepairRadio = view.findViewById(R.id.radio_button_repair);
         Spinner devNameSpinner = view.findViewById(R.id.spinnerDevName);
         Spinner locationSpinner = view.findViewById(R.id.spinnerLocation);
         Spinner statesSpinner = view.findViewById(R.id.spinnerState);
@@ -47,8 +52,18 @@ public class SearchUnitParamsDialog extends BaseDialog {
 
         mViewModel.getDevices().observe(this, deviceSpinnerAdapter::setData);
         mViewModel.getLocations().observe(this, locationSpinnerAdapter::setData);
-        mViewModel.getStates().observe(this, stateSpinnerAdapter::setData);
+        mViewModel.getStates().observe(this, list -> stateSpinnerAdapter.setDataByTypeAndLocation(list, getSelectedType(), locationSpinnerAdapter.getSelectedNameId()));
         mViewModel.getEmployees().observe(this, employeeSpinnerAdapter::setData);
+
+        isRepairRadio.setOnClickListener(v -> updateStateSpinner());
+        isSerialRadio.setOnClickListener(v -> updateStateSpinner());
+
+        locationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {updateStateSpinner();}
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
 
         searchButton.setOnClickListener(v -> startSearch());
         return dialog;
@@ -58,11 +73,19 @@ public class SearchUnitParamsDialog extends BaseDialog {
         String nameId = deviceSpinnerAdapter.getSelectedNameId();
         String locationId = locationSpinnerAdapter.getSelectedNameId();
         String employeeId = employeeSpinnerAdapter.getSelectedNameId();
-        String typeId = isSerialRadio.isChecked()?SERIAL_TYPE:REPAIR_TYPE;
+        String typeId = getSelectedType();
         String stateId = stateSpinnerAdapter.getSelectedNameId();
         String serial = serialEdit.getText().toString();
 
         mViewModel.getUnitListFromBD(nameId, locationId, employeeId, typeId, stateId, serial);
         dismiss();
+    }
+
+    private String getSelectedType() {
+        return isSerialRadio.isChecked()?SERIAL_TYPE:REPAIR_TYPE;
+    }
+
+    private void updateStateSpinner() {
+        stateSpinnerAdapter.setDataByTypeAndLocation(mViewModel.getStates().getValue(), getSelectedType(), locationSpinnerAdapter.getSelectedNameId());
     }
 }

@@ -51,7 +51,8 @@ public class SpinnerAdapter {
         updateSpinner();
     }
 
-    /**Вариант setData с возможностью задать, как будет называться первая добавленная строка для
+    /**Заполняет спиннер именами объектов из списка объектов. Сохраняет идентификаторы.
+     * Вариант setData с возможностью задать, как будет называться первая добавленная строка для
      * ANY_VALUE. Если указано null, то добавочная строка создаваться не будет*/
     public void setData(ArrayList<? extends Entity> list, String s) {
         this.ids = getNameIds(list);
@@ -70,6 +71,10 @@ public class SpinnerAdapter {
         updateSpinner();
     }
 
+    /**Метод работает только для типов State
+     * Метод делает спинер, но в отличии от setData отбирает статусы по типу и локации. Вариант
+     * setDataByTypeAndLocation с возможностью задать, как будет называться первая добавленная
+     * строка для ANY_VALUE. Если указано null, то добавочная строка создаваться не будет*/
     public void setDataByTypeAndLocation(ArrayList<State> list, String typeId, String locationId, String s) {
         this.ids = getNameIdsByTypeAndLocation(list, typeId, locationId);
         this.names = getNamesByTypeAndLocation(list, typeId, locationId);
@@ -77,10 +82,7 @@ public class SpinnerAdapter {
         updateSpinner();
     }
 
-    public void addFirstLine(String s) {
-        //todo можно потом будет сделать добавление извне, сейчас все спиннерам добавляется
-        // одинаковая первая строка: "-любой-", через addFirstLine можно будет добавлять
-        // индивидуально (пока это не нужно)
+    private void addFirstLine(String s) {
         ids.add(0, ANY_VALUE);
         names.add(0, s);
         updateSpinner();

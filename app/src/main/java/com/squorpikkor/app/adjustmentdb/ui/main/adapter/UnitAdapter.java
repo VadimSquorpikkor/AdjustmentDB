@@ -11,7 +11,6 @@ import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.Utils;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import java.util.ArrayList;
-import static com.squorpikkor.app.adjustmentdb.Utils.EMPTY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightDateAndTime;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightValue;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.IS_COMPLETE;

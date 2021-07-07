@@ -15,7 +15,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         tools:ignore="AllowBackup">
-        <activity android:name=".ui.main.recognition.RecognizeActivity" />
         <activity
             android:name=".MainActivity"
             android:icon="@mipmap/logo">
