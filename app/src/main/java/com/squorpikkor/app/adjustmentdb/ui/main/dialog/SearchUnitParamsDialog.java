@@ -24,6 +24,7 @@ public class SearchUnitParamsDialog extends BaseDialog {
     private SpinnerAdapter locationSpinnerAdapter;
     private SpinnerAdapter stateSpinnerAdapter;
     private SpinnerAdapter employeeSpinnerAdapter;
+    private SpinnerAdapter deviceSetSpinnerAdapter;
 
     //todo сделать список статусов зависимым от выбраной локации (подгружать в диалог статусы по локации). Для "пустой" локации подгружать все статусы
     public SearchUnitParamsDialog() {
@@ -38,6 +39,7 @@ public class SearchUnitParamsDialog extends BaseDialog {
 
         isSerialRadio = view.findViewById(R.id.radio_button_serial);
         isRepairRadio = view.findViewById(R.id.radio_button_repair);
+        Spinner deviceSetSpinner = view.findViewById(R.id.spinnerDevSetName);
         Spinner devNameSpinner = view.findViewById(R.id.spinnerDevName);
         Spinner locationSpinner = view.findViewById(R.id.spinnerLocation);
         Spinner statesSpinner = view.findViewById(R.id.spinnerState);
@@ -45,12 +47,14 @@ public class SearchUnitParamsDialog extends BaseDialog {
         Button searchButton = view.findViewById(R.id.show_button);
         serialEdit = view.findViewById(R.id.editTextSerial);
 
+        deviceSetSpinnerAdapter = new SpinnerAdapter(deviceSetSpinner, mContext);
         deviceSpinnerAdapter = new SpinnerAdapter(devNameSpinner, mContext);
         locationSpinnerAdapter = new SpinnerAdapter(locationSpinner, mContext);
         stateSpinnerAdapter = new SpinnerAdapter(statesSpinner, mContext);
         employeeSpinnerAdapter = new SpinnerAdapter(employeeSpinner, mContext);
 
-        mViewModel.getDevices().observe(this, deviceSpinnerAdapter::setData);
+        mViewModel.getDeviceSets().observe(this, deviceSetSpinnerAdapter::setData);
+        mViewModel.getDevices().observe(this, list1 -> deviceSpinnerAdapter.setDataByDevSet(list1, deviceSetSpinnerAdapter.getSelectedNameId()));
         mViewModel.getLocations().observe(this, locationSpinnerAdapter::setData);
         mViewModel.getStates().observe(this, list -> stateSpinnerAdapter.setDataByTypeAndLocation(list, getSelectedType(), locationSpinnerAdapter.getSelectedNameId()));
         mViewModel.getEmployees().observe(this, employeeSpinnerAdapter::setData);
@@ -58,9 +62,17 @@ public class SearchUnitParamsDialog extends BaseDialog {
         isRepairRadio.setOnClickListener(v -> updateStateSpinner());
         isSerialRadio.setOnClickListener(v -> updateStateSpinner());
 
+        //todo сделать частью SpinnerAdapter
         locationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {updateStateSpinner();}
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        deviceSetSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {updateDeviceSpinner();}
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
@@ -87,5 +99,9 @@ public class SearchUnitParamsDialog extends BaseDialog {
 
     private void updateStateSpinner() {
         stateSpinnerAdapter.setDataByTypeAndLocation(mViewModel.getStates().getValue(), getSelectedType(), locationSpinnerAdapter.getSelectedNameId());
+    }
+
+    private void updateDeviceSpinner() {
+        deviceSpinnerAdapter.setDataByDevSet(mViewModel.getDevices().getValue(), deviceSetSpinnerAdapter.getSelectedNameId());
     }
 }

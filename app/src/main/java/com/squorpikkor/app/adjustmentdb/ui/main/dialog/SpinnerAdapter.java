@@ -3,6 +3,8 @@ package com.squorpikkor.app.adjustmentdb.ui.main.dialog;
 import android.content.Context;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+
+import com.squorpikkor.app.adjustmentdb.ui.main.entities.Device;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.Entity;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.State;
 
@@ -82,6 +84,28 @@ public class SpinnerAdapter {
         updateSpinner();
     }
 
+    /**Метод работает только для типов Device
+     * Метод делает спинер, но в отличии от setData отбирает устройства по типу комплекта
+     * (только для 1117, например)*/
+    public void setDataByDevSet(ArrayList<Device> list, String devSetId) {
+        this.ids = getNameIdsByDevSet(list, devSetId);
+        this.names = getNamesByDevSet(list, devSetId);
+        addFirstLine();
+        updateSpinner();
+    }
+
+    /**Метод работает только для типов Device
+     * Метод делает спинер, но в отличии от setData отбирает устройства по типу комплекта
+     * (только для 1117, например)
+     * Вариант setDataByDevSet с возможностью задать, как будет называться первая добавленная
+     * строка для ANY_VALUE. Если указано null, то добавочная строка создаваться не будет*/
+    public void setDataByDevSet(ArrayList<Device> list, String devSetId, String s) {
+        this.ids = getNameIdsByDevSet(list, devSetId);
+        this.names = getNamesByDevSet(list, devSetId);
+        if (s!=null) addFirstLine(s);
+        updateSpinner();
+    }
+
     private void addFirstLine(String s) {
         ids.add(0, ANY_VALUE);
         names.add(0, s);
@@ -132,6 +156,24 @@ public class SpinnerAdapter {
                             && states.get(i).getLocation().equals(locationId)) newList.add(states.get(i).getName());
                 }
             }
+        return newList;
+    }
+
+    private ArrayList<String> getNameIdsByDevSet(ArrayList<Device> devices, String devSetId) {
+        if (devices==null||devices.size()==0||devSetId==null)return new ArrayList<>();
+        ArrayList<String> newList = new ArrayList<>();
+        for (int i = 0; i < devices.size(); i++) {
+            if (devSetId.equals(ANY_VALUE) || devices.get(i).getDevSetId().equals(devSetId)) newList.add(devices.get(i).getNameId());
+        }
+        return newList;
+    }
+
+    private ArrayList<String> getNamesByDevSet(ArrayList<Device> devices, String devSetId) {
+        if (devices==null||devices.size()==0||devSetId==null)return new ArrayList<>();
+        ArrayList<String> newList = new ArrayList<>();
+        for (int i = 0; i < devices.size(); i++) {
+            if (devSetId.equals(ANY_VALUE) || devices.get(i).getDevSetId().equals(devSetId)) newList.add(devices.get(i).getName());
+        }
         return newList;
     }
 

@@ -2,3 +2,5 @@ https://www.journaldev.com/18198/qr-code-barcode-scanner-android
 
 https://developers.google.com/ml-kit/vision/barcode-scanning/android
 https://github.com/googlesamples/mlkit/tree/master/android/vision-quickstart/app/src/main/java/com/google/mlkit/vision/demo/java
+
+Используется barcode.class из SDK, так что никаких доп. лицензий

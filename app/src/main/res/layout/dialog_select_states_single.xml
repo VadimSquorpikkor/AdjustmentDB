@@ -19,6 +19,17 @@
 
     <LinearLayout style="@style/dialogLinearHorizontal">
         <TextView
+            android:id="@+id/dialogSetNameLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/device_set_doted" />
+
+        <Spinner
+            android:id="@+id/spinnerDevSetName"
+            style="@style/dialogLinearEdit" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <TextView
             android:id="@+id/dialogNewNameLabel"
             style="@style/dialogLinearText"
             android:text="@string/add_type" />

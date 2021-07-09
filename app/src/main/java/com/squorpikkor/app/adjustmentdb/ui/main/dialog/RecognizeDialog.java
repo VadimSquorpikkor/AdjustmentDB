@@ -9,6 +9,7 @@ import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -34,17 +35,15 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_VALUE
  * получать самую свежую версию списка устройств при каждом добавлении нового устройства в БД*/
 public class RecognizeDialog extends BaseDialog{
 
-    SurfaceView mCameraView;
-    TextView mSerialText;
-    TextView mDevNameText;
-    CameraSource mCameraSource;
+    private SurfaceView mCameraView;
+    private TextView mSerialText;
+    private TextView mDevNameText;
+    private CameraSource mCameraSource;
 
-    Spinner deviceSpinner;
-    Spinner stateSpinner;
-    Spinner employeeSpinner;
-    SpinnerAdapter deviceSpinnerAdapter;
-    SpinnerAdapter stateSpinnerAdapter;
-    SpinnerAdapter employeeSpinnerAdapter;
+    private SpinnerAdapter deviceSpinnerAdapter;
+    private SpinnerAdapter stateSpinnerAdapter;
+    private SpinnerAdapter employeeSpinnerAdapter;
+    private SpinnerAdapter deviceSetSpinnerAdapter;
 
     EditText eSerial;
     ArrayList<String> names;
@@ -77,22 +76,32 @@ public class RecognizeDialog extends BaseDialog{
         mSerialText.setOnClickListener(v -> mSerialText.setText(""));
         mDevNameText.setOnClickListener(v -> mDevNameText.setText(""));
 
-        deviceSpinner = view.findViewById(R.id.newName);
-        stateSpinner = view.findViewById(R.id.state_spinner);
-        employeeSpinner = view.findViewById(R.id.employee_spinner);
+        Spinner deviceSetSpinner = view.findViewById(R.id.spinnerDevSetName);
+        Spinner deviceSpinner = view.findViewById(R.id.newName);
+        Spinner stateSpinner = view.findViewById(R.id.state_spinner);
+        Spinner employeeSpinner = view.findViewById(R.id.employee_spinner);
 
+        deviceSetSpinnerAdapter = new SpinnerAdapter(deviceSetSpinner, mContext);
         deviceSpinnerAdapter = new SpinnerAdapter(deviceSpinner, mContext);
         stateSpinnerAdapter = new SpinnerAdapter(stateSpinner, mContext);
         employeeSpinnerAdapter = new SpinnerAdapter(employeeSpinner, mContext);
 
-        mViewModel.getDevices().observe(this, list -> {
-            deviceSpinnerAdapter.setData(list, EMPTY_VALUE_TEXT);
+        mViewModel.getDeviceSets().observe(this, deviceSetSpinnerAdapter::setData);
+        mViewModel.getDevices().observe(this, list1 -> {
+            deviceSpinnerAdapter.setDataByDevSet(list1, deviceSetSpinnerAdapter.getSelectedNameId(), EMPTY_VALUE_TEXT);
             names = mViewModel.getDeviceNamesRuAndEn();
             //сортировка по длине имени в обратном порядке, чтобы сразу искался "6130С" и только потом "6130"
             Collections.sort(names, Collections.reverseOrder());
         });
         mViewModel.getStates().observe(this, list -> stateSpinnerAdapter.setDataByTypeAndLocation(list, unitType, location, EMPTY_VALUE_TEXT));
         mViewModel.getEmployees().observe(this, list -> employeeSpinnerAdapter.setData(list, EMPTY_VALUE_TEXT));
+
+        deviceSetSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {updateDeviceSpinner();}
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
 
         startCameraSource();
 
@@ -102,6 +111,10 @@ public class RecognizeDialog extends BaseDialog{
         setVisibility(unit);
 
         return dialog;
+    }
+
+    private void updateDeviceSpinner() {
+        deviceSpinnerAdapter.setDataByDevSet(mViewModel.getDevices().getValue(), deviceSetSpinnerAdapter.getSelectedNameId(), EMPTY_VALUE_TEXT);
     }
 
     /**Если у юнита уже задано имя устройства, то все поля с имененм скрываем
@@ -119,11 +132,13 @@ public class RecognizeDialog extends BaseDialog{
         if (nameIsEmpty){
             mDevNameText.setVisibility(View.VISIBLE);
             view.findViewById(R.id.dialogNewNameLabel).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.dialogSetNameLabel).setVisibility(View.VISIBLE);
             view.findViewById(R.id.newName).setVisibility(View.VISIBLE);
             view.findViewById(R.id.name_already_recognized).setVisibility(View.GONE);
         } else {
             mDevNameText.setVisibility(View.GONE);
             view.findViewById(R.id.dialogNewNameLabel).setVisibility(View.GONE);
+            view.findViewById(R.id.dialogSetNameLabel).setVisibility(View.GONE);
             view.findViewById(R.id.newName).setVisibility(View.GONE);
             view.findViewById(R.id.name_already_recognized).setVisibility(View.VISIBLE);
         }

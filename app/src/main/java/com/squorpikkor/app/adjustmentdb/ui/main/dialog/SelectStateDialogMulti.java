@@ -2,6 +2,8 @@ package com.squorpikkor.app.adjustmentdb.ui.main.dialog;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -22,6 +24,7 @@ public class SelectStateDialogMulti extends BaseDialog {
     private SpinnerAdapter stateSpinnerAdapter;
     private SpinnerAdapter deviceSpinnerAdapter;
     private SpinnerAdapter employeeSpinnerAdapter;
+    private SpinnerAdapter deviceSetSpinnerAdapter;
 
     public SelectStateDialogMulti() {
     }
@@ -39,17 +42,27 @@ public class SelectStateDialogMulti extends BaseDialog {
         DUnit unit = unitList != null ? unitList.get(0) : null;//todo переименовать -> firstUnit
         String unitType = unit==null?null:unit.getType();
 
+        Spinner deviceSetSpinner = view.findViewById(R.id.spinnerDevSetName);
         Spinner stateSpinner = view.findViewById(R.id.state_spinner);
         Spinner deviceSpinner = view.findViewById(R.id.name_spinner);
         Spinner employeeSpinner = view.findViewById(R.id.employee_spinner);
 
+        deviceSetSpinnerAdapter = new SpinnerAdapter(deviceSetSpinner, mContext);
         deviceSpinnerAdapter = new SpinnerAdapter(deviceSpinner, mContext);
         stateSpinnerAdapter = new SpinnerAdapter(stateSpinner, mContext);
         employeeSpinnerAdapter = new SpinnerAdapter(employeeSpinner, mContext);
 
-        mViewModel.getDevices().observe(this, list -> deviceSpinnerAdapter.setData(list, EMPTY_VALUE_TEXT));
+        mViewModel.getDeviceSets().observe(this, deviceSetSpinnerAdapter::setData);
+        mViewModel.getDevices().observe(this, list1 -> deviceSpinnerAdapter.setDataByDevSet(list1, deviceSetSpinnerAdapter.getSelectedNameId(), EMPTY_VALUE_TEXT));
         mViewModel.getStates().observe(this, list -> stateSpinnerAdapter.setDataByTypeAndLocation(list, unitType, location, EMPTY_VALUE_TEXT));
         mViewModel.getEmployees().observe(this, list -> employeeSpinnerAdapter.setData(list, EMPTY_VALUE_TEXT));
+
+        deviceSetSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {updateDeviceSpinner();}
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
 
         Button cancelButton = view.findViewById(R.id.cancel_button);
         Button okButton = view.findViewById(R.id.ok_button);
@@ -59,6 +72,10 @@ public class SelectStateDialogMulti extends BaseDialog {
         okButton.setOnClickListener(view -> saveUnits(unitList));
 
         return dialog;
+    }
+
+    private void updateDeviceSpinner() {
+        deviceSpinnerAdapter.setDataByDevSet(mViewModel.getDevices().getValue(), deviceSetSpinnerAdapter.getSelectedNameId(), EMPTY_VALUE_TEXT);
     }
 
     private void saveUnits(ArrayList<DUnit> unitList) {

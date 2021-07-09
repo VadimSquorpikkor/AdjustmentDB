@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.Device;
+import com.squorpikkor.app.adjustmentdb.ui.main.entities.DeviceSet;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.Employee;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.Entity;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.Location;
@@ -102,6 +103,11 @@ public static final String TABLE_NAMES = "names";
     public static final String TABLE_DEVICES = "devices";
     public static final String DEVICE_ID = "id";
     public static final String DEVICE_NAME_ID = "name_id";
+    public static final String DEVICE_DEV_SET_ID = "devset_id";
+
+    public static final String TABLE_DEVICE_SET = "device_set";
+    public static final String DEVICE_SET_ID = "id";
+    public static final String DEVICE_SET_NAME_ID = "name_id";
 
     public static final String EMPTY_LOCATION_ID = "empty_location_id";
     public static final String EMPTY_LOCATION_NAME = "Локация не найдена";
@@ -189,6 +195,7 @@ public static final String TABLE_NAMES = "names";
     MutableLiveData<ArrayList<Device>> devices;
     MutableLiveData<ArrayList<Employee>> employees;
     MutableLiveData<ArrayList<State>> states;
+    MutableLiveData<ArrayList<DeviceSet>> deviceSets;
 
     /**Юниты, которые были найдены поиском по БД по параметрам*/
     MutableLiveData<ArrayList<DUnit>> foundUnitsList;
@@ -206,6 +213,9 @@ public static final String TABLE_NAMES = "names";
         return states;
     }
 
+    public MutableLiveData<ArrayList<DeviceSet>> getDeviceSets() {
+        return deviceSets;
+    }
 
     /**Из списка локаций выбирает список их имен*/
     public ArrayList<String> getLocationNames() {
@@ -282,6 +292,7 @@ public static final String TABLE_NAMES = "names";
         dbh.deviceListener(devices);
         dbh.employeeListener(employees);
         dbh.stateListener(states);
+        dbh.deviceSetListener(deviceSets);
     }
 //----------------------------------------------------
 
@@ -292,6 +303,7 @@ public static final String TABLE_NAMES = "names";
         devices = new MutableLiveData<>();
         employees = new MutableLiveData<>();
         states = new MutableLiveData<>();
+        deviceSets = new MutableLiveData<>();
 
         foundUnitsList = new MutableLiveData<>();
         foundUnitsList = new MutableLiveData<>();
@@ -506,8 +518,9 @@ public static final String TABLE_NAMES = "names";
 
     @Override
     public DUnit getDUnitFromString(String s) {
+        Log.e(TAG, "до ******** "+s);
         s = decodeMe(s);
-        Log.e(TAG, "******** "+s);
+        Log.e(TAG, "после ***** "+s);
         String[] ar = s.split(SPLIT_SYMBOL);
         if (ar.length == 2) {
             //Для серии: имя+внутренний_серийный (БДКГ-02 1234), id = БДКГ-02_1234

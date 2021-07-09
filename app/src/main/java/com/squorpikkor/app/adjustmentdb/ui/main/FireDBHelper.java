@@ -13,6 +13,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.Device;
+import com.squorpikkor.app.adjustmentdb.ui.main.entities.DeviceSet;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.Employee;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.Entity;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.Location;
@@ -26,8 +27,11 @@ import java.util.Map;
 
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DEVICE_DEV_SET_ID;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DEVICE_ID;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DEVICE_NAME_ID;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DEVICE_SET_ID;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DEVICE_SET_NAME_ID;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPLOYEE_EMAIL;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPLOYEE_ID;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPLOYEE_LOCATION;
@@ -45,6 +49,7 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_LOCAT
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_NAME_ID;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_TYPE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_DEVICES;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_DEVICE_SET;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_EMPLOYEES;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_LOCATIONS;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_NAMES;
@@ -129,11 +134,15 @@ class FireDBHelper {
                 String id = document.get(DEVICE_ID).toString();
                 String nameId = document.get(DEVICE_NAME_ID).toString();
                 String name = document.get(DEVICE_NAME_ID).toString();
-                Device device = new Device(id, nameId, name);
+                String devSetId = document.get(DEVICE_DEV_SET_ID).toString();
+                String devSetName = document.get(DEVICE_DEV_SET_ID).toString();
+
+                Device device = new Device(id, nameId, name, devSetId, devSetName);
 
                 //JOIN------------------------------------------------------------------
                 db.collection(TABLE_NAMES).document(nameId).get()
                         .addOnCompleteListener(task1 -> {
+                            //И русские и английские имена нужны для распознавания наклеек, которые могут быть и русские и английские
                             String ru = "";
                             String en = "";
                             if (task1.isSuccessful()) {
@@ -149,6 +158,15 @@ class FireDBHelper {
                             if (!en.equals("")) device.setEngName(en);
                             data.setValue(data.getValue());
                         });
+
+                //JOIN------------------------------------------------------------------
+                //  \\\\\\ //  пока не буду делать отдельную таблицу и отдельно русские имена.
+//                db.collection(TABLE_NAMES).document(devSetId).get()
+//                        .addOnCompleteListener(task1 -> {
+//                            device.setDevSetName(getStringFromSnapshot(task1, nameId));
+//                            data.setValue(data.getValue());//update Mutable
+//                        });
+
                 newDevices.add(device);
             }
             data.setValue(newDevices);
@@ -202,6 +220,28 @@ class FireDBHelper {
                             data.setValue(data.getValue());
                         });
                 newStates.add(state);
+            }
+            data.setValue(newStates);
+        });
+    }
+
+    void deviceSetListener(MutableLiveData<ArrayList<DeviceSet>> data) {
+        db.collection(TABLE_DEVICE_SET)
+                .get().addOnCompleteListener(task -> {
+            ArrayList<DeviceSet> newStates = new ArrayList<>();
+            for (DocumentSnapshot document : task.getResult()) {
+                String id = document.get(DEVICE_SET_ID).toString();
+                String nameId = document.get(DEVICE_SET_NAME_ID).toString();
+                String name = document.get(DEVICE_SET_NAME_ID).toString();
+                DeviceSet devSet = new DeviceSet(id, nameId, name);
+
+                //JOIN------------------------------------------------------------------
+                db.collection(TABLE_NAMES).document(nameId).get()
+                        .addOnCompleteListener(task1 -> {
+                            devSet.setName(getStringFromSnapshot(task1, nameId));
+                            data.setValue(data.getValue());
+                        });
+                newStates.add(devSet);
             }
             data.setValue(newStates);
         });

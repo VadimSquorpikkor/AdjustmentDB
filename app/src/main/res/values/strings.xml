@@ -15,6 +15,7 @@
     <string name="next">Дальше</string>
 
 
+    <string name="device_set_doted">Комплект:</string>
     <string name="device_type_doted">Тип устройства:</string>
     <string name="inner_serial_doted">Внутренний номер:</string>
     <string name="serial_number_doted">Серийный номер:</string>

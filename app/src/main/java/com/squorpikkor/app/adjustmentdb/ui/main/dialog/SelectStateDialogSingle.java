@@ -3,6 +3,7 @@ package com.squorpikkor.app.adjustmentdb.ui.main.dialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -21,6 +22,7 @@ public class SelectStateDialogSingle extends BaseDialog {
     private SpinnerAdapter deviceSpinnerAdapter;
     private SpinnerAdapter stateSpinnerAdapter;
     private SpinnerAdapter employeeSpinnerAdapter;
+    private SpinnerAdapter deviceSetSpinnerAdapter;
 
     EditText descriptionEdit;
     EditText innerEdit;
@@ -43,17 +45,27 @@ public class SelectStateDialogSingle extends BaseDialog {
         unit = mViewModel.getSelectedUnit().getValue();
         location = mViewModel.getLocation_id().getValue();
 
+        Spinner deviceSetSpinner = view.findViewById(R.id.spinnerDevSetName);
         Spinner devicesSpinner = view.findViewById(R.id.newName);
         Spinner statesSpinner = view.findViewById(R.id.state_spinner);
         Spinner employeeSpinner = view.findViewById(R.id.state_spinner_employee);
 
+        deviceSetSpinnerAdapter = new SpinnerAdapter(deviceSetSpinner, mContext);
         deviceSpinnerAdapter = new SpinnerAdapter(devicesSpinner, mContext);
         stateSpinnerAdapter = new SpinnerAdapter(statesSpinner, mContext);
         employeeSpinnerAdapter = new SpinnerAdapter(employeeSpinner, mContext);
 
-        mViewModel.getDevices().observe(this, list -> deviceSpinnerAdapter.setData(list, EMPTY_VALUE_TEXT));
+        mViewModel.getDeviceSets().observe(this, deviceSetSpinnerAdapter::setData);
+        mViewModel.getDevices().observe(this, list1 -> deviceSpinnerAdapter.setDataByDevSet(list1, deviceSetSpinnerAdapter.getSelectedNameId(), EMPTY_VALUE_TEXT));
         mViewModel.getStates().observe(this, list -> stateSpinnerAdapter.setDataByTypeAndLocation(list, unit.getType(), location, EMPTY_VALUE_TEXT));
         mViewModel.getEmployees().observe(this, list -> employeeSpinnerAdapter.setData(list, EMPTY_VALUE_TEXT));
+
+        deviceSetSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {updateDeviceSpinner();}
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
 
         Button cancelButton = view.findViewById(R.id.cancel_button);
         Button okButton = view.findViewById(R.id.ok_button);
@@ -63,17 +75,20 @@ public class SelectStateDialogSingle extends BaseDialog {
         innerEdit = view.findViewById(R.id.dInner);
         serialEdit = view.findViewById(R.id.dSerial);
 
+        TextView labelDevSet = view.findViewById(R.id.dialogSetNameLabel);
         TextView labelDevices = view.findViewById(R.id.dialogNewNameLabel);
         TextView labelInner = view.findViewById(R.id.dialogInnerLabel);
         TextView labelSerial = view.findViewById(R.id.dialogSerialLabel);
         TextView labelEmployee = view.findViewById(R.id.dialogEmployeeLabel);
 
+        deviceSetSpinner.setVisibility(View.GONE);
         devicesSpinner.setVisibility(View.GONE);
         nameText.setVisibility(View.GONE);
         innerEdit.setVisibility(View.GONE);
         serialEdit.setVisibility(View.GONE);
         employeeSpinner.setVisibility(View.GONE);
 
+        labelDevSet.setVisibility(View.GONE);
         labelDevices.setVisibility(View.GONE);
         labelInner.setVisibility(View.GONE);
         labelSerial.setVisibility(View.GONE);
@@ -82,7 +97,9 @@ public class SelectStateDialogSingle extends BaseDialog {
         //Если у юнита уже есть серийный или внутренний номер или имя или ответственный, то его уже нельзя поменять, поэтому я просто скрываю его
         if (unit != null) {
             if (isEmptyOrNull(unit.getName())) {
+                deviceSetSpinner.setVisibility(View.VISIBLE);
                 devicesSpinner.setVisibility(View.VISIBLE);
+                labelDevSet.setVisibility(View.VISIBLE);
                 labelDevices.setVisibility(View.VISIBLE);
             } else {
                 nameText.setVisibility(View.VISIBLE);
@@ -107,6 +124,10 @@ public class SelectStateDialogSingle extends BaseDialog {
         okButton.setOnClickListener(view -> saveUnit(unit));
 
         return dialog;
+    }
+
+    private void updateDeviceSpinner() {
+        deviceSpinnerAdapter.setDataByDevSet(mViewModel.getDevices().getValue(), deviceSetSpinnerAdapter.getSelectedNameId(), EMPTY_VALUE_TEXT);
     }
 
     private void saveUnit(DUnit unit) {
