@@ -178,8 +178,12 @@ class FireDBHelper {
                 .get().addOnCompleteListener(task -> {
             ArrayList<Employee> newEmployees = new ArrayList<>();
             for (DocumentSnapshot document : task.getResult()) {
+                //Внимание! Для employee name_id — это id, а name — это name_id
+                //Так сделано, потому что для сохранения сотрудника в юните нужен id сотрудника
+                // (поэтому name_id — это id), а для отображения имени в спиннере достаточно
+                // name_id без подгрузки имени из таблицы имен (name — это name_id)
                 String id = document.get(EMPLOYEE_ID).toString();
-                String nameId = document.get(EMPLOYEE_NAME_ID).toString();
+                String nameId = document.get(EMPLOYEE_ID).toString();
                 String name = document.get(EMPLOYEE_NAME_ID).toString();
                 String eMail = document.get(EMPLOYEE_EMAIL).toString();
                 String location = document.get(EMPLOYEE_LOCATION).toString();
