@@ -29,6 +29,7 @@ import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DEVICE_DEV_SET_ID;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DEVICE_ID;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DEVICE_IMG_PATH;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DEVICE_NAME_ID;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DEVICE_SET_ID;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DEVICE_SET_NAME_ID;
@@ -59,6 +60,7 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_UNITS
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_CLOSE_DATE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_DATE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_DEVICE;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_DEVICE_SET;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_EMPLOYEE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_EVENT_ID;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_ID;
@@ -82,7 +84,13 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_TYPE;
  * денормализировать БД для экономии запросов, в самом приложении нужно будет немного изменить
  * метод, загружающий сущности (убрать аналог JOIN)
  * 4. При переходе, вдруг, на другую БД (SQL), будет минимум гемора, просто сделать метод,
- * загружающий объекты*/
+ * загружающий объекты
+ *
+ * ВАЖНО! Картинки для устройств хранятся (по крайней мере пока — потом посмотрим) на хостинге от
+ * AdjustmentWeb, в самой базе хранятся ссылки на эти картинки. Чтобы изменить/добавить картинку
+ * нужно в проекте AdjustmentWeb добавить эти картинки в папку /pics и задеплоить изменения; в БД
+ * добавить ссылку на изображение (получится что-то типа https://adjustmentdb.web.app/pics/2503.png)
+ * */
 
 class FireDBHelper {
 
@@ -135,9 +143,8 @@ class FireDBHelper {
                 String nameId = document.get(DEVICE_NAME_ID).toString();
                 String name = document.get(DEVICE_NAME_ID).toString();
                 String devSetId = document.get(DEVICE_DEV_SET_ID).toString();
-                String devSetName = document.get(DEVICE_DEV_SET_ID).toString();
-
-                Device device = new Device(id, nameId, name, devSetId, devSetName);
+                String imgPath = document.get(DEVICE_IMG_PATH).toString();
+                Device device = new Device(id, nameId, name, devSetId, imgPath);
 
                 //JOIN------------------------------------------------------------------
                 db.collection(TABLE_NAMES).document(nameId).get()
@@ -320,9 +327,10 @@ class FireDBHelper {
         data.put(UNIT_SERIAL, unit.getSerial());
         data.put(UNIT_TYPE, unit.getType());
         data.put(UNIT_DATE, unit.getDate());
+        data.put(UNIT_DEVICE_SET, unit.getDeviceSet());
         if (unit.getCloseDate()!=null) data.put(UNIT_CLOSE_DATE, unit.getCloseDate());
-        data.put(UNIT_LOCATION, unit.getLastEvent().getLocation());
-        data.put(UNIT_STATE, unit.getLastEvent().getState());
+        if (unit.getLastEvent()!=null) data.put(UNIT_LOCATION, unit.getLastEvent().getLocation());
+        if (unit.getLastEvent()!=null) data.put(UNIT_STATE, unit.getLastEvent().getState());
         db.collection(TABLE_UNITS)
                 .document(unit.getId())
 //                .update(data)
@@ -354,6 +362,7 @@ class FireDBHelper {
     }
 
     /**Обертка для getUnitListByParam*/
+    //todo добавить поиск по комплекту
     void getUnitList(MutableLiveData<ArrayList<DUnit>> unitList, String deviceNameId, String locationId, String employeeId, String typeId, String stateId, String serial) {
         getUnitListByParam(unitList,
                 UNIT_DEVICE, deviceNameId,
@@ -408,6 +417,7 @@ class FireDBHelper {
         unit.setInnerSerial(String.valueOf(documentSnapshots.get(UNIT_INNER_SERIAL)));
         unit.setSerial(String.valueOf(documentSnapshots.get(UNIT_SERIAL)));
         unit.setType(String.valueOf(documentSnapshots.get(UNIT_TYPE)));
+        unit.setDeviceSet(String.valueOf(documentSnapshots.get(UNIT_DEVICE_SET)));
         Timestamp timestamp = (Timestamp) documentSnapshots.get(UNIT_DATE);
         if (timestamp != null) unit.setDate(timestamp.toDate());
         Timestamp closeTime = (Timestamp) documentSnapshots.get(UNIT_CLOSE_DATE);

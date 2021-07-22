@@ -14,12 +14,22 @@
         android:layout_height="wrap_content"
         android:layout_margin="4dp">
 
+        <ImageView
+            android:id="@+id/deviceImage"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/text_is_complete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/main_orange"
             android:textSize="18sp"
+            tools:text="ЗАВЕРШЕНО"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -33,7 +43,7 @@
             tools:text="БДКГ-02"
             android:textSize="11sp"
             android:textColor="@color/white"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/deviceImage"
             app:layout_constraintTop_toTopOf="parent"
             />
 
@@ -45,7 +55,7 @@
             tools:text="123.002"
             android:textColor="@color/main_orange"
             android:paddingEnd="10dp"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/deviceImage"
             app:layout_constraintTop_toBottomOf="@+id/textName"
             app:layout_constraintBottom_toTopOf="@+id/textState"
             />
@@ -84,7 +94,7 @@
             android:textSize="11sp"
             android:textStyle="italic"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/deviceImage"
             app:layout_constraintTop_toBottomOf="@+id/textSerial"
             tools:text="Передано на линейку" />
 

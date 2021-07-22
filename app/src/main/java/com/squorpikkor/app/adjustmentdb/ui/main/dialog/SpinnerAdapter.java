@@ -1,6 +1,7 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.dialog;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
@@ -159,20 +160,37 @@ public class SpinnerAdapter {
         return newList;
     }
 
+    /**перебор из строки "1117M&6101", это будет значить, что у девайса 2 возможных варианта комплекта (парсить строку в массив имен разбивая по "&": 1117M%6101 -> [1117M, 6101])*/
+    private boolean isInArray(String input, String reg) {
+        String[] arr = input.split("&");
+        for (String str:arr) {
+            if (str.equals(reg)) return true;
+        }
+        return false;
+    }
+
+    /**Возвращает name_id по имени комплекта.
+     * Принимает не только строку типа "1117", но и строку типа "1117M&6101",
+     * т.е. у девайса может быть несколько возможных комплектов*/
     private ArrayList<String> getNameIdsByDevSet(ArrayList<Device> devices, String devSetId) {
         if (devices==null||devices.size()==0||devSetId==null)return new ArrayList<>();
         ArrayList<String> newList = new ArrayList<>();
         for (int i = 0; i < devices.size(); i++) {
-            if (devSetId.equals(ANY_VALUE) || devices.get(i).getDevSetId().equals(devSetId)) newList.add(devices.get(i).getNameId());
+//            if (devSetId.equals(ANY_VALUE) || devices.get(i).getDevSetId().equals(devSetId)) newList.add(devices.get(i).getNameId());
+            if (devSetId.equals(ANY_VALUE) || isInArray(devices.get(i).getDevSetId(), devSetId)) newList.add(devices.get(i).getNameId());
         }
         return newList;
     }
 
+    /**Возвращает name по имени комплекта.
+     * Принимает не только строку типа "1117", но и строку типа "1117M&6101",
+     * т.е. у девайса может быть несколько возможных комплектов*/
     private ArrayList<String> getNamesByDevSet(ArrayList<Device> devices, String devSetId) {
         if (devices==null||devices.size()==0||devSetId==null)return new ArrayList<>();
         ArrayList<String> newList = new ArrayList<>();
         for (int i = 0; i < devices.size(); i++) {
-            if (devSetId.equals(ANY_VALUE) || devices.get(i).getDevSetId().equals(devSetId)) newList.add(devices.get(i).getName());
+//            if (devSetId.equals(ANY_VALUE) || devices.get(i).getDevSetId().equals(devSetId)) newList.add(devices.get(i).getName());
+            if (devSetId.equals(ANY_VALUE) || isInArray(devices.get(i).getDevSetId(), devSetId)) newList.add(devices.get(i).getNameId());
         }
         return newList;
     }

@@ -52,7 +52,7 @@ public class SelectStateDialogMulti extends BaseDialog {
         stateSpinnerAdapter = new SpinnerAdapter(stateSpinner, mContext);
         employeeSpinnerAdapter = new SpinnerAdapter(employeeSpinner, mContext);
 
-        mViewModel.getDeviceSets().observe(this, deviceSetSpinnerAdapter::setData);
+        mViewModel.getDeviceSets().observe(this, list2 -> deviceSetSpinnerAdapter.setData(list2, EMPTY_VALUE_TEXT));
         mViewModel.getDevices().observe(this, list1 -> deviceSpinnerAdapter.setDataByDevSet(list1, deviceSetSpinnerAdapter.getSelectedNameId(), EMPTY_VALUE_TEXT));
         mViewModel.getStates().observe(this, list -> stateSpinnerAdapter.setDataByTypeAndLocation(list, unitType, location, EMPTY_VALUE_TEXT));
         mViewModel.getEmployees().observe(this, list -> employeeSpinnerAdapter.setData(list, EMPTY_VALUE_TEXT));
@@ -93,10 +93,12 @@ public class SelectStateDialogMulti extends BaseDialog {
         String newStateId = stateSpinnerAdapter.getSelectedNameId();
         String employee = employeeSpinnerAdapter.getSelectedNameId();
         String description = descriptionEdit.getText().toString();
+        String devSetId = deviceSetSpinnerAdapter.getSelectedNameId();
 
         if (unit.getName().equals("") && !newNameId.equals(ANY_VALUE)) unit.setName(newNameId);
         if (unit.getDate()==null) unit.setDate(new Date());
         if (!newStateId.equals(ANY_VALUE)) unit.addNewEvent(mViewModel, newStateId, description, location);
         if (!employee.equals(ANY_VALUE)) unit.setEmployee(employee);
+        if (!devSetId.equals(ANY_VALUE)) unit.setDeviceSet(devSetId);
     }
 }

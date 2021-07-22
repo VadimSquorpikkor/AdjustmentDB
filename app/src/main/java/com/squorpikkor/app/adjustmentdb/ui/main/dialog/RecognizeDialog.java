@@ -86,7 +86,7 @@ public class RecognizeDialog extends BaseDialog{
         stateSpinnerAdapter = new SpinnerAdapter(stateSpinner, mContext);
         employeeSpinnerAdapter = new SpinnerAdapter(employeeSpinner, mContext);
 
-        mViewModel.getDeviceSets().observe(this, deviceSetSpinnerAdapter::setData);
+        mViewModel.getDeviceSets().observe(this, list2 -> deviceSetSpinnerAdapter.setData(list2, EMPTY_VALUE_TEXT));
         mViewModel.getDevices().observe(this, list1 -> {
             deviceSpinnerAdapter.setDataByDevSet(list1, deviceSetSpinnerAdapter.getSelectedNameId(), EMPTY_VALUE_TEXT);
             names = mViewModel.getDeviceNamesRuAndEn();
@@ -166,6 +166,7 @@ public class RecognizeDialog extends BaseDialog{
      * юниту будут присвоены распознанные значения. Если параметры выбрать руками, то распознанные
      * значения будут проигнорированы, юнит будет сохранен с параметрами выбранными вручную*/
     private void updateUnitData(DUnit unit) {
+        String devSetId = deviceSetSpinnerAdapter.getSelectedNameId();
         String name_id = mViewModel.getDeviceNameId(mDevNameText.getText().toString());//получить id из имени
         String newNameId = deviceSpinnerAdapter.getSelectedNameId().equals(ANY_VALUE)?name_id:deviceSpinnerAdapter.getSelectedNameId();
         String newSerial = eSerial.getText().toString().equals("")?mSerialText.getText().toString():eSerial.getText().toString();
@@ -179,6 +180,7 @@ public class RecognizeDialog extends BaseDialog{
         if (unit.getDate()==null) unit.setDate(new Date());
         if (!newStateId.equals(ANY_VALUE)) unit.addNewEvent(mViewModel, newStateId, description, location);
         if (!employee.equals(ANY_VALUE)) unit.setEmployee(employee);
+        if (!devSetId.equals(ANY_VALUE)) unit.setDeviceSet(devSetId);
     }
 
     String cutSerialString(String text, String mask) {

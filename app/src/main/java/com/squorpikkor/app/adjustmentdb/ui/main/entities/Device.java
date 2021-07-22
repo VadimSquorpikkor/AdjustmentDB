@@ -2,18 +2,14 @@ package com.squorpikkor.app.adjustmentdb.ui.main.entities;
 
 public class Device extends Entity{
 
-    //todo надо подумать, что делать с блоками, которые могут принадлежать разным комплектам.
-    // Как вариант — хранить в БД два типа устройств с разными именами документа(то же — id),
-    // но с одинаковым именами. Чтобы нельзя было записать в блок для 6101 тип от 1117 надо сделать спинер типа устройств неактивным если комплект выбран "любой"
-
     String engName;
     String devSetId;
-    String devSetName;
+    String imgPath;
 
-    public Device(String id, String nameId, String name, String devSetId, String devSetName) {
+    public Device(String id, String nameId, String name, String devSetId, String imgPath) {
         super(id, nameId, name);
         this.devSetId = devSetId;
-        this.devSetName = devSetName;
+        this.imgPath = imgPath;
     }
 
     public String getEngName() {
@@ -28,11 +24,8 @@ public class Device extends Entity{
         return devSetId;
     }
 
-    public String getDevSetName() {
-        return devSetName;
+    public String getImgPath() {
+        return imgPath;
     }
 
-    public void setDevSetName(String devSetName) {
-        this.devSetName = devSetName;
-    }
 }

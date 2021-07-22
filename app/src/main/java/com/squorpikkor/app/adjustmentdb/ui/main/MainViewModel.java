@@ -66,6 +66,7 @@ public static final String TABLE_NAMES = "names";
     public static final String UNIT_DATE = "date";
     public static final String UNIT_CLOSE_DATE = "close_date";
     public static final String UNIT_DEVICE = "device_id"; //todo возможно в имени стринга и не нужен "_ID", только в значении
+    public static final String UNIT_DEVICE_SET = "devset_id";
     public static final String UNIT_EMPLOYEE = "employee_id";
     public static final String UNIT_ID = "id";
     public static final String UNIT_EVENT_ID = "event_id";
@@ -104,6 +105,7 @@ public static final String TABLE_NAMES = "names";
     public static final String DEVICE_ID = "id";
     public static final String DEVICE_NAME_ID = "name_id";
     public static final String DEVICE_DEV_SET_ID = "devset_id";
+    public static final String DEVICE_IMG_PATH = "img_path";
 
     public static final String TABLE_DEVICE_SET = "device_set";
     public static final String DEVICE_SET_ID = "id";
@@ -247,6 +249,13 @@ public static final String TABLE_NAMES = "names";
     public String getDeviceNameById(String id) {
         return getNameByIdPrivate(devices.getValue(), id);
     }
+    public String getDeviceImageByDevId(String id) {//todo походу надо device делать частью unit
+        if (devices==null||devices.getValue()==null||devices.getValue().size()==0||id==null||id.equals("")) return null;
+        for (int i = 0; i < devices.getValue().size(); i++) {
+            if (devices.getValue().get(i).getId().equals(id)) return devices.getValue().get(i).getImgPath();
+        }
+        return null;
+    }
     public String getDeviceNameIdByName(String name) {
         return getNameIdByNamePrivate(devices.getValue(), name);
     }
@@ -260,6 +269,7 @@ public static final String TABLE_NAMES = "names";
         }
         return name;
     }
+
     public String getEmployeeNameById(String id) {
         return getNameByIdPrivate(employees.getValue(), id);
     }

@@ -19,6 +19,7 @@ public class DUnit {
     private Date date;
     private Date closeDate;
     private DEvent lastEvent;
+    private String deviceSet;
 
     public DUnit() {
     }
@@ -91,6 +92,15 @@ public class DUnit {
 
         if (stateId.equals(ANY_VALUE)) return null;
         else return new DEvent(new Date(), stateId, description, location, this.id, eventId);
+    }
+
+
+    public String getDeviceSet() {
+        return deviceSet;
+    }
+
+    public void setDeviceSet(String deviceSet) {
+        this.deviceSet = deviceSet;
     }
 
     public Date getCloseDate() {

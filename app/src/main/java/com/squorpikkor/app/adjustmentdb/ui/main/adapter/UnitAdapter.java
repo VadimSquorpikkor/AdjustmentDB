@@ -3,9 +3,12 @@ package com.squorpikkor.app.adjustmentdb.ui.main.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.squareup.picasso.Picasso;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.Utils;
@@ -61,13 +64,12 @@ public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolde
         else holder.tInnerSerial.setText(String.format("(вн. %s)", unit.getInnerSerial()));
         holder.tDatePassed.setText(String.format("%s д.", unit.daysPassed()));
 
-
-
-
         String dateAndTime = getRightDateAndTime(unit.getDate());
         String location = unit.getLastEvent()==null?"":unit.getLastEvent().getLocation();
         String employee = unit.getEmployee();
         boolean isComplete = unit.isComplete();
+        String devPath = mViewModel.getDeviceImageByDevId(unit.getName());
+        if (devPath!=null && !devPath.equals("")) Picasso.get().load(devPath).into(holder.deviceImage);//это всё, что нужно для загрузки изображения с помощью Picasso. Кроме простоты, пикассо ещё кэширует загруженные картинки
 
         holder.tDate.setText(dateAndTime);
         holder.tLocation.setText(getRightValue(mViewModel.getLocationNameById(location)));
@@ -91,6 +93,7 @@ public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolde
         private final TextView tLocation;
         private final TextView tEmployee;
         private final TextView tIsComplete;
+        private final ImageView deviceImage;
 
         public DUnitViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -103,6 +106,7 @@ public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolde
             tLocation = itemView.findViewById(R.id.textLocation);
             tEmployee = itemView.findViewById(R.id.textEmployee);
             tIsComplete = itemView.findViewById(R.id.text_is_complete);
+            deviceImage = itemView.findViewById(R.id.deviceImage);
 
             //для работы OnNoteClickListener
             itemView.setOnClickListener(view -> {
