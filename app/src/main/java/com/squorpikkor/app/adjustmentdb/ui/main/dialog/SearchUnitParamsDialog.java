@@ -53,7 +53,7 @@ public class SearchUnitParamsDialog extends BaseDialog {
         stateSpinnerAdapter = new SpinnerAdapter(statesSpinner, mContext);
         employeeSpinnerAdapter = new SpinnerAdapter(employeeSpinner, mContext);
 
-        mViewModel.getDeviceSets().observe(this, deviceSetSpinnerAdapter::setData);
+        mViewModel.getDeviceSets().observe(this, deviceSetSpinnerAdapter::setDataWithEmpty);
         mViewModel.getDevices().observe(this, list1 -> deviceSpinnerAdapter.setDataByDevSet(list1, deviceSetSpinnerAdapter.getSelectedNameId()));
         mViewModel.getLocations().observe(this, locationSpinnerAdapter::setData);
         mViewModel.getStates().observe(this, list -> stateSpinnerAdapter.setDataByTypeAndLocation(list, getSelectedType(), locationSpinnerAdapter.getSelectedNameId()));

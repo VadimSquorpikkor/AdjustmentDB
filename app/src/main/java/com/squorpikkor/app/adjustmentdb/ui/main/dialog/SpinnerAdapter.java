@@ -54,6 +54,15 @@ public class SpinnerAdapter {
         updateSpinner();
     }
 
+    /**То же, что и setData(ArrayList<? extends Entity> list), только добавляет строку "-без комплекта-", т.е чтобы отобразить те устройства, которые не входят ни в один из комплектов*/
+    public void setDataWithEmpty(ArrayList<? extends Entity> list) {
+        this.ids = getNameIds(list);
+        this.names = getNames(list);
+        addFirstLineEmpty();
+        addFirstLine();
+        updateSpinner();
+    }
+
     /**Заполняет спиннер именами объектов из списка объектов. Сохраняет идентификаторы.
      * Вариант setData с возможностью задать, как будет называться первая добавленная строка для
      * ANY_VALUE. Если указано null, то добавочная строка создаваться не будет*/
@@ -116,6 +125,12 @@ public class SpinnerAdapter {
     public void addFirstLine() {
         ids.add(0, ANY_VALUE);
         names.add(0, ANY_VALUE_TEXT);
+        updateSpinner();
+    }
+
+    public void addFirstLineEmpty() {
+        ids.add(0, "");
+        names.add(0, "-без комплекта-");
         updateSpinner();
     }
 
@@ -190,7 +205,8 @@ public class SpinnerAdapter {
         ArrayList<String> newList = new ArrayList<>();
         for (int i = 0; i < devices.size(); i++) {
 //            if (devSetId.equals(ANY_VALUE) || devices.get(i).getDevSetId().equals(devSetId)) newList.add(devices.get(i).getName());
-            if (devSetId.equals(ANY_VALUE) || isInArray(devices.get(i).getDevSetId(), devSetId)) newList.add(devices.get(i).getNameId());
+//            if (devSetId.equals(ANY_VALUE) || isInArray(devices.get(i).getDevSetId(), devSetId)) newList.add(devices.get(i).getNameId());
+            if (devSetId.equals(ANY_VALUE) || isInArray(devices.get(i).getDevSetId(), devSetId)) newList.add(devices.get(i).getName());
         }
         return newList;
     }
