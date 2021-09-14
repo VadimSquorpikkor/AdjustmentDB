@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="176dp"
+    android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/side_nav_bar"
     android:gravity="bottom"
@@ -13,35 +13,36 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-
-
     <ImageView
         android:id="@+id/account_image"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:contentDescription="Description"
         android:paddingTop="8dp"
         app:srcCompat="@mipmap/logo" />
-
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/version"
-        android:paddingTop="8dp"
-        tools:text="AdjustmentDB 1.23"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     <TextView
         android:id="@+id/location_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="23sp"
+        android:paddingTop="8dp"
+        android:textColor="@color/main_orange"
         tools:text="Регулировка" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/version"
+        tools:text="AdjustmentDB 1.23"
+        android:textSize="16sp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     <TextView
         android:id="@+id/email_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="12sp"
         tools:text="www@address.com" />
 
 </LinearLayout>

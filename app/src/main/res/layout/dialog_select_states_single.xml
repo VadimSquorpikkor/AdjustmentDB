@@ -3,123 +3,44 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="5dp"
     android:background="@color/colorBackground"
     android:orientation="vertical"
     android:padding="15dp"
     android:gravity="center_horizontal">
 
-    <TextView
-        android:id="@+id/dName"
-        android:layout_width="wrap_content"
+
+    <com.google.android.material.tabs.TabLayout
+        app:tabIndicatorColor="@color/main_orange"
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/main_orange"
-        android:textSize="20sp"
-        tools:text="AT1630" />
+        android:layout_marginBottom="20dp"
+        >
 
-    <LinearLayout style="@style/dialogLinearHorizontal">
-        <TextView
-            android:id="@+id/dialogSetNameLabel"
-            style="@style/dialogLinearText"
-            android:text="@string/device_set_doted" />
-
-        <Spinner
-            android:id="@+id/spinnerDevSetName"
-            style="@style/dialogLinearEdit" />
-    </LinearLayout>
-
-    <LinearLayout style="@style/dialogLinearHorizontal">
-        <TextView
-            android:id="@+id/dialogNewNameLabel"
-            style="@style/dialogLinearText"
-            android:text="@string/add_type" />
-
-        <Spinner
-            android:id="@+id/newName"
-            style="@style/dialogLinearEdit" />
-    </LinearLayout>
-
-    <LinearLayout style="@style/dialogLinearHorizontal">
-        <TextView
-            android:id="@+id/dialogInnerLabel"
-            style="@style/dialogLinearText"
-            android:text="@string/inner_serial_doted"/>
-
-        <EditText
-            android:id="@+id/dInner"
-            style="@style/dialogLinearEdit"
-            android:background="@drawable/edit_text_field"
-            android:hint="@string/inner_serial"
-            android:importantForAutofill="no"
-            android:inputType="number"/>
-    </LinearLayout>
-
-    <LinearLayout style="@style/dialogLinearHorizontal">
-        <TextView
-            android:id="@+id/dialogSerialLabel"
-            style="@style/dialogLinearText"
-            android:text="@string/serial_number_doted"/>
-
-        <EditText
-            android:id="@+id/dSerial"
-            style="@style/dialogLinearEdit"
-            android:background="@drawable/edit_text_field"
-            android:hint="@string/serial_number"
-            android:importantForAutofill="no"
-            android:inputType="text"/>
-    </LinearLayout>
-
-    <LinearLayout style="@style/dialogLinearHorizontal">
-        <TextView
-            android:id="@+id/dialogEmployeeLabel"
-            style="@style/dialogLinearText"
-            android:text="@string/employee_doted"/>
-
-        <Spinner
-            android:id="@+id/state_spinner_employee"
-            style="@style/dialogLinearEdit"/>
-    </LinearLayout>
-
-    <LinearLayout style="@style/dialogLinearHorizontal">
-        <TextView
-            android:id="@+id/dialogStateLabel"
-            style="@style/dialogLinearText"
-            android:text="@string/add_state_doted"/>
-
-        <Spinner
-            android:id="@+id/state_spinner"
-            style="@style/dialogLinearEdit"/>
-    </LinearLayout>
-
-    <EditText
-        android:id="@+id/description"
-        style="@style/dialogEditText"
-        android:background="@drawable/edit_text_field"
-        android:layout_marginBottom="10dp"
-        android:hint="@string/add_description"
-        android:importantForAutofill="no"
-        android:inputType="text"/>
-
-    <LinearLayout style="@style/dialogLinearHorizontal">
-        <Button
-            android:id="@+id/cancel_button"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_weight="1"
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tab_detail"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/cancel"
-            android:textAllCaps="false"
-            android:textSize="12sp"/>
+            android:textColor="@color/main_orange"
+            android:text="Подробно" />
 
-        <Button
-            android:id="@+id/ok_button"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tab_short"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/ok"
-            android:textAllCaps="false"
-            android:textSize="12sp"/>
-    </LinearLayout>
+            android:textColor="@color/main_orange"
+            android:text="Кратко" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <include layout="@layout/dialog_state_single_detail" android:id="@+id/layout_detail"/>
+
+    <include layout="@layout/dialog_state_single_short" android:id="@+id/layout_short"/>
+
+
+
+
 
 </LinearLayout>

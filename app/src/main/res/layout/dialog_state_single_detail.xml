@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:gravity="center_horizontal">
+
+    <TextView
+        android:id="@+id/dName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/main_orange"
+        android:textSize="20sp"
+        tools:text="AT1630" />
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <TextView
+            android:id="@+id/dialogSetNameLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/device_set_doted" />
+
+        <Spinner
+            android:id="@+id/spinnerDevSetName"
+            style="@style/dialogLinearEdit" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <TextView
+            android:id="@+id/dialogNewNameLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/add_type" />
+
+        <Spinner
+            android:id="@+id/newName"
+            style="@style/dialogLinearEdit" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <TextView
+            android:id="@+id/dialogInnerLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/inner_serial_doted"/>
+
+        <EditText
+            android:id="@+id/dInner"
+            style="@style/dialogLinearEdit"
+            android:background="@drawable/edit_text_field"
+            android:hint="@string/inner_serial"
+            android:importantForAutofill="no"
+            android:inputType="number"/>
+    </LinearLayout>
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <TextView
+            android:id="@+id/dialogSerialLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/serial_number_doted"/>
+
+        <EditText
+            android:id="@+id/dSerial"
+            style="@style/dialogLinearEdit"
+            android:background="@drawable/edit_text_field"
+            android:hint="@string/serial_number"
+            android:importantForAutofill="no"
+            android:inputType="text"/>
+    </LinearLayout>
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <TextView
+            android:id="@+id/dialogEmployeeLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/employee_doted"/>
+
+        <Spinner
+            android:id="@+id/state_spinner_employee"
+            style="@style/dialogLinearEdit"/>
+    </LinearLayout>
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <TextView
+            android:id="@+id/dialogStateLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/add_state_doted"/>
+
+        <Spinner
+            android:id="@+id/state_spinner"
+            style="@style/dialogLinearEdit"/>
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/description"
+        style="@style/dialogEditText"
+        android:background="@drawable/edit_text_field"
+        android:layout_marginBottom="10dp"
+        android:hint="@string/add_description"
+        android:importantForAutofill="no"
+        android:inputType="text"/>
+
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <Button
+            android:id="@+id/cancel_button"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel"
+            android:textAllCaps="false"
+            android:textSize="12sp"/>
+
+        <Button
+            android:id="@+id/ok_button"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/ok"
+            android:textAllCaps="false"
+            android:textSize="12sp"/>
+    </LinearLayout>
+
+</LinearLayout>

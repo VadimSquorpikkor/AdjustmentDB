@@ -157,7 +157,7 @@ public class SpinnerAdapter {
         return newList;
     }
 
-    private ArrayList<String> getNamesByTypeAndLocation(ArrayList<State> states, String typeId, String locationId) {
+    public ArrayList<String> getNamesByTypeAndLocation(ArrayList<State> states, String typeId, String locationId) {
         if (states==null||states.size()==0||typeId==null)return new ArrayList<>();
         ArrayList<String> newList = new ArrayList<>();
             if (locationId.equals(ANY_VALUE)) {
@@ -220,7 +220,8 @@ public class SpinnerAdapter {
         return newList;
     }
 
-    private ArrayList<String> getNameIdsByTypeAndLocation(ArrayList<State> states, String typeId, String locationId) {
+
+    public ArrayList<String> getNameIdsByTypeAndLocation(ArrayList<State> states, String typeId, String locationId) {
         if (states==null||states.size()==0||typeId==null)return new ArrayList<>();
         ArrayList<String> newList = new ArrayList<>();
         if (locationId.equals(ANY_VALUE)) {

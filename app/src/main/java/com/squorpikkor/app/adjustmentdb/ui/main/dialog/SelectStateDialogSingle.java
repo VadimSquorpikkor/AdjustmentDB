@@ -2,21 +2,31 @@ package com.squorpikkor.app.adjustmentdb.ui.main.dialog;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.google.android.material.tabs.TabLayout;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
+import com.squorpikkor.app.adjustmentdb.SaveLoad;
+import com.squorpikkor.app.adjustmentdb.ui.main.adapter.ShortStateAdapter;
+import com.squorpikkor.app.adjustmentdb.ui.main.entities.State;
+
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 import java.util.Date;
 
 import static com.squorpikkor.app.adjustmentdb.Utils.isEmptyOrNull;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_VALUE_TEXT;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class SelectStateDialogSingle extends BaseDialog {
 
@@ -32,6 +42,10 @@ public class SelectStateDialogSingle extends BaseDialog {
 
     String location;
     DUnit unit;
+
+    RecyclerView stateNamesRecycler;
+
+    public static final String STATE_SINGLE_DIALOG_TAB_STATE = "state_single_dialog_tab_state";
 
     public SelectStateDialogSingle() {
     }
@@ -59,6 +73,7 @@ public class SelectStateDialogSingle extends BaseDialog {
         mViewModel.getDeviceSets().observe(this, list2 -> deviceSetSpinnerAdapter.setData(list2, EMPTY_VALUE_TEXT));
         mViewModel.getDevices().observe(this, list1 -> deviceSpinnerAdapter.setDataByDevSet(list1, deviceSetSpinnerAdapter.getSelectedNameId(), EMPTY_VALUE_TEXT));
         mViewModel.getStates().observe(this, list -> stateSpinnerAdapter.setDataByTypeAndLocation(list, unit.getType(), location, EMPTY_VALUE_TEXT));
+        mViewModel.getStates().observe(this, this::updateShortStateRecycler);
         mViewModel.getEmployees().observe(this, list -> employeeSpinnerAdapter.setData(list, EMPTY_VALUE_TEXT));
 
         deviceSetSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -120,7 +135,54 @@ public class SelectStateDialogSingle extends BaseDialog {
         cancelButton.setOnClickListener(view -> dismiss());
         okButton.setOnClickListener(view -> saveUnit(unit));
 
+        TabLayout tabs = view.findViewById(R.id.tab_layout);
+        tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                toggleTab(tab.getPosition());
+            }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {}
+        });
+        //установить вариант диалога при последнем выборе
+        int tabIndex = SaveLoad.loadIntParam(STATE_SINGLE_DIALOG_TAB_STATE);
+        toggleTab(tabIndex);
+        tabs.getTabAt(tabIndex).select();
+
+        stateNamesRecycler = view.findViewById(R.id.recycler_state_name);
+
+
         return dialog;
+    }
+
+    private void updateShortStateRecycler(ArrayList<State> list) {
+        ArrayList<String> ids = stateSpinnerAdapter.getNameIdsByTypeAndLocation(list, unit.getType(), location);
+        ArrayList<String> names = stateSpinnerAdapter.getNamesByTypeAndLocation(list, unit.getType(), location);
+
+        ShortStateAdapter adapter = new ShortStateAdapter(ids, names);
+        adapter.setOnItemClickListener(this::saveUnitNewStateOnly);
+        stateNamesRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+        stateNamesRecycler.setAdapter(adapter);
+    }
+
+    private void toggleTab(int tab) {
+        SaveLoad.saveParam(STATE_SINGLE_DIALOG_TAB_STATE, tab);
+        if (tab == 0) {
+            view.findViewById(R.id.layout_detail).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.layout_short).setVisibility(View.GONE);
+        } else {
+            view.findViewById(R.id.layout_detail).setVisibility(View.GONE);
+            view.findViewById(R.id.layout_short).setVisibility(View.VISIBLE);
+        }
+    }
+
+    /**Вариант сохранения юнита, когда обновляется единственный параметр — статус устройства*/
+    private void saveUnitNewStateOnly(String name) {
+        unit.addNewEvent(mViewModel, name, "", location);
+        mViewModel.saveUnitAndEvent(unit);
+        dismiss();
     }
 
     private void updateDeviceSpinner() {
