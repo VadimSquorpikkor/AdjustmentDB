@@ -41,12 +41,15 @@ public class FoundUnitAdapter extends RecyclerView.Adapter<FoundUnitAdapter.Foun
         String serial = getRightValue(unit.getSerial());
         String innerSerial = getRightValue(unit.getInnerSerial());
         String id = getRightValue(unit.getId());
+//        String state = unit.getLastEvent().getState();
+        if (unit.getLastEvent()!=null) holder.deviceState.setText(mViewModel.getStateNameById(unit.getLastEvent().getState()));
 
         holder.deviceType.setText(type);
         holder.deviceName.setText(name);
         holder.deviceSerial.setText(serial);
         holder.deviceInnerSerial.setText(innerSerial);
         holder.deviceId.setText(id);
+//        holder.deviceState.setText(state);
     }
 
     /**Просто возвращает кол-во элементов в массиве*/
@@ -61,6 +64,7 @@ public class FoundUnitAdapter extends RecyclerView.Adapter<FoundUnitAdapter.Foun
         private final TextView deviceSerial;
         private final TextView deviceInnerSerial;
         private final TextView deviceId;
+        private final TextView deviceState;
 
         public FoundViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -69,6 +73,7 @@ public class FoundUnitAdapter extends RecyclerView.Adapter<FoundUnitAdapter.Foun
             deviceSerial = itemView.findViewById(R.id.dev_serial);
             deviceInnerSerial = itemView.findViewById(R.id.dev_inner_serial);
             deviceId = itemView.findViewById(R.id.dev_id);
+            deviceState = itemView.findViewById(R.id.dev_state);
         }
     }
 }

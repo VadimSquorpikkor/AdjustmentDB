@@ -2,89 +2,44 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="5dp"
     android:background="@color/colorBackground"
     android:orientation="vertical"
     android:padding="15dp"
     android:gravity="center_horizontal">
 
+    <com.google.android.material.tabs.TabLayout
+        app:tabIndicatorColor="@color/main_orange"
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        >
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tab_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/main_orange"
+            android:text="Подробно" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tab_short"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/main_orange"
+            android:text="Кратко" />
+
+    </com.google.android.material.tabs.TabLayout>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Новые значения будут добавлены только устройствам без значений. Устройства, у которых уже есть какие-то значения, будут проигнорированы"/>
 
-    <LinearLayout style="@style/dialogLinearHorizontal">
-        <TextView
-            android:id="@+id/dialogSetNameLabel"
-            style="@style/dialogLinearText"
-            android:text="@string/device_set_doted" />
+    <include layout="@layout/dialog_state_multi_detail"  android:id="@+id/layout_detail"/>
 
-        <Spinner
-            android:id="@+id/spinnerDevSetName"
-            style="@style/dialogLinearEdit" />
-    </LinearLayout>
-
-    <LinearLayout style="@style/dialogLinearHorizontal">
-        <TextView
-            android:id="@+id/dialogNewNameLabel"
-            style="@style/dialogLinearText"
-            android:text="@string/add_type" />
-
-        <Spinner
-            android:id="@+id/name_spinner"
-            style="@style/dialogLinearEdit" />
-    </LinearLayout>
-
-    <LinearLayout style="@style/dialogLinearHorizontal">
-        <TextView
-            android:id="@+id/dialogStateLabel"
-            style="@style/dialogLinearText"
-            android:text="@string/add_state_doted"/>
-
-        <Spinner
-            android:id="@+id/state_spinner"
-            style="@style/dialogLinearEdit"/>
-    </LinearLayout>
-
-    <LinearLayout style="@style/dialogLinearHorizontal">
-        <TextView
-            android:id="@+id/dialogEmployeeLabel"
-            style="@style/dialogLinearText"
-            android:text="@string/add_employee_doted"/>
-
-        <Spinner
-            android:id="@+id/employee_spinner"
-            style="@style/dialogLinearEdit"/>
-    </LinearLayout>
-
-    <EditText
-        android:id="@+id/description"
-        style="@style/dialogEditText"
-        android:background="@drawable/edit_text_field"
-        android:hint="@string/add_description"
-        android:importantForAutofill="no"
-        android:inputType="text"/>
-
-    <LinearLayout style="@style/dialogLinearHorizontal">
-        <Button
-            android:id="@+id/cancel_button"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="@string/cancel"
-            android:textAllCaps="false"
-            android:textSize="12sp"/>
-
-        <Button
-            android:id="@+id/ok_button"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/ok"
-            android:textAllCaps="false"
-            android:textSize="12sp"/>
-    </LinearLayout>
+    <include layout="@layout/dialog_state_single_short" android:id="@+id/layout_short"/>
 
 </LinearLayout>
