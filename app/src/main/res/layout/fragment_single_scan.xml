@@ -175,6 +175,32 @@
             app:layout_constraintTop_toBottomOf="@+id/textViewEmployee"
             tools:text="23" />
 
+        <TextView
+            android:id="@+id/textTrackId"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_marginStart="20dp"
+            android:gravity="end"
+            android:text="TrackId"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/textTrackIdValue"
+            app:layout_constraintTop_toBottomOf="@+id/textDaysPassedValue" />
+
+        <TextView
+            android:id="@+id/textTrackIdValue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_marginEnd="20dp"
+            android:gravity="start"
+            app:layout_constraintLeft_toRightOf="@+id/textTrackId"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textDaysPassedValue"
+            tools:text="123456789" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
@@ -183,7 +209,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textDaysPassedValue" />
+            app:layout_constraintTop_toBottomOf="@+id/textTrackIdValue" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/addNewState"

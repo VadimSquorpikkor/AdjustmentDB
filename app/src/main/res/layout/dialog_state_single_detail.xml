@@ -88,6 +88,51 @@
             style="@style/dialogLinearEdit"/>
     </LinearLayout>
 
+    <LinearLayout style="@style/dialogLinearHorizontal">
+        <TextView
+            android:id="@+id/dialogTrackIdLabel"
+            style="@style/dialogLinearText"
+            android:text="@string/trackid_doted"/>
+
+        <EditText
+            android:id="@+id/dTrackId"
+            style="@style/dialogLinearEdit"
+            android:background="@drawable/edit_text_field"
+            android:hint="@string/trackid"
+            android:importantForAutofill="no"
+            android:inputType="text"/>
+    </LinearLayout>
+
+    <LinearLayout style="@style/dialogLinearHorizontal" android:gravity="end">
+
+        <Button
+            android:id="@+id/button_generate"
+            android:padding="8dp"
+            android:background="@drawable/button_shape_selector"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:textSize="12sp"
+            android:drawablePadding="5dp"
+            android:textAllCaps="false"
+            android:text="Сгенерировать"
+            android:drawableTop="@drawable/ic_baseline_auto_fix_high_24"/>
+
+        <Button
+            android:id="@+id/paste_button"
+            android:padding="8dp"
+            android:background="@drawable/button_shape_selector_green"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:textSize="12sp"
+            android:drawablePadding="5dp"
+            android:textAllCaps="false"
+            android:text="Предыдущее"
+            android:drawableTop="@drawable/ic_baseline_content_paste_24"/>
+
+    </LinearLayout>
+
     <EditText
         android:id="@+id/description"
         style="@style/dialogEditText"

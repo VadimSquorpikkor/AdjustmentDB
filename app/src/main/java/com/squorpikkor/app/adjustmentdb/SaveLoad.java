@@ -14,12 +14,26 @@ public class SaveLoad {
         mPreferences.edit().putInt(key, param).apply();
     }
 
+    public static void saveParam(String key, String param) {
+        SharedPreferences mPreferences = App.getContext().getSharedPreferences("pref", Context.MODE_PRIVATE);
+        mPreferences.edit().putString(key, param).apply();
+    }
+
     /**Загрузка int по ключу*/
     public static int loadIntParam(String key) {
         SharedPreferences mPreferences = App.getContext().getSharedPreferences("pref", Context.MODE_PRIVATE);
         int value = 0;
         if (mPreferences.contains(key)) {
             value = mPreferences.getInt(key, 0);
+        }
+        return value;
+    }
+
+    public static String loadStringParam(String key) {
+        SharedPreferences mPreferences = App.getContext().getSharedPreferences("pref", Context.MODE_PRIVATE);
+        String value = "";
+        if (mPreferences.contains(key)) {
+            value = mPreferences.getString(key, "");
         }
         return value;
     }

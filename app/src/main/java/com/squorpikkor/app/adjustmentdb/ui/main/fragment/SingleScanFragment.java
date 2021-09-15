@@ -36,6 +36,7 @@ public class SingleScanFragment extends Fragment {
     private TextView tId;
     private TextView tEmployee;
     private TextView tDaysPassed;
+    private TextView tTrackId;
     private RecyclerView recyclerUnitsStates;
     private ArrayList<DEvent> states;
     private FloatingActionButton addNewStateButton;
@@ -71,6 +72,7 @@ public class SingleScanFragment extends Fragment {
         tDaysPassed = view.findViewById(R.id.textDaysPassedValue);
         recyclerUnitsStates = view.findViewById(R.id.recyclerView);
         isCompleteImage = view.findViewById(R.id.is_complete);
+        tTrackId = view.findViewById(R.id.textTrackIdValue);
 
         isCompleteImage.setVisibility(View.GONE);
 
@@ -139,6 +141,8 @@ public class SingleScanFragment extends Fragment {
 
         if (unit.isComplete()) isCompleteImage.setVisibility(View.VISIBLE);
         else isCompleteImage.setVisibility(View.GONE);
+
+        tTrackId.setText(Utils.getRightValue(unit.getTrackId()));
 
         mViewModel.addSelectedUnitStatesListListener(unit.getId());
     }

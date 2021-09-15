@@ -99,4 +99,16 @@ public class Utils {
             default:return "дней";
         }
     }
+
+    public static final String SAVED_TRACKID = "saved_trackid";
+
+    public static String generateTrackId() {
+        String id = ""+(System.currentTimeMillis()/1000);
+        SaveLoad.saveParam(SAVED_TRACKID, id);
+        return id;
+    }
+
+    public static String getPreviouslyGeneratedTrackId() {
+        return SaveLoad.loadStringParam(SAVED_TRACKID);
+    }
 }

@@ -20,6 +20,7 @@ public class DUnit {
     private Date closeDate;
     private DEvent lastEvent;
     private String deviceSet;
+    private String trackId;
 
     public DUnit() {
     }
@@ -189,5 +190,14 @@ public class DUnit {
 
     public void setEventId(String eventId) {
         this.eventId = eventId;
+    }
+
+    /**ТрекID для поиска ремонтного устройства. Если в ремонт приходят несколько устройств комплектом, то у них всех будет одинаковый ТрекID*/
+    public String getTrackId() {
+        return trackId;
+    }
+
+    public void setTrackId(String trackId) {
+        this.trackId = trackId;
     }
 }

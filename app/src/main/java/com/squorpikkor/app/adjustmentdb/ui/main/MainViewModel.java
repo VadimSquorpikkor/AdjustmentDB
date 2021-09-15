@@ -75,6 +75,7 @@ public static final String TABLE_NAMES = "names";
     public static final String UNIT_SERIAL = "serial";
     public static final String UNIT_STATE = "state_id";
     public static final String UNIT_TYPE = "type_id";//todo по-хорошему нужна коллекция тайпов. Пока обойдусь
+    public static final String UNIT_TRACKID = "trackid";
 
     public static final String TABLE_STATES = "states"; //в прошлом profile
     public static final String STATE_ID = "id";

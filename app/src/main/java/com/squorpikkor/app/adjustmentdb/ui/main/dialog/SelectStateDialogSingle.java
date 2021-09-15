@@ -21,6 +21,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static com.squorpikkor.app.adjustmentdb.Utils.SAVED_TRACKID;
+import static com.squorpikkor.app.adjustmentdb.Utils.generateTrackId;
+import static com.squorpikkor.app.adjustmentdb.Utils.getPreviouslyGeneratedTrackId;
 import static com.squorpikkor.app.adjustmentdb.Utils.isEmptyOrNull;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_VALUE_TEXT;
@@ -38,6 +41,7 @@ public class SelectStateDialogSingle extends BaseDialog {
     EditText descriptionEdit;
     EditText innerEdit;
     EditText serialEdit;
+    EditText trackIdEdit;
     TextView nameText;
 
     String location;
@@ -46,6 +50,7 @@ public class SelectStateDialogSingle extends BaseDialog {
     RecyclerView stateNamesRecycler;
 
     public static final String STATE_SINGLE_DIALOG_TAB_STATE = "state_single_dialog_tab_state";
+
 
     public SelectStateDialogSingle() {
     }
@@ -85,28 +90,39 @@ public class SelectStateDialogSingle extends BaseDialog {
 
         Button cancelButton = view.findViewById(R.id.cancel_button);
         Button okButton = view.findViewById(R.id.ok_button);
+        Button generateTrackIdButton = view.findViewById(R.id.button_generate);
+        Button pasteTrackIdButton = view.findViewById(R.id.paste_button);
 
         nameText = view.findViewById(R.id.dName);
         descriptionEdit = view.findViewById(R.id.description);
         innerEdit = view.findViewById(R.id.dInner);
         serialEdit = view.findViewById(R.id.dSerial);
+        trackIdEdit = view.findViewById(R.id.dTrackId);
 
         TextView labelDevSet = view.findViewById(R.id.dialogSetNameLabel);
         TextView labelDevices = view.findViewById(R.id.dialogNewNameLabel);
         TextView labelInner = view.findViewById(R.id.dialogInnerLabel);
         TextView labelSerial = view.findViewById(R.id.dialogSerialLabel);
         TextView labelEmployee = view.findViewById(R.id.dialogEmployeeLabel);
+        TextView labelTrackId = view.findViewById(R.id.dialogTrackIdLabel);
 
         devicesSpinner.setVisibility(View.GONE);
         nameText.setVisibility(View.GONE);
         innerEdit.setVisibility(View.GONE);
         serialEdit.setVisibility(View.GONE);
+        trackIdEdit.setVisibility(View.GONE);
         employeeSpinner.setVisibility(View.GONE);
 
         labelDevices.setVisibility(View.GONE);
         labelInner.setVisibility(View.GONE);
         labelSerial.setVisibility(View.GONE);
         labelEmployee.setVisibility(View.GONE);
+        labelTrackId.setVisibility(View.GONE);
+
+        generateTrackIdButton.setVisibility(View.GONE);
+        pasteTrackIdButton.setVisibility(View.GONE);
+
+        String savedTrackId = getPreviouslyGeneratedTrackId();
 
         //Если у юнита уже есть серийный или внутренний номер или имя или ответственный, то его уже нельзя поменять, поэтому я просто скрываю его
         if (unit != null) {
@@ -130,10 +146,18 @@ public class SelectStateDialogSingle extends BaseDialog {
                 employeeSpinner.setVisibility(View.VISIBLE);
                 labelEmployee.setVisibility(View.VISIBLE);
             }
+            if (unit.isRepairUnit()&&(unit.getTrackId()==null||unit.getTrackId().equals(""))) { //для TRACKID
+                labelTrackId.setVisibility(View.VISIBLE);
+                trackIdEdit.setVisibility(View.VISIBLE);
+                generateTrackIdButton.setVisibility(View.VISIBLE);
+                if (!savedTrackId.equals("")) pasteTrackIdButton.setVisibility(View.VISIBLE);
+            }
         }
 
         cancelButton.setOnClickListener(view -> dismiss());
         okButton.setOnClickListener(view -> saveUnit(unit));
+        generateTrackIdButton.setOnClickListener(v -> trackIdEdit.setText(generateTrackId()));
+        pasteTrackIdButton.setOnClickListener(v -> trackIdEdit.setText(getPreviouslyGeneratedTrackId()));
 
         TabLayout tabs = view.findViewById(R.id.tab_layout);
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -152,7 +176,6 @@ public class SelectStateDialogSingle extends BaseDialog {
         tabs.getTabAt(tabIndex).select();
 
         stateNamesRecycler = view.findViewById(R.id.recycler_state_name);
-
 
         return dialog;
     }
@@ -203,6 +226,7 @@ public class SelectStateDialogSingle extends BaseDialog {
         String employee = employeeSpinnerAdapter.getSelectedNameId();
         String description = descriptionEdit.getText().toString();
         String devSetId = deviceSetSpinnerAdapter.getSelectedNameId();
+        String trackId = trackIdEdit.getText().toString();
 
         if (unit.getName().equals("") && !newNameId.equals(ANY_VALUE)) unit.setName(newNameId);
         if (unit.getInnerSerial().equals("") && !newInner.equals("")) unit.setInnerSerial(newInner);
@@ -211,5 +235,7 @@ public class SelectStateDialogSingle extends BaseDialog {
         if (!newStateId.equals(ANY_VALUE)) unit.addNewEvent(mViewModel, newStateId, description, location);
         if (!employee.equals(ANY_VALUE)) unit.setEmployee(employee);
         if (!devSetId.equals(ANY_VALUE)) unit.setDeviceSet(devSetId);
+//        if (!trackId.equals("") && !(unit.getTrackId()==null || unit.getTrackId().equals(""))) unit.setTrackId(trackId);
+        if (!trackId.equals("") && (unit.getTrackId()==null || unit.getTrackId().equals(""))) unit.setTrackId(trackId);
     }
 }

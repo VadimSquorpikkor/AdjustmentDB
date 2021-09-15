@@ -50,5 +50,7 @@
     <string name="days_in_work">Дней в работе</string>
     <string name="add_employee_doted">Добавить ответственного:</string>
     <string name="manual_params_description">Если имя и/или серийный не выбраны, то устройству будут присвоены распознанные значения. Если параметры выбрать руками, то распознанные значения будут проигнорированы, устройство будет сохранено с параметрами выбранными вручную</string>
+    <string name="trackid_doted">TrackId:</string>
+    <string name="trackid">TrackId</string>
 
 </resources>

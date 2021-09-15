@@ -68,6 +68,7 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_INNER_
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_LOCATION;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_SERIAL;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_STATE;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_TRACKID;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_TYPE;
 
 
@@ -331,6 +332,7 @@ class FireDBHelper {
         if (unit.getCloseDate()!=null) data.put(UNIT_CLOSE_DATE, unit.getCloseDate());
         if (unit.getLastEvent()!=null) data.put(UNIT_LOCATION, unit.getLastEvent().getLocation());
         if (unit.getLastEvent()!=null) data.put(UNIT_STATE, unit.getLastEvent().getState());
+        data.put(UNIT_TRACKID, unit.getTrackId());
         db.collection(TABLE_UNITS)
                 .document(unit.getId())
 //                .update(data)
@@ -422,6 +424,7 @@ class FireDBHelper {
         if (timestamp != null) unit.setDate(timestamp.toDate());
         Timestamp closeTime = (Timestamp) documentSnapshots.get(UNIT_CLOSE_DATE);
         if (closeTime != null) unit.setCloseDate(closeTime.toDate());
+        unit.setTrackId(String.valueOf(documentSnapshots.get(UNIT_TRACKID)));
         return unit;
     }
 
