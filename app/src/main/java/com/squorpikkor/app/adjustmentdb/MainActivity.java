@@ -8,6 +8,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
@@ -16,7 +17,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -47,7 +47,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.squorpikkor.app.adjustmentdb.BuildConfig.VERSION_NAME;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_INFO_FRAGMENT;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -71,10 +70,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
+        //Выбор вкладки, которая будет открываться при старте приложения.
+        //Выбирается пользователем в настройках, по умолчанию — 1 ("Поиск"). Нумерация идет с 0)
+        String saved = PreferenceManager.getDefaultSharedPreferences(this).getString("preferredTab", "1");
+        int preferredTab = Integer.parseInt(saved);
+
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(sectionsPagerAdapter);
-        viewPager.setCurrentItem(1);
+        viewPager.setCurrentItem(preferredTab);
         viewPager.setPageTransformer(true, new ZoomOutPageTransformer());
 
         drawer_layout = findViewById(R.id.drawer_layout);
@@ -202,15 +206,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         item.setCheckable(false);
         int id = item.getItemId();
-        if (id == R.id.first) {
-            reSignIn();
-        } else if (id == R.id.third) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                this.finishAndRemoveTask();
-            } else {
-                this.finish();
-            }
+        switch (id) {
+            case R.id.account_menu:  reSignIn(); break;
+            case R.id.settings_menu: startActivity(new Intent(this, SettingsActivity.class)); break;
+            case R.id.exit_menu:  this.finishAndRemoveTask(); break;
         }
+
         drawer_layout.closeDrawer(GravityCompat.START);
         return true;
     }

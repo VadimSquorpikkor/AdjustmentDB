@@ -460,8 +460,8 @@ public static final String TABLE_NAMES = "names";
 
         switch (backPressCommand) {
             case BACK_PRESS_SEARCH: startExit.setValue(true); break;
-            case BACK_PRESS_SINGLE: goToSearchTab.setValue(true); break;
             case BACK_PRESS_MULTI:
+            case BACK_PRESS_SINGLE: goToSearchTab.setValue(true); break;
             case BACK_PRESS_STATES: restartScanning.setValue(true); break;
             case BACK_PRESS_MULTI_STATES: restartMultiScanning(); break;
             case BACK_PRESS_INFO_FRAGMENT: backToRecycler.setValue(true); break;

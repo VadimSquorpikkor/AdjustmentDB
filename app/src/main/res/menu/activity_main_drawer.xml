@@ -6,11 +6,17 @@
     <group android:checkableBehavior="single">
 
         <item
-            android:id="@+id/first"
+            android:id="@+id/account_menu"
             android:icon="@drawable/fui_ic_anonymous_white_24dp"
             android:title="Поменять аккаунт"/>
+
         <item
-            android:id="@+id/third"
+            android:id="@+id/settings_menu"
+            android:icon="@drawable/ic_baseline_settings_24"
+            android:title="Настройки"/>
+
+        <item
+            android:id="@+id/exit_menu"
             android:icon="@drawable/ic_baseline_meeting_room_24"
             android:title="Выйти" />
     </group>

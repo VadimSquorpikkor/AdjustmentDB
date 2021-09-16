@@ -1,0 +1,35 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory app:title="Облегчить себе жизнь">
+
+        <ListPreference
+            app:defaultValue="2"
+            app:entries="@array/select_fragment_entries"
+            app:entryValues="@array/select_values"
+            app:key="preferredTab"
+            app:title="Вкладка по умолчанию"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:key="auto_start_dialog"
+            app:title="Автостарт ввода параметров"
+            android:summary="После успешного распознавания QR-кода будет автоматически запускаться диалог ввода параметров"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Здесь ещё что-то будет">
+        <!--<EditTextPreference
+            app:key="signature"
+            app:title="@string/signature_title"
+            app:useSimpleSummaryProvider="true" />-->
+
+        <!--<SwitchPreferenceCompat
+            app:dependency="sync"
+            app:key="attachment"
+            app:summaryOff="@string/attachment_summary_off"
+            app:summaryOn="@string/attachment_summary_on"
+            app:title="@string/attachment_title" />-->
+    </PreferenceCategory>
+
+</PreferenceScreen>

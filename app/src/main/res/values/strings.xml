@@ -36,6 +36,10 @@
     <string name="tab_text_1">Одиночное\nсканирование</string>
     <string name="tab_text_2">Поиск\nустройства</string>
     <string name="tab_text_3">Множественное\nсканирование</string>
+    <string name="set_text_1">Одиночное сканирование</string>
+    <string name="set_text_2">Поиск устройства</string>
+    <string name="set_text_3">Множественное сканирование</string>
+
     <string name="new_name">Название</string>
     <string name="show">Показать</string>
     <string name="nothing_found">Ничего не найдено!</string>
@@ -52,5 +56,7 @@
     <string name="manual_params_description">Если имя и/или серийный не выбраны, то устройству будут присвоены распознанные значения. Если параметры выбрать руками, то распознанные значения будут проигнорированы, устройство будет сохранено с параметрами выбранными вручную</string>
     <string name="trackid_doted">TrackId:</string>
     <string name="trackid">TrackId</string>
+<!--    <string name="title_activity_settings" />--> <!--о как-->
+    <string name="title_activity_settings">Настройки</string>
 
 </resources>

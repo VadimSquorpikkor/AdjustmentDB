@@ -1,9 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Выбор фрагмента по умолчанию в настройках -->
+    <string-array name="select_fragment_entries">
+        <item>@string/set_text_1</item>
+        <item>@string/set_text_2</item>
+        <item>@string/set_text_3</item>
+    </string-array>
+
+    <string-array name="select_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
     <string-array name="state_array">
         <item>-- не выбрано --</item>
         <item>На сборке</item>
         <item>На регулировке</item>
         <item>На линейке</item>
     </string-array>
+
+
+
 </resources>
