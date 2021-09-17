@@ -1,7 +1,6 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.fragment;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
@@ -11,7 +10,6 @@ import android.widget.TextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -19,7 +17,6 @@ import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.Utils;
-import com.squorpikkor.app.adjustmentdb.app.App;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.StatesAdapter;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.RecognizeDialog;
@@ -90,6 +87,7 @@ public class SingleScanFragment extends Fragment {
         mViewModel.getSelectedUnit().observe(getViewLifecycleOwner(), this::insertDataToFields);
         mViewModel.getUnitStatesList().observe(getViewLifecycleOwner(), this::updateEvents);
         mViewModel.getRestartScanning().observe(getViewLifecycleOwner(), this::restartScanning);
+        mViewModel.getShouldOpenDialog().observe(getViewLifecycleOwner(), b -> {if (b) openStatesDialog();});
 
         mViewModel.startSingleScanner(getActivity(), surfaceView);
 
@@ -121,6 +119,7 @@ public class SingleScanFragment extends Fragment {
             mViewModel.getSingleScanner().initialiseDetectorsAndSources();
             mViewModel.setBackPressCommand(BACK_PRESS_SINGLE);
             mViewModel.getSelectedUnit().setValue(null);
+            mViewModel.getShouldOpenDialog().setValue(false);
         }
     }
 
@@ -148,11 +147,6 @@ public class SingleScanFragment extends Fragment {
         tTrackId.setText(Utils.getRightValue(unit.getTrackId()));
 
         mViewModel.addSelectedUnitStatesListListener(unit.getId());
-
-        //Открытие диалога статусов сразу после успешного распознания QR-кода (и вставки данных в диалог)
-        //Если пользователь установил такое правило в настройках
-        boolean shouldOpen = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getBoolean("auto_start_dialog", false);
-        if (shouldOpen) openStatesDialog();
     }
 
     private void openStatesDialog() {

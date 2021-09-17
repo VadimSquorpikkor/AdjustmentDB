@@ -6,9 +6,12 @@ import android.util.Log;
 import android.view.SurfaceView;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.preference.PreferenceManager;
+
 import com.google.firebase.auth.FirebaseUser;
 import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
+import com.squorpikkor.app.adjustmentdb.app.App;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.Device;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.DeviceSet;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.Employee;
@@ -150,6 +153,7 @@ public static final String TABLE_NAMES = "names";
     private final MutableLiveData<Boolean> restartMultiScanning;
     private final MutableLiveData<Boolean> backToRecycler;
     private final MutableLiveData<Boolean> isWrongQR;
+    private final MutableLiveData<Boolean> shouldOpenDialog;
     private final MutableLiveData<Integer> position;
 
     private FirebaseUser user;
@@ -335,6 +339,7 @@ public static final String TABLE_NAMES = "names";
 
         isWrongQR = new MutableLiveData<>();
         position = new MutableLiveData<>();
+        shouldOpenDialog = new MutableLiveData<>();
     }
 
     public void closeEvent(String event_id) {
@@ -426,7 +431,11 @@ public static final String TABLE_NAMES = "names";
         return isWrongQR;
     }
 
-//--------------- BACK PRESS -----------------------------------------------------------------------
+    public MutableLiveData<Boolean> getShouldOpenDialog() {
+        return shouldOpenDialog;
+    }
+
+    //--------------- BACK PRESS -----------------------------------------------------------------------
 
     public MutableLiveData<Boolean> getStartExit() {
         return startExit;
@@ -520,7 +529,18 @@ public static final String TABLE_NAMES = "names";
             selectedUnit.setValue(unit);
             addSelectedUnitListener(unit.getId());
             getEventsForThisUnit(unit.getId());
+            showStateDialog();
         } else sayWrongQr();
+
+    }
+
+    /**Открытие диалога статусов сразу после успешного распознания QR-кода (и вставки данных в диалог)
+     * Если пользователь установил такое правило в настройках*/
+    private void showStateDialog() {
+        boolean savedValue = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean("auto_start_dialog", false);
+        if (savedValue) {
+            if (shouldOpenDialog.getValue()==null || !shouldOpenDialog.getValue()) shouldOpenDialog.setValue(true);
+        }
     }
 
     private void sayWrongQr() {
