@@ -107,29 +107,31 @@
 
         <Button
             android:id="@+id/button_generate"
-            android:padding="8dp"
+            android:paddingStart="15dp"
             android:background="@drawable/button_shape_selector"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:textSize="12sp"
-            android:drawablePadding="5dp"
             android:textAllCaps="false"
-            android:text="Сгенерировать"
-            android:drawableTop="@drawable/ic_baseline_auto_fix_high_24"/>
+            android:text="Сгенерировать ID"
+            android:elevation="10dp"
+            android:drawableLeft="@drawable/ic_baseline_auto_fix_high_24"/>
 
         <Button
             android:id="@+id/paste_button"
-            android:padding="8dp"
+            android:paddingStart="15dp"
             android:background="@drawable/button_shape_selector_green"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:textSize="12sp"
-            android:drawablePadding="5dp"
             android:textAllCaps="false"
             android:text="Предыдущее"
-            android:drawableTop="@drawable/ic_baseline_content_paste_24"/>
+            android:elevation="10dp"
+            android:drawableLeft="@drawable/ic_baseline_content_paste_24"/>
 
     </LinearLayout>
 
