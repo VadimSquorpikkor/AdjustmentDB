@@ -95,6 +95,7 @@
         <item name="android:layout_margin">7dp</item>
         <item name="android:textAlignment">viewStart</item>
         <item name="android:scrollbarSize">22dp</item>
+        <item name="android:spinnerMode">dialog</item>
     </style>
 
     <style name="dialogLinearHorizontal">

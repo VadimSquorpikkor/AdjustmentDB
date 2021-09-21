@@ -72,7 +72,7 @@
 
         <Spinner
             android:id="@+id/spinnerDevSetName"
-            style="@style/dialogLinearEdit" />
+            style="@style/dialogLinearSpinner" />
 
     </LinearLayout>
 
@@ -85,7 +85,7 @@
 
         <Spinner
             android:id="@+id/spinnerDevName"
-            style="@style/dialogLinearEdit" />
+            style="@style/dialogLinearSpinner" />
 
     </LinearLayout>
 
@@ -98,7 +98,7 @@
 
         <Spinner
             android:id="@+id/spinnerLocation"
-            style="@style/dialogLinearEdit" />
+            style="@style/dialogLinearSpinner" />
     </LinearLayout>
 
     <LinearLayout style="@style/dialogLinearHorizontal">

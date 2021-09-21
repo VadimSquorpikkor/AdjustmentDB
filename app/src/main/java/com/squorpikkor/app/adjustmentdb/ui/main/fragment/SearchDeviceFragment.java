@@ -46,12 +46,19 @@ public class SearchDeviceFragment extends Fragment {
 
         mViewModel.getStartExit().observe(getViewLifecycleOwner(), this::exitDialog);
         mViewModel.getFoundUnitsList().observe(getViewLifecycleOwner(), this::updateFoundRecycler);
+        mViewModel.getCanWork().observe(getViewLifecycleOwner(), this::setButtonVisibility);
 
         openSearchDialogButton = view.findViewById(R.id.open_search);
         openSearchDialogButton.setOnClickListener(v -> openSearchDialog());
 
         mViewModel.setBackPressCommand(BACK_PRESS_SEARCH);
         return view;
+    }
+
+    /**Если работа запрещена (например пользователь не зарегистрирован), то кнопка поиска скрывается*/
+    private void setButtonVisibility(Boolean show) {
+        if(show)openSearchDialogButton.setVisibility(View.VISIBLE);
+        else openSearchDialogButton.setVisibility(View.GONE);
     }
 
     private void openSearchDialog() {

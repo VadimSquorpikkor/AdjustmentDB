@@ -41,7 +41,9 @@ public class Scanner {
         this.dataSet = new HashSet<>();
     }
 
-    public void initialiseDetectorsAndSources() {
+    /**Если goWork = false (работа запрещена, например пользователь не зарегистрирован), то сканер не инициализируется*/
+    public void initialiseDetectorsAndSources(boolean goWork) {
+        if (!goWork) return;
         BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(context)
                 .setBarcodeFormats(Barcode.ALL_FORMATS)
                 .build();

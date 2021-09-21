@@ -97,7 +97,7 @@ public class MultiScanFragment extends Fragment {
     public void onResume() {
         super.onResume();
         surfaceView.setVisibility(View.VISIBLE);
-        mViewModel.getMultiScanner().initialiseDetectorsAndSources();
+        mViewModel.getMultiScanner().initialiseDetectorsAndSources(mViewModel.getCanWork().getValue());
         if (foundUnitsList!=null && foundUnitsList.size() != 0) {
             nextButton.setVisibility(View.VISIBLE);
             mViewModel.setBackPressCommand(BACK_PRESS_MULTI_STATES);

@@ -1,0 +1,374 @@
+package com.squorpikkor.app.adjustmentdb;
+
+import static com.squorpikkor.app.adjustmentdb.BuildConfig.VERSION_NAME;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_LOCATION_NAME;
+
+import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.preference.PreferenceManager;
+import androidx.viewpager.widget.ViewPager;
+
+import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
+import com.firebase.ui.auth.IdpResponse;
+import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.squorpikkor.app.adjustmentdb.ui.main.DrawableTask;
+import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
+import com.squorpikkor.app.adjustmentdb.ui.main.entities.Location;
+import com.squorpikkor.app.adjustmentdb.ui.main.fragment.UnitInfoFragment;
+import com.squorpikkor.app.adjustmentdb.ui.main.fragment_cradle.SectionsPagerAdapter;
+import com.squorpikkor.app.adjustmentdb.ui.main.fragment_cradle.ZoomOutPageTransformer;
+
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+class MainActivityOld  extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+
+    public static final String TAG = "tag";
+    MainViewModel mViewModel;
+    TextView location;
+    TextView locationText;
+    TextView emailText;
+    TextView version;
+    ImageView accountImage;
+    private static final int RC_SIGN_IN = 101;
+    TabLayout tabs;
+    DrawerLayout drawer_layout;
+    NavigationView navigationView;
+    ViewPager viewPager;
+    Signing signing;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+
+        //Выбор вкладки, которая будет открываться при старте приложения.
+        //Выбирается пользователем в настройках, по умолчанию — 1 ("Поиск"). Нумерация идет с 0)
+        String saved = PreferenceManager.getDefaultSharedPreferences(this).getString("preferredTab", "1");
+        int preferredTab = Integer.parseInt(saved);
+
+        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
+        viewPager = findViewById(R.id.view_pager);
+        viewPager.setAdapter(sectionsPagerAdapter);
+        viewPager.setCurrentItem(preferredTab);
+        viewPager.setPageTransformer(true, new ZoomOutPageTransformer());
+
+        drawer_layout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        tabs = findViewById(R.id.tabs);
+        tabs.setupWithViewPager(viewPager);
+
+        //CustomView
+        tabs.getTabAt(0).setCustomView(R.layout.tab_view_0);
+        tabs.getTabAt(1).setCustomView(R.layout.tab_view_1);
+        tabs.getTabAt(2).setCustomView(R.layout.tab_view_2);
+
+        //Для варианта без customView
+        //setupTabIcons();
+
+        location = findViewById(R.id.location);
+
+        View headerView = navigationView.getHeaderView(0);
+        version = headerView.findViewById(R.id.version);
+        String appName = getString(R.string.app_name);
+        version.setText(String.format("%s %s", appName, VERSION_NAME));
+        locationText = headerView.findViewById(R.id.location_text);
+        emailText = headerView.findViewById(R.id.email_text);
+        accountImage = headerView.findViewById(R.id.account_image);
+
+        final MutableLiveData<Drawable> getImage = mViewModel.getUserImage();
+        getImage.observe(this, drawable -> accountImage.setImageDrawable(drawable));
+
+        /*final MutableLiveData<String> locationId = mViewModel.getLocation_id();
+        locationId.observe(this, s -> {
+            if (locationId.getValue() != null) {
+                mViewModel.setStatesForLocation(locationId.getValue());
+            }
+        });*/
+
+        final MutableLiveData<String> locationName = mViewModel.getLocationName();
+        locationName.observe(this, s -> {
+            if (locationName.getValue() != null) {
+                location.setText(locationName.getValue());
+                locationText.setText(locationName.getValue());
+            }
+        });
+
+        final MutableLiveData<Boolean> goToSearch = mViewModel.getGoToSearchTab();
+        goToSearch.observe(this, this::goToSearchTab);
+
+//        signing = new Signing(this);
+//        signing.signing();
+
+        signIn();
+
+        // Choose authentication providers
+        List<AuthUI.IdpConfig> providers = Arrays.asList(new AuthUI.IdpConfig.GoogleBuilder().build());
+        // Create and launch sign-in intent
+        /*Intent signInIntent = AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setAvailableProviders(providers)
+                .build();
+        signInLauncher.launch(signInIntent);*/
+
+//        mViewModel.getLocations().observe(this, new Observer<ArrayList<Location>>() {
+        mViewModel.getLocations().observe(this, (Observer<ArrayList<Location>>) locations -> {
+            if (mViewModel.getLocationName() != null && mViewModel.getLocationName().equals(EMPTY_LOCATION_NAME)) {
+
+            }
+            Log.e(TAG, "onCreate: "+locations.get(locations.size()-1).getName());
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            mViewModel.setLocationByEmail(user.getEmail());
+            DrawableTask task = new DrawableTask(mViewModel);
+            if (user.getPhotoUrl()==null){mViewModel.updateUserImage(ContextCompat.getDrawable(this, R.mipmap.logo));}
+            else task.execute(user.getPhotoUrl().toString());
+        });
+
+        mViewModel.getCanWork().observe(this, aBoolean -> {
+            Log.e(TAG, "-----------------------onChanged: "+aBoolean);
+            if (aBoolean){
+                mViewModel.addListeners();
+            } else {
+                mViewModel.removeListeners();
+                mViewModel.setLocationByEmail(null);
+                mViewModel.updateUserImage(ContextCompat.getDrawable(MainActivityOld.this, R.mipmap.logo));
+            }
+        });
+
+    }
+
+    private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
+            new FirebaseAuthUIActivityResultContract(), this::onSignInResult
+    );
+
+    private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
+        IdpResponse response = result.getIdpResponse();
+        if (result.getResultCode() == RESULT_OK) {
+            Log.e(TAG, "onSignInResult: OK");
+            // Successfully signed in
+            ///////FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null && user.getEmail() != null) {
+                emailText.setText(user.getEmail());
+//                    accountImage.setImageDrawable(user.getPhotoUrl());
+                mViewModel.setLocationByEmail(user.getEmail());
+                mViewModel.setFirebaseUser(user);
+
+                DrawableTask task = new DrawableTask(mViewModel);
+                if (user.getPhotoUrl()==null){mViewModel.updateUserImage(ContextCompat.getDrawable(this, R.mipmap.logo));}
+                else {
+                    task.execute(user.getPhotoUrl().toString());
+                }
+            }
+            // ...
+        } else {
+            Log.e(TAG, "onSignInResult: NOT OK");
+            // Sign in failed. If response is null the user canceled the
+            // sign-in flow using the back button. Otherwise check
+            // response.getError().getErrorCode() and handle the error.
+            // ...
+        }
+
+
+
+
+    }
+//        DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
+//        connectedRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot snapshot) {
+//                boolean connected = snapshot.getValue(Boolean.class);
+//                if (connected) {
+//                    Toast.makeText(this, "Connected", Toask.LENGTH_SHORT);
+//                } else {
+//                    Toast.makeText(this, "Not connected", Toask.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError error) {
+//            }
+//        });
+
+    private void setupTabIcons() {
+        tabs.getTabAt(0).setIcon(R.drawable.ic_baseline_camera_24);
+        tabs.getTabAt(1).setIcon(R.drawable.ic_baseline_search_24);
+        tabs.getTabAt(2).setIcon(R.drawable.ic_baseline_multi_24);
+    }
+
+    private void reSignIn() {
+        List<AuthUI.IdpConfig> providers = Collections.singletonList(
+                new AuthUI.IdpConfig.GoogleBuilder().build());
+        AuthUI.getInstance().signOut(this);
+        startActivityForResult(
+                AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(providers)
+                        .build(),
+                RC_SIGN_IN);
+    }
+
+
+    //todo зачем нужна такая аутентификация? просто проверять по адресу аккаунту через
+    // getProfileByEMail, пользователь не зарегистрированный в системе (не добавленный в БД) всё
+    // равно не получит профиля, а значит статусов, а значит не сможет добавить данные в БД
+    private void signIn() {
+        if (mViewModel.getFirebaseUser() == null) {
+            // Choose authentication providers
+            List<AuthUI.IdpConfig> providers = Arrays.asList(
+//                new AuthUI.IdpConfig.EmailBuilder().build(),
+//                new AuthUI.IdpConfig.PhoneBuilder().build(),
+                    new AuthUI.IdpConfig.GoogleBuilder().build());
+//                new AuthUI.IdpConfig.FacebookBuilder().build(),
+//                new AuthUI.IdpConfig.TwitterBuilder().build());
+
+            // Create and launch sign-in intent
+            startActivityForResult(
+                    AuthUI.getInstance()
+                            .createSignInIntentBuilder()
+                            .setAvailableProviders(providers)
+                            .build(),
+                    RC_SIGN_IN);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e(TAG, "onActivityResult: requestCode = "+requestCode);
+        if (requestCode == RC_SIGN_IN) {
+            IdpResponse response = IdpResponse.fromResultIntent(data);
+            Log.e(TAG, "onActivityResult: resultCode = "+resultCode);
+            if (resultCode == RESULT_OK) {
+                mViewModel.checkUserEmail(response.getEmail());
+                //response.getEmail()
+                // Successfully signed in
+                /*FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null && user.getEmail() != null) {
+                    emailText.setText(user.getEmail());
+//                    accountImage.setImageDrawable(user.getPhotoUrl());
+                    mViewModel.setLocationByEmail(user.getEmail());
+                    mViewModel.setFirebaseUser(user);
+
+                    DrawableTask task = new DrawableTask(mViewModel);
+                    if (user.getPhotoUrl()==null){mViewModel.updateUserImage(ContextCompat.getDrawable(this, R.mipmap.logo));}
+                    else {
+                        task.execute(user.getPhotoUrl().toString());
+                    }
+                }*/
+            } else {
+                Log.e(TAG, "******************************onActivityResult: NOT OK");
+                // Sign in failed. If response is null the user canceled the
+                // sign-in flow using the back button. Otherwise check
+                // response.getError().getErrorCode() and handle the error.
+                // ...
+            }
+        }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        item.setCheckable(false);
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.account_menu:  reSignIn(); break;
+//            case R.id.account_menu:  signing.signing();; break;
+            case R.id.settings_menu: startActivity(new Intent(this, SettingsActivity.class)); break;
+            case R.id.exit_menu:  this.finishAndRemoveTask(); break;
+        }
+
+        drawer_layout.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    //Замена для AsyncTask (который deprecated)
+    public void doSomeTaskAsync(String url) {
+        ExecutorService executors = Executors.newFixedThreadPool(1);
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                // your async code goes here.
+                HttpURLConnection connection = null;
+                Bitmap x;
+                InputStream input = null;
+                Drawable img;
+                try {
+                    connection = (HttpURLConnection) new URL(url).openConnection();
+                    connection.connect();
+                    input = connection.getInputStream();
+
+                    x = BitmapFactory.decodeStream(input);
+                    img = new BitmapDrawable(Resources.getSystem(), x);
+                    mViewModel.updateUserImage(img);
+                } catch (Exception e) {
+                    Log.e(TAG, "run: EXCEPTION");
+                } finally {
+                    if (connection != null) connection.disconnect();
+                }
+            }
+        };
+        executors.submit(runnable);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        //Если кликнуть в SearchFragment на пункт списка и открыть UnitInfoFragment,
+        // то нажатие на кнопку "назад" будет работать в обычном режиме, значит при нажатии будет
+        // закрываться UnitInfoFragment и возвращаться к SearchFragment
+        // Если открыть ScanFragment при открытом UnitInfoFragment, то нажатие "назад" вернёт на UnitInfoFragment(!)
+
+        //if (mViewModel.getBackPressCommand().equals(BACK_PRESS_INFO_FRAGMENT)) {
+        Fragment f = getSupportFragmentManager().findFragmentById(R.id.child_fragment_container_3);
+        if(viewPager.getCurrentItem()==1 && f instanceof UnitInfoFragment){//если во втором пейджере И в открытом UnitInfoFragment
+            return super.onKeyDown(keyCode, event);
+        }
+        //Иначе нажатие перехватывается и кнопка "назад" уже работает по-разному от ситуации
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            mViewModel.getBack();
+        }
+        return false;
+    }
+
+    private void goToSearchTab(boolean state) {
+        if (state) viewPager.setCurrentItem(1);
+    }
+
+}

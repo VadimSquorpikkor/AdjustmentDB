@@ -48,6 +48,7 @@ public class SpinnerAdapter {
     /**Заполняет спиннер именами объектов из списка объектов. Сохраняет идентификаторы.
      * Автоматом первой строкой добавляет "-любой-"*/
     public void setData(ArrayList<? extends Entity> list) {
+        if (list==null||list.size()==0)return;//Если список спиннера пустой, то добавлять "-любой-" не нужно
         this.ids = getNameIds(list);
         this.names = getNames(list);
         addFirstLine();
@@ -56,6 +57,7 @@ public class SpinnerAdapter {
 
     /**То же, что и setData(ArrayList<? extends Entity> list), только добавляет строку "-без комплекта-", т.е чтобы отобразить те устройства, которые не входят ни в один из комплектов*/
     public void setDataWithEmpty(ArrayList<? extends Entity> list) {
+        if (list==null||list.size()==0)return;//Если список спиннера пустой, то добавлять "-любой-" не нужно
         this.ids = getNameIds(list);
         this.names = getNames(list);
         addFirstLineEmpty();
@@ -67,6 +69,7 @@ public class SpinnerAdapter {
      * Вариант setData с возможностью задать, как будет называться первая добавленная строка для
      * ANY_VALUE. Если указано null, то добавочная строка создаваться не будет*/
     public void setData(ArrayList<? extends Entity> list, String s) {
+        if (list==null||list.size()==0)return;//Если список спиннера пустой, то добавлять "-любой-" не нужно
         this.ids = getNameIds(list);
         this.names = getNames(list);
         if (s!=null) addFirstLine(s);
@@ -77,6 +80,7 @@ public class SpinnerAdapter {
      * Метод делает спинер, но в отличии от setData отбирает статусы по типу и локации*/
     @SuppressWarnings("unused")
     public void setDataByTypeAndLocation(ArrayList<State> list, String typeId, String locationId) {
+        if (list==null||list.size()==0)return;//Если список спиннера пустой, то добавлять "-любой-" не нужно
         this.ids = getNameIdsByTypeAndLocation(list, typeId, locationId);
         this.names = getNamesByTypeAndLocation(list, typeId, locationId);
         addFirstLine();
@@ -88,6 +92,7 @@ public class SpinnerAdapter {
      * setDataByTypeAndLocation с возможностью задать, как будет называться первая добавленная
      * строка для ANY_VALUE. Если указано null, то добавочная строка создаваться не будет*/
     public void setDataByTypeAndLocation(ArrayList<State> list, String typeId, String locationId, String s) {
+        if (list==null||list.size()==0)return;//Если список спиннера пустой, то добавлять "-любой-" не нужно
         this.ids = getNameIdsByTypeAndLocation(list, typeId, locationId);
         this.names = getNamesByTypeAndLocation(list, typeId, locationId);
         if (s!=null) addFirstLine(s);
@@ -98,6 +103,7 @@ public class SpinnerAdapter {
      * Метод делает спинер, но в отличии от setData отбирает устройства по типу комплекта
      * (только для 1117, например)*/
     public void setDataByDevSet(ArrayList<Device> list, String devSetId) {
+        if (list==null||list.size()==0)return;//Если список спиннера пустой, то добавлять "-любой-" не нужно
         this.ids = getNameIdsByDevSet(list, devSetId);
         this.names = getNamesByDevSet(list, devSetId);
         addFirstLine();
@@ -110,6 +116,7 @@ public class SpinnerAdapter {
      * Вариант setDataByDevSet с возможностью задать, как будет называться первая добавленная
      * строка для ANY_VALUE. Если указано null, то добавочная строка создаваться не будет*/
     public void setDataByDevSet(ArrayList<Device> list, String devSetId, String s) {
+        if (list==null||list.size()==0)return;//Если список спиннера пустой, то добавлять "-любой-" не нужно
         this.ids = getNameIdsByDevSet(list, devSetId);
         this.names = getNamesByDevSet(list, devSetId);
         if (s!=null) addFirstLine(s);
@@ -137,6 +144,7 @@ public class SpinnerAdapter {
     /**Главная магия: сразу же получаем идентификатор выбранного в
      * спиннере имени ("Диагностика" -> "adj_r_diagnostica")*/
     public String getSelectedNameId() {
+        if (ids==null)return "";
         return this.ids.get(spinner.getSelectedItemPosition());
     }
 

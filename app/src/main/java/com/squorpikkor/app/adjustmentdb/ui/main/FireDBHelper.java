@@ -181,6 +181,24 @@ class FireDBHelper {
         });
     }
 
+    /**Поиск эл.почты в employees, если пользователя с такой почтой нет, возвращает false*/
+    void checkUser(String email, MutableLiveData<Boolean> canWorks) {
+        db.collection(TABLE_EMPLOYEES)
+                .whereEqualTo(EMPLOYEE_EMAIL, email)
+                .get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot querySnapshot = task.getResult();
+                if (querySnapshot == null || querySnapshot.isEmpty()) {
+                    canWorks.setValue(false);
+                    Log.e(TAG, "♦НЕТ ТАКОГО ПОЛЬЗОВАТЕЛЯ!");
+                } else {
+                    canWorks.setValue(true);
+                    Log.e(TAG, "♦Есть такой ПОЛЬЗОВАТЕЛЬ");
+                }
+            }
+        });
+    }
+
     void employeeListener(MutableLiveData<ArrayList<Employee>> data) {
         db.collection(TABLE_EMPLOYEES)
                 .get().addOnCompleteListener(task -> {

@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static com.squorpikkor.app.adjustmentdb.Utils.SAVED_TRACKID;
 import static com.squorpikkor.app.adjustmentdb.Utils.generateTrackId;
 import static com.squorpikkor.app.adjustmentdb.Utils.getPreviouslyGeneratedTrackId;
 import static com.squorpikkor.app.adjustmentdb.Utils.isEmptyOrNull;
@@ -38,16 +37,15 @@ public class SelectStateDialogSingle extends BaseDialog {
     private SpinnerAdapter employeeSpinnerAdapter;
     private SpinnerAdapter deviceSetSpinnerAdapter;
 
-    EditText descriptionEdit;
-    EditText innerEdit;
-    EditText serialEdit;
-    EditText trackIdEdit;
-    TextView nameText;
+    private EditText descriptionEdit;
+    private EditText innerEdit;
+    private EditText serialEdit;
+    private EditText trackIdEdit;
 
-    String location;
-    DUnit unit;
+    private String location;
+    private DUnit unit;
 
-    RecyclerView stateNamesRecycler;
+    private RecyclerView stateNamesRecycler;
 
     public static final String STATE_SINGLE_DIALOG_TAB_STATE = "state_single_dialog_tab_state";
 
@@ -93,7 +91,7 @@ public class SelectStateDialogSingle extends BaseDialog {
         Button generateTrackIdButton = view.findViewById(R.id.button_generate);
         Button pasteTrackIdButton = view.findViewById(R.id.paste_button);
 
-        nameText = view.findViewById(R.id.dName);
+        TextView nameText = view.findViewById(R.id.dName);
         descriptionEdit = view.findViewById(R.id.description);
         innerEdit = view.findViewById(R.id.dInner);
         serialEdit = view.findViewById(R.id.dSerial);

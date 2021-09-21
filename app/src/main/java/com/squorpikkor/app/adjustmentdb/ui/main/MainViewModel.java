@@ -116,7 +116,8 @@ public static final String TABLE_NAMES = "names";
     public static final String DEVICE_SET_NAME_ID = "name_id";
 
     public static final String EMPTY_LOCATION_ID = "empty_location_id";
-    public static final String EMPTY_LOCATION_NAME = "Локация не найдена";
+//    public static final String EMPTY_LOCATION_NAME = "Локация не найдена";
+    public static final String EMPTY_LOCATION_NAME = "Пользователь не зарегистрирован";
 //--------------------------------------------------------------------------------------------------
     public static final String TYPE_ANY = "any_type";
     public static final String SERIAL_TYPE = "serial_type";
@@ -302,10 +303,26 @@ public static final String TABLE_NAMES = "names";
         return foundUnitsList;
     }
 
-    void addListeners() {
+    MutableLiveData<Boolean> canWork;
+
+    public MutableLiveData<Boolean> getCanWork() {
+        return canWork;
+    }
+
+    public void checkUserEmail(String email) {
+        dbh.checkUser(email, canWork);
+    }
+
+    public void removeListeners() {
+        locations.setValue(null);
+        devices.setValue(null);
+        states.setValue(null);
+        deviceSets.setValue(null);
+    }
+
+    public void addListeners() {
         dbh.locationListener(locations);
         dbh.deviceListener(devices);
-        dbh.employeeListener(employees);
         dbh.stateListener(states);
         dbh.deviceSetListener(deviceSets);
     }
@@ -322,7 +339,7 @@ public static final String TABLE_NAMES = "names";
 
         foundUnitsList = new MutableLiveData<>();
         foundUnitsList = new MutableLiveData<>();
-        addListeners();
+//        addListeners();
         selectedUnit = new MutableLiveData<>();
         unitStatesList = new MutableLiveData<>();
         scannerFoundUnitsList = new MutableLiveData<>();
@@ -340,6 +357,11 @@ public static final String TABLE_NAMES = "names";
         isWrongQR = new MutableLiveData<>();
         position = new MutableLiveData<>();
         shouldOpenDialog = new MutableLiveData<>();
+
+        canWork = new MutableLiveData<>();
+        canWork.setValue(false);
+
+        dbh.employeeListener(employees);
     }
 
     public void closeEvent(String event_id) {

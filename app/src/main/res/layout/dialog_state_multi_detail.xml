@@ -15,7 +15,7 @@
 
         <Spinner
             android:id="@+id/spinnerDevSetName"
-            style="@style/dialogLinearEdit" />
+            style="@style/dialogLinearSpinner" />
     </LinearLayout>
 
     <LinearLayout style="@style/dialogLinearHorizontal">
@@ -26,7 +26,7 @@
 
         <Spinner
             android:id="@+id/name_spinner"
-            style="@style/dialogLinearEdit" />
+            style="@style/dialogLinearSpinner" />
     </LinearLayout>
 
     <LinearLayout style="@style/dialogLinearHorizontal">
@@ -37,7 +37,7 @@
 
         <Spinner
             android:id="@+id/state_spinner"
-            style="@style/dialogLinearEdit"/>
+            style="@style/dialogLinearSpinner"/>
     </LinearLayout>
 
     <LinearLayout style="@style/dialogLinearHorizontal">
@@ -48,7 +48,7 @@
 
         <Spinner
             android:id="@+id/employee_spinner"
-            style="@style/dialogLinearEdit"/>
+            style="@style/dialogLinearSpinner"/>
     </LinearLayout>
 
     <EditText

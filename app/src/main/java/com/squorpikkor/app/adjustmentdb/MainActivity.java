@@ -7,15 +7,12 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,35 +30,27 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squorpikkor.app.adjustmentdb.ui.main.DrawableTask;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
+import com.squorpikkor.app.adjustmentdb.ui.main.entities.Location;
 import com.squorpikkor.app.adjustmentdb.ui.main.fragment.UnitInfoFragment;
 import com.squorpikkor.app.adjustmentdb.ui.main.fragment_cradle.SectionsPagerAdapter;
 import com.squorpikkor.app.adjustmentdb.ui.main.fragment_cradle.ZoomOutPageTransformer;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static com.squorpikkor.app.adjustmentdb.BuildConfig.VERSION_NAME;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String TAG = "tag";
-    MainViewModel mViewModel;
-    TextView location;
-    TextView locationText;
-    TextView emailText;
-    TextView version;
-    ImageView accountImage;
-    private static final int RC_SIGN_IN = 1;
-    TabLayout tabs;
-    DrawerLayout drawer_layout;
-    NavigationView navigationView;
-    ViewPager viewPager;
+    private MainViewModel mViewModel;
+    private TextView location;
+    private TextView locationText;
+    private ImageView accountImage;
+    private static final int RC_SIGN_IN = 101;
+    private DrawerLayout drawer_layout;
+    private ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,39 +71,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         viewPager.setPageTransformer(true, new ZoomOutPageTransformer());
 
         drawer_layout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        tabs = findViewById(R.id.tabs);
+        TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
         //CustomView
+        //noinspection ConstantConditions
         tabs.getTabAt(0).setCustomView(R.layout.tab_view_0);
+        //noinspection ConstantConditions
         tabs.getTabAt(1).setCustomView(R.layout.tab_view_1);
+        //noinspection ConstantConditions
         tabs.getTabAt(2).setCustomView(R.layout.tab_view_2);
-
-        //Для варианта без customView
-        //setupTabIcons();
 
         location = findViewById(R.id.location);
 
         View headerView = navigationView.getHeaderView(0);
-        version = headerView.findViewById(R.id.version);
+        TextView version = headerView.findViewById(R.id.version);
         String appName = getString(R.string.app_name);
         version.setText(String.format("%s %s", appName, VERSION_NAME));
         locationText = headerView.findViewById(R.id.location_text);
-        emailText = headerView.findViewById(R.id.email_text);
+        TextView emailText = headerView.findViewById(R.id.email_text);
         accountImage = headerView.findViewById(R.id.account_image);
 
         final MutableLiveData<Drawable> getImage = mViewModel.getUserImage();
         getImage.observe(this, drawable -> accountImage.setImageDrawable(drawable));
-
-        /*final MutableLiveData<String> locationId = mViewModel.getLocation_id();
-        locationId.observe(this, s -> {
-            if (locationId.getValue() != null) {
-                mViewModel.setStatesForLocation(locationId.getValue());
-            }
-        });*/
 
         final MutableLiveData<String> locationName = mViewModel.getLocationName();
         locationName.observe(this, s -> {
@@ -128,15 +110,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         goToSearch.observe(this, this::goToSearchTab);
 
         signIn();
+
+        mViewModel.getLocations().observe(this, (Observer<ArrayList<Location>>) locations -> {
+            locationName.setValue(mViewModel.getLocationNameById(mViewModel.getLocation_id().getValue()));
+        });
+
+        mViewModel.getCanWork().observe(this, aBoolean -> {
+            //FirebaseUser user = FirebaseAuth.getInstance().
+            if (aBoolean) {
+                mViewModel.addListeners();
+
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                mViewModel.setLocationByEmail(user.getEmail());
+                emailText.setText(user.getEmail());
+                DrawableTask task = new DrawableTask(mViewModel);
+                if (user.getPhotoUrl() == null) {
+                    mViewModel.updateUserImage(ContextCompat.getDrawable(this, R.mipmap.logo));
+                } else task.execute(user.getPhotoUrl().toString());
+            } else {
+                mViewModel.removeListeners();
+                mViewModel.setLocationByEmail(null);
+                mViewModel.updateUserImage(ContextCompat.getDrawable(MainActivity.this, R.mipmap.logo));
+                emailText.setText("- - -");
+            }
+        });
+
     }
 
-    private void setupTabIcons() {
-        tabs.getTabAt(0).setIcon(R.drawable.ic_baseline_camera_24);
-        tabs.getTabAt(1).setIcon(R.drawable.ic_baseline_search_24);
-        tabs.getTabAt(2).setIcon(R.drawable.ic_baseline_multi_24);
-    }
-
-    private void reSignIn() {
+    private void signIn() {
         List<AuthUI.IdpConfig> providers = Collections.singletonList(
                 new AuthUI.IdpConfig.GoogleBuilder().build());
         AuthUI.getInstance().signOut(this);
@@ -148,56 +149,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 RC_SIGN_IN);
     }
 
-    //todo зачем нужна такая аутентификация? просто проверять по адресу аккаунту через
-    // getProfileByEMail, пользователь не зарегистрированный в системе (не добавленный в БД) всё
-    // равно не получит профиля, а значит статусов, а значит не сможет добавить данные в БД
-    private void signIn() {
-        if (mViewModel.getFirebaseUser() == null) {
-            // Choose authentication providers
-            List<AuthUI.IdpConfig> providers = Arrays.asList(
-//                new AuthUI.IdpConfig.EmailBuilder().build(),
-//                new AuthUI.IdpConfig.PhoneBuilder().build(),
-                    new AuthUI.IdpConfig.GoogleBuilder().build());
-//                new AuthUI.IdpConfig.FacebookBuilder().build(),
-//                new AuthUI.IdpConfig.TwitterBuilder().build());
-
-            // Create and launch sign-in intent
-            startActivityForResult(
-                    AuthUI.getInstance()
-                            .createSignInIntentBuilder()
-                            .setAvailableProviders(providers)
-                            .build(),
-                    RC_SIGN_IN);
-        }
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == RC_SIGN_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
-
             if (resultCode == RESULT_OK) {
-                // Successfully signed in
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if (user != null && user.getEmail() != null) {
-                    emailText.setText(user.getEmail());
-//                    accountImage.setImageDrawable(user.getPhotoUrl());
-                    mViewModel.setLocationByEmail(user.getEmail());
-                    mViewModel.setFirebaseUser(user);
-
-                    DrawableTask task = new DrawableTask(mViewModel);
-                    if (user.getPhotoUrl()==null){mViewModel.updateUserImage(ContextCompat.getDrawable(this, R.mipmap.logo));}
-                    else {
-                        task.execute(user.getPhotoUrl().toString());
-                    }
-                }
+                mViewModel.checkUserEmail(response.getEmail());
             } else {
-                // Sign in failed. If response is null the user canceled the
-                // sign-in flow using the back button. Otherwise check
-                // response.getError().getErrorCode() and handle the error.
-                // ...
+                Log.e(TAG, "******************************onActivityResult: NOT OK");
             }
         }
     }
@@ -207,42 +167,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         item.setCheckable(false);
         int id = item.getItemId();
         switch (id) {
-            case R.id.account_menu:  reSignIn(); break;
+            case R.id.account_menu: signIn(); break;
             case R.id.settings_menu: startActivity(new Intent(this, SettingsActivity.class)); break;
-            case R.id.exit_menu:  this.finishAndRemoveTask(); break;
+            case R.id.exit_menu: this.finishAndRemoveTask(); break;
         }
 
         drawer_layout.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    //Замена для AsyncTask (который deprecated)
-    public void doSomeTaskAsync(String url) {
-        ExecutorService executors = Executors.newFixedThreadPool(1);
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                // your async code goes here.
-                HttpURLConnection connection = null;
-                Bitmap x;
-                InputStream input = null;
-                Drawable img;
-                try {
-                    connection = (HttpURLConnection) new URL(url).openConnection();
-                    connection.connect();
-                    input = connection.getInputStream();
-
-                    x = BitmapFactory.decodeStream(input);
-                    img = new BitmapDrawable(Resources.getSystem(), x);
-                    mViewModel.updateUserImage(img);
-                } catch (Exception e) {
-                    Log.e(TAG, "run: EXCEPTION");
-                } finally {
-                    if (connection != null) connection.disconnect();
-                }
-            }
-        };
-        executors.submit(runnable);
     }
 
     @Override
@@ -254,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //if (mViewModel.getBackPressCommand().equals(BACK_PRESS_INFO_FRAGMENT)) {
         Fragment f = getSupportFragmentManager().findFragmentById(R.id.child_fragment_container_3);
-        if(viewPager.getCurrentItem()==1 && f instanceof UnitInfoFragment){//если во втором пейджере И в открытом UnitInfoFragment
+        if (viewPager.getCurrentItem() == 1 && f instanceof UnitInfoFragment) {//если во втором пейджере И в открытом UnitInfoFragment
             return super.onKeyDown(keyCode, event);
         }
         //Иначе нажатие перехватывается и кнопка "назад" уже работает по-разному от ситуации
