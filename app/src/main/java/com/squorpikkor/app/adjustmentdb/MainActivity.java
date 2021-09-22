@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.squorpikkor.app.adjustmentdb.BuildConfig.VERSION_NAME;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_LOCATION_NAME;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -109,32 +110,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         final MutableLiveData<Boolean> goToSearch = mViewModel.getGoToSearchTab();
         goToSearch.observe(this, this::goToSearchTab);
 
-        signIn();
 
-        mViewModel.getLocations().observe(this, (Observer<ArrayList<Location>>) locations -> {
-            locationName.setValue(mViewModel.getLocationNameById(mViewModel.getLocation_id().getValue()));
-        });
+        if (FirebaseAuth.getInstance().getCurrentUser() != null && FirebaseAuth.getInstance().getCurrentUser().getEmail() != null) {
+            Log.e(TAG, "*********************************************onCreate: "+FirebaseAuth.getInstance().getCurrentUser().getEmail());
+            mViewModel.checkUserEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+        } else{
+            //mViewModel.getLocationName().setValue(EMPTY_LOCATION_NAME);
+            signIn();
+        }
 
-        mViewModel.getCanWork().observe(this, aBoolean -> {
-            //FirebaseUser user = FirebaseAuth.getInstance().
-            if (aBoolean) {
-                mViewModel.addListeners();
+        mViewModel.getLocations().observe(this, locations ->
+                locationName.setValue(mViewModel.getLocationNameById(mViewModel.getLocation_id().getValue())));
 
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                mViewModel.setLocationByEmail(user.getEmail());
-                emailText.setText(user.getEmail());
-                DrawableTask task = new DrawableTask(mViewModel);
-                if (user.getPhotoUrl() == null) {
-                    mViewModel.updateUserImage(ContextCompat.getDrawable(this, R.mipmap.logo));
-                } else task.execute(user.getPhotoUrl().toString());
-            } else {
-                mViewModel.removeListeners();
-                mViewModel.setLocationByEmail(null);
-                mViewModel.updateUserImage(ContextCompat.getDrawable(MainActivity.this, R.mipmap.logo));
-                emailText.setText("- - -");
-            }
-        });
-
+        mViewModel.getEmail().observe(this, emailText::setText);
     }
 
     private void signIn() {

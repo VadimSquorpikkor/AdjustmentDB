@@ -4,13 +4,18 @@ import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.SurfaceView;
+
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.preference.PreferenceManager;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
+import com.squorpikkor.app.adjustmentdb.MainActivity;
+import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.app.App;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.Device;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.DeviceSet;
@@ -156,6 +161,7 @@ public static final String TABLE_NAMES = "names";
     private final MutableLiveData<Boolean> isWrongQR;
     private final MutableLiveData<Boolean> shouldOpenDialog;
     private final MutableLiveData<Integer> position;
+    private final MutableLiveData<String> email;
 
     private FirebaseUser user;
 
@@ -360,8 +366,30 @@ public static final String TABLE_NAMES = "names";
 
         canWork = new MutableLiveData<>();
         canWork.setValue(false);
+        email = new MutableLiveData<>();
+        canWork.observeForever(this::doListen);
+
 
         dbh.employeeListener(employees);
+    }
+
+    private void doListen(Boolean aBoolean) {
+        if (aBoolean) {
+            addListeners();
+
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            setLocationByEmail(user.getEmail());
+            email.setValue(user.getEmail());
+            DrawableTask task = new DrawableTask(this);
+            if (user.getPhotoUrl() == null) {
+                updateUserImage(ContextCompat.getDrawable(App.getContext(), R.mipmap.logo));
+            } else task.execute(user.getPhotoUrl().toString());
+        } else {
+            removeListeners();
+            setLocationByEmail(null);
+            updateUserImage(ContextCompat.getDrawable(App.getContext(), R.mipmap.logo));
+            email.setValue("- - -");
+        }
     }
 
     public void closeEvent(String event_id) {
@@ -455,6 +483,10 @@ public static final String TABLE_NAMES = "names";
 
     public MutableLiveData<Boolean> getShouldOpenDialog() {
         return shouldOpenDialog;
+    }
+
+    public MutableLiveData<String> getEmail() {
+        return email;
     }
 
     //--------------- BACK PRESS -----------------------------------------------------------------------
