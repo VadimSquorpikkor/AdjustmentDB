@@ -383,17 +383,18 @@ class FireDBHelper {
 
     /**Обертка для getUnitListByParam*/
     //todo добавить поиск по комплекту
-    void getUnitList(MutableLiveData<ArrayList<DUnit>> unitList, String deviceNameId, String locationId, String employeeId, String typeId, String stateId, String serial) {
+    void getUnitList(MutableLiveData<ArrayList<DUnit>> unitList, String deviceNameId, String locationId, String employeeId, String typeId, String stateId, String devSet, String serial) {
         getUnitListByParam(unitList,
                 UNIT_DEVICE, deviceNameId,
                 UNIT_LOCATION, locationId,
                 UNIT_EMPLOYEE, employeeId,
                 UNIT_TYPE, typeId,
                 UNIT_STATE, stateId,
+                UNIT_DEVICE_SET, devSet,
                 UNIT_SERIAL, serial);
     }
 
-    void getUnitListByParam(MutableLiveData<ArrayList<DUnit>> unitList, String param1, String value1, String param2, String value2, String param3, String value3, String param4, String value4, String param5, String value5, String param6, String value6) {
+    void getUnitListByParam(MutableLiveData<ArrayList<DUnit>> unitList, String param1, String value1, String param2, String value2, String param3, String value3, String param4, String value4, String param5, String value5, String param6, String value6,  String param7, String value7) {
         Query query = db.collection(TABLE_UNITS);
         if (!value1.equals(ANY_VALUE)) query = query.whereEqualTo(param1, value1);
         if (!value2.equals(ANY_VALUE)) query = query.whereEqualTo(param2, value2);
@@ -401,6 +402,7 @@ class FireDBHelper {
         if (!value4.equals(ANY_VALUE)) query = query.whereEqualTo(param4, value4);
         if (!value5.equals(ANY_VALUE)) query = query.whereEqualTo(param5, value5);
         if (!value6.equals(ANY_VALUE)) query = query.whereEqualTo(param6, value6);
+        if (!value7.equals(ANY_VALUE)) query = query.whereEqualTo(param7, value7);
 
         query.get()
                 .addOnCompleteListener(task -> {

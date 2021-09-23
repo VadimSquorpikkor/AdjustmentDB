@@ -88,8 +88,9 @@ public class SearchUnitParamsDialog extends BaseDialog {
         String typeId = getSelectedType();
         String stateId = stateSpinnerAdapter.getSelectedNameId();
         String serial = serialEdit.getText().toString();
+        String devSet = deviceSetSpinnerAdapter.getSelectedNameId();
 
-        mViewModel.getUnitListFromBD(nameId, locationId, employeeId, typeId, stateId, serial);
+        mViewModel.getUnitListFromBD(nameId, locationId, employeeId, typeId, stateId, devSet, serial);
         dismiss();
     }
 

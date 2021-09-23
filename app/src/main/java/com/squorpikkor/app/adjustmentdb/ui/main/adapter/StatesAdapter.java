@@ -46,6 +46,7 @@ public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesView
         long time = event.getDate().getTime();
         holder.tDate.setText(String.format("%s / %s", getRightDate(time), getRightTime(time)));
         String daysPassed = String.valueOf(event.daysPassed());
+        if (daysPassed.equals("0")) daysPassed = "<1";
         holder.tDaysPassed.setText(String.format("Дней в работе: %s", daysPassed));
     }
 

@@ -533,12 +533,12 @@ public static final String TABLE_NAMES = "names";
 //--------------------------------------------------------------------------------------------------
 
     //todo переименовать на startSearch
-    public void getUnitListFromBD(String deviceNameId, String locationId, String employeeId, String typeId, String stateId, String serial) {
+    public void getUnitListFromBD(String deviceNameId, String locationId, String employeeId, String typeId, String stateId, String devSet, String serial) {
         Log.e(TAG, "♦ deviceName - "+deviceNameId+" location - "+locationId+" employee - "+employeeId+" type - "+typeId);
-        //Если поле номера пустое, то ищем по параметрам, если поле содержит значение, то ищем по этому значению, игнорируя
-        // все остальные параметры. Т.е. ищем или по параметрам, или по номеру
-        if (serial.equals("")) dbh.getUnitList(foundUnitsList, deviceNameId, locationId, employeeId, typeId, stateId, ANY_VALUE);
-        else dbh.getUnitList(foundUnitsList, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, serial);
+        //Если поле серийного номера пустое, то ищем по параметрам; если поле содержит значение, то ищем по этому значению, игнорируя
+        // все остальные параметры. Т.е. ищем или по параметрам, или по серийному номеру
+        if (serial.equals("")) dbh.getUnitList(foundUnitsList, deviceNameId, locationId, employeeId, typeId, stateId, devSet, ANY_VALUE);
+        else dbh.getUnitList(foundUnitsList, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, serial);
     }
 
     public void restartMultiScanning() {

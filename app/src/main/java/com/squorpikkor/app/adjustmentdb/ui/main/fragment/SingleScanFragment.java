@@ -139,7 +139,9 @@ public class SingleScanFragment extends Fragment {
         tSerial.setText(Utils.getRightValue(unit.getSerial()));
         if (unit.isRepairUnit()) recognizeButton.setVisibility(View.VISIBLE);
         tEmployee.setText(Utils.getRightValue(mViewModel.getEmployeeNameById(unit.getEmployee())));
-        tDaysPassed.setText(String.valueOf(unit.daysPassed()));
+        String passed = String.valueOf(unit.daysPassed());
+        if (passed.equals("0")) passed = "<1";
+        tDaysPassed.setText(passed);
 
         if (unit.isComplete()) isCompleteImage.setVisibility(View.VISIBLE);
         else isCompleteImage.setVisibility(View.GONE);

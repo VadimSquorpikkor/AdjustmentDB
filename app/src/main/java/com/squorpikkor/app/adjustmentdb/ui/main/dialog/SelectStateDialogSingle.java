@@ -144,7 +144,7 @@ public class SelectStateDialogSingle extends BaseDialog {
                 employeeSpinner.setVisibility(View.VISIBLE);
                 labelEmployee.setVisibility(View.VISIBLE);
             }
-            if (unit.isRepairUnit()&&(unit.getTrackId()==null||unit.getTrackId().equals(""))) { //для TRACKID
+            if (unit.isRepairUnit()&&(unit.getTrackId()==null||unit.getTrackId().equals("")||unit.getTrackId().equals("null"))) { //для TRACKID
                 labelTrackId.setVisibility(View.VISIBLE);
                 trackIdEdit.setVisibility(View.VISIBLE);
                 generateTrackIdButton.setVisibility(View.VISIBLE);
@@ -234,6 +234,6 @@ public class SelectStateDialogSingle extends BaseDialog {
         if (!employee.equals(ANY_VALUE)) unit.setEmployee(employee);
         if (!devSetId.equals(ANY_VALUE)) unit.setDeviceSet(devSetId);
 //        if (!trackId.equals("") && !(unit.getTrackId()==null || unit.getTrackId().equals(""))) unit.setTrackId(trackId);
-        if (!trackId.equals("") && (unit.getTrackId()==null || unit.getTrackId().equals(""))) unit.setTrackId(trackId);
+        if (!trackId.equals("") && (unit.getTrackId()==null || unit.getTrackId().equals("") || unit.getTrackId().equals("null"))) unit.setTrackId(trackId);
     }
 }
