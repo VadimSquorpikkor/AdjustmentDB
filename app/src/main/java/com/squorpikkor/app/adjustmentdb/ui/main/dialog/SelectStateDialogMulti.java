@@ -34,8 +34,9 @@ public class SelectStateDialogMulti extends BaseDialog {
     private SpinnerAdapter employeeSpinnerAdapter;
     private SpinnerAdapter deviceSetSpinnerAdapter;
 
-    ArrayList<DUnit> mUnitList;
-    RecyclerView stateNamesRecycler;
+    private ArrayList<DUnit> mUnitList;
+    private ShortStateAdapter shortStateAdapter;
+
     public static final String STATE_MULTI_DIALOG_TAB_STATE = "state_multi_dialog_tab_state";
 
     public SelectStateDialogMulti() {
@@ -63,6 +64,12 @@ public class SelectStateDialogMulti extends BaseDialog {
         deviceSpinnerAdapter = new SpinnerAdapter(deviceSpinner, mContext);
         stateSpinnerAdapter = new SpinnerAdapter(stateSpinner, mContext);
         employeeSpinnerAdapter = new SpinnerAdapter(employeeSpinner, mContext);
+
+        RecyclerView stateNamesRecycler = view.findViewById(R.id.recycler_state_name);
+        shortStateAdapter = new ShortStateAdapter();
+        shortStateAdapter.setOnItemClickListener(this::saveUnitNewStateOnly);
+        stateNamesRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+        stateNamesRecycler.setAdapter(shortStateAdapter);
 
         mViewModel.getDeviceSets().observe(this, list2 -> deviceSetSpinnerAdapter.setData(list2, EMPTY_VALUE_TEXT));
         mViewModel.getDevices().observe(this, list1 -> deviceSpinnerAdapter.setDataByDevSet(list1, deviceSetSpinnerAdapter.getSelectedNameId(), EMPTY_VALUE_TEXT));
@@ -100,8 +107,6 @@ public class SelectStateDialogMulti extends BaseDialog {
         toggleTab(tabIndex);
         tabs.getTabAt(tabIndex).select();
 
-        stateNamesRecycler = view.findViewById(R.id.recycler_state_name);
-
         return dialog;
     }
 
@@ -109,11 +114,7 @@ public class SelectStateDialogMulti extends BaseDialog {
         if (list==null||list.size()==0) return;
         ArrayList<String> ids = stateSpinnerAdapter.getNameIdsByTypeAndLocation(list, mUnitList.get(0).getType(), location);
         ArrayList<String> names = stateSpinnerAdapter.getNamesByTypeAndLocation(list, mUnitList.get(0).getType(), location);
-
-        ShortStateAdapter adapter = new ShortStateAdapter(ids, names);
-        adapter.setOnItemClickListener(this::saveUnitNewStateOnly);
-        stateNamesRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
-        stateNamesRecycler.setAdapter(adapter);
+        shortStateAdapter.setList(ids, names);
     }
 
     private void toggleTab(int tab) {

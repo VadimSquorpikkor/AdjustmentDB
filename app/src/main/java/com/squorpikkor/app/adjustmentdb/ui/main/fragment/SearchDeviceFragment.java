@@ -93,11 +93,11 @@ public class SearchDeviceFragment extends Fragment {
         foundUnitRecycler.setAdapter(unitAdapter);
     }
 
-    private void openInfoFragment(int position) {
+    private void openInfoFragment(DUnit unit) {
         mViewModel.setBackPressCommand(BACK_PRESS_INFO_FRAGMENT);
-        mViewModel.getPosition().setValue(position);
+        //mViewModel.getPosition().setValue(position);
         requireActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.child_fragment_container_3, UnitInfoFragment.newInstance())
+                .replace(R.id.child_fragment_container_3, UnitInfoFragment.newInstance(unit))
                 .addToBackStack(null)
                 .commit();
     }

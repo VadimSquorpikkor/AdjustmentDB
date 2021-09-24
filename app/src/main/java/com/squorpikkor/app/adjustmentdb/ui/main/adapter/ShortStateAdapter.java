@@ -1,5 +1,6 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.adapter;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,13 +19,17 @@ import java.util.ArrayList;
  * значение элемента (точнее идентификатор выбранного имени). Короче — я ♥ RecyclerView*/
 public class ShortStateAdapter extends RecyclerView.Adapter<ShortStateAdapter.ShortStateViewHolder> {
 
-    ArrayList<String> ids;
-    ArrayList<String> names;
-    OnItemClickListener onItemClickListener;
+    private ArrayList<String> ids = new ArrayList<>();
+    private ArrayList<String> names = new ArrayList<>();
+    private OnItemClickListener onItemClickListener;
 
-    public ShortStateAdapter(ArrayList<String> ids, ArrayList<String> names) {
+    @SuppressLint("NotifyDataSetChanged")
+    public void setList(ArrayList<String> ids, ArrayList<String> names) {
+        if (ids==null)   ids = new ArrayList<>();//Если list == null, то в ресайклер будет передан пустой лист
+        if (names==null) names = new ArrayList<>();//Если list == null, то в ресайклер будет передан пустой лист
         this.ids = ids;
         this.names = names;
+        notifyDataSetChanged();
     }
 
     public interface OnItemClickListener {

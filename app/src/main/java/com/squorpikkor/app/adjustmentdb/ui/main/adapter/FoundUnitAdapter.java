@@ -1,5 +1,6 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.adapter;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,13 +17,20 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_UNIT
 
 /**Адаптер для списка найденных устройств в режиме мультисканирования*/
 public class FoundUnitAdapter extends RecyclerView.Adapter<FoundUnitAdapter.FoundViewHolder>{
-    private final ArrayList<DUnit> units;
+    private ArrayList<DUnit> list = new ArrayList<>();
     MainViewModel mViewModel;
 
     /**Конструктор, в котором передаем ArrayList для RecyclerView */
-    public FoundUnitAdapter(ArrayList<DUnit> units, MainViewModel model) {
-        this.units = units;
+    public FoundUnitAdapter(MainViewModel model) {
         this.mViewModel = model;
+    }
+
+    /**Сеттер. После того, как список передан в адаптер, адаптер автоматом обновляет Recycler, для отображения изменений*/
+    @SuppressLint("NotifyDataSetChanged")
+    public void setList(ArrayList<DUnit> list) {
+        if (list==null) list = new ArrayList<>();//Если list == null, то в ресайклер будет передан пустой лист
+        this.list = list;
+        notifyDataSetChanged();
     }
 
     /**Присваиваем xml лэйаут к итему RecyclerView */
@@ -35,13 +43,12 @@ public class FoundUnitAdapter extends RecyclerView.Adapter<FoundUnitAdapter.Foun
 
     @Override
     public void onBindViewHolder(@NonNull FoundViewHolder holder, int position) {
-        DUnit unit = units.get(position);
+        DUnit unit = list.get(position);
         String type = unit.isRepairUnit()?REPAIR_UNIT:SERIAL_UNIT;
         String name = mViewModel.getDeviceNameById(unit.getName());
         String serial = getRightValue(unit.getSerial());
         String innerSerial = getRightValue(unit.getInnerSerial());
         String id = getRightValue(unit.getId());
-//        String state = unit.getLastEvent().getState();
         if (unit.getLastEvent()!=null) holder.deviceState.setText(mViewModel.getStateNameById(unit.getLastEvent().getState()));
 
         holder.deviceType.setText(type);
@@ -49,13 +56,12 @@ public class FoundUnitAdapter extends RecyclerView.Adapter<FoundUnitAdapter.Foun
         holder.deviceSerial.setText(serial);
         holder.deviceInnerSerial.setText(innerSerial);
         holder.deviceId.setText(id);
-//        holder.deviceState.setText(state);
     }
 
     /**Просто возвращает кол-во элементов в массиве*/
     @Override
     public int getItemCount() {
-        return units.size();
+        return list.size();
     }
 
     static class FoundViewHolder extends RecyclerView.ViewHolder {

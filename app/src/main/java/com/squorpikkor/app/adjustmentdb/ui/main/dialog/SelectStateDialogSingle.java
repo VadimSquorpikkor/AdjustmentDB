@@ -45,7 +45,7 @@ public class SelectStateDialogSingle extends BaseDialog {
     private String location;
     private DUnit unit;
 
-    private RecyclerView stateNamesRecycler;
+    private ShortStateAdapter adapter;
 
     public static final String STATE_SINGLE_DIALOG_TAB_STATE = "state_single_dialog_tab_state";
 
@@ -72,6 +72,12 @@ public class SelectStateDialogSingle extends BaseDialog {
         deviceSpinnerAdapter = new SpinnerAdapter(devicesSpinner, mContext);
         stateSpinnerAdapter = new SpinnerAdapter(statesSpinner, mContext);
         employeeSpinnerAdapter = new SpinnerAdapter(employeeSpinner, mContext);
+
+        RecyclerView stateNamesRecycler = view.findViewById(R.id.recycler_state_name);
+        adapter = new ShortStateAdapter();
+        adapter.setOnItemClickListener(this::saveUnitNewStateOnly);
+        stateNamesRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+        stateNamesRecycler.setAdapter(adapter);
 
         mViewModel.getDeviceSets().observe(this, list2 -> deviceSetSpinnerAdapter.setData(list2, EMPTY_VALUE_TEXT));
         mViewModel.getDevices().observe(this, list1 -> deviceSpinnerAdapter.setDataByDevSet(list1, deviceSetSpinnerAdapter.getSelectedNameId(), EMPTY_VALUE_TEXT));
@@ -173,19 +179,13 @@ public class SelectStateDialogSingle extends BaseDialog {
         toggleTab(tabIndex);
         tabs.getTabAt(tabIndex).select();
 
-        stateNamesRecycler = view.findViewById(R.id.recycler_state_name);
-
         return dialog;
     }
 
     private void updateShortStateRecycler(ArrayList<State> list) {
         ArrayList<String> ids = stateSpinnerAdapter.getNameIdsByTypeAndLocation(list, unit.getType(), location);
         ArrayList<String> names = stateSpinnerAdapter.getNamesByTypeAndLocation(list, unit.getType(), location);
-
-        ShortStateAdapter adapter = new ShortStateAdapter(ids, names);
-        adapter.setOnItemClickListener(this::saveUnitNewStateOnly);
-        stateNamesRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
-        stateNamesRecycler.setAdapter(adapter);
+        adapter.setList(ids, names);
     }
 
     private void toggleTab(int tab) {

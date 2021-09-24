@@ -25,6 +25,7 @@ import com.squorpikkor.app.adjustmentdb.ui.main.dialog.WrongQRDialog;
 import java.util.ArrayList;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_SINGLE;
 import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_STATES;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.LESS_THAN_ONE;
 
 public class SingleScanFragment extends Fragment {
 
@@ -37,13 +38,13 @@ public class SingleScanFragment extends Fragment {
     private TextView tEmployee;
     private TextView tDaysPassed;
     private TextView tTrackId;
-    private RecyclerView recyclerUnitsStates;
     private ArrayList<DEvent> states;
     private FloatingActionButton addNewStateButton;
     private FloatingActionButton recognizeButton;
     private SurfaceView surfaceView;
     private ConstraintLayout infoLayout;
     private ImageView isCompleteImage;
+    private StatesAdapter statesAdapter;
 
     public static SingleScanFragment newInstance() {
         return new SingleScanFragment();
@@ -70,7 +71,12 @@ public class SingleScanFragment extends Fragment {
         tId = view.findViewById(R.id.textViewIdValue);
         tEmployee = view.findViewById(R.id.textViewEmployeeValue);
         tDaysPassed = view.findViewById(R.id.textDaysPassedValue);
-        recyclerUnitsStates = view.findViewById(R.id.recyclerView);
+
+        RecyclerView recyclerUnitsStates = view.findViewById(R.id.recyclerView);
+        statesAdapter = new StatesAdapter(mViewModel);
+        recyclerUnitsStates.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerUnitsStates.setAdapter(statesAdapter);
+
         isCompleteImage = view.findViewById(R.id.is_complete);
         tTrackId = view.findViewById(R.id.textTrackIdValue);
 
@@ -97,9 +103,7 @@ public class SingleScanFragment extends Fragment {
     private void updateEvents(ArrayList<DEvent> events) {
         states = events;
         if (events==null)return;
-        StatesAdapter statesAdapter = new StatesAdapter(states, mViewModel);
-        recyclerUnitsStates.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerUnitsStates.setAdapter(statesAdapter);
+        statesAdapter.setList(states);
     }
 
     private void showWrongDialog(boolean isWrong) {
@@ -140,7 +144,7 @@ public class SingleScanFragment extends Fragment {
         if (unit.isRepairUnit()) recognizeButton.setVisibility(View.VISIBLE);
         tEmployee.setText(Utils.getRightValue(mViewModel.getEmployeeNameById(unit.getEmployee())));
         String passed = String.valueOf(unit.daysPassed());
-        if (passed.equals("0")) passed = "<1";
+        if (passed.equals("0")) passed = LESS_THAN_ONE;
         tDaysPassed.setText(passed);
 
         if (unit.isComplete()) isCompleteImage.setVisibility(View.VISIBLE);

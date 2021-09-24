@@ -46,7 +46,6 @@ public class MultiScanFragment extends Fragment {
         mViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
         nextButton = view.findViewById(R.id.button_next);
-        recyclerFoundUnits = view.findViewById(R.id.recyclerViewFound);
 
         TextView txtBarcodeValue = view.findViewById(R.id.txtBarcodeValue);
         txtBarcodeValue.setVisibility(View.GONE);
@@ -55,6 +54,11 @@ public class MultiScanFragment extends Fragment {
         nextButton = view.findViewById(R.id.button_next);
         nextButton.setVisibility(View.GONE);
         foundCount = view.findViewById(R.id.found_count);
+
+        recyclerFoundUnits = view.findViewById(R.id.recyclerViewFound);
+        foundUnitAdapter = new FoundUnitAdapter(mViewModel);
+        recyclerFoundUnits.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerFoundUnits.setAdapter(foundUnitAdapter);
 
         final MutableLiveData<ArrayList<DUnit>> foundUnits = mViewModel.getScannerFoundUnitsList();
         foundUnits.observe(getViewLifecycleOwner(), s -> {
@@ -66,10 +70,7 @@ public class MultiScanFragment extends Fragment {
             } else {
                 mViewModel.setBackPressCommand(BACK_PRESS_MULTI);
             }
-
-            foundUnitAdapter = new FoundUnitAdapter(foundUnitsList, mViewModel);
-            recyclerFoundUnits.setLayoutManager(new LinearLayoutManager(getActivity()));
-            recyclerFoundUnits.setAdapter(foundUnitAdapter);
+            foundUnitAdapter.setList(foundUnitsList);
         });
 
         nextButton.setOnClickListener(v -> {
@@ -97,6 +98,9 @@ public class MultiScanFragment extends Fragment {
     public void onResume() {
         super.onResume();
         surfaceView.setVisibility(View.VISIBLE);
+
+//        boolean state = mViewModel.getMultiScanner()!=null&&mViewModel.getCanWork()!=null&&mViewModel.getCanWork().getValue()!=null&&mViewModel.getCanWork().getValue();
+
         mViewModel.getMultiScanner().initialiseDetectorsAndSources(mViewModel.getCanWork().getValue());
         if (foundUnitsList!=null && foundUnitsList.size() != 0) {
             nextButton.setVisibility(View.VISIBLE);

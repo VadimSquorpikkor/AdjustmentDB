@@ -14,7 +14,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
-import com.squorpikkor.app.adjustmentdb.MainActivity;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.app.App;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.Device;
@@ -135,6 +134,7 @@ public static final String TABLE_NAMES = "names";
     public static final String ANY_VALUE_TEXT = "- любой -";//"- любой -"
     public static final String EMPTY_VALUE_TEXT = "- не выбран -";//"- не выбран -"
     public static final String IS_COMPLETE = "ЗАВЕРШЕНО";
+    public static final String LESS_THAN_ONE = " <1";
 //--------------------------------------------------------------------------------------------------
 
     public static final String BACK_PRESS_SEARCH = "back_press_search";
@@ -160,7 +160,6 @@ public static final String TABLE_NAMES = "names";
     private final MutableLiveData<Boolean> backToRecycler;
     private final MutableLiveData<Boolean> isWrongQR;
     private final MutableLiveData<Boolean> shouldOpenDialog;
-    private final MutableLiveData<Integer> position;
     private final MutableLiveData<String> email;
 
     private FirebaseUser user;
@@ -361,14 +360,12 @@ public static final String TABLE_NAMES = "names";
         backToRecycler.setValue(false);
 
         isWrongQR = new MutableLiveData<>();
-        position = new MutableLiveData<>();
         shouldOpenDialog = new MutableLiveData<>();
 
         canWork = new MutableLiveData<>();
         canWork.setValue(false);
         email = new MutableLiveData<>();
         canWork.observeForever(this::doListen);
-
 
         dbh.employeeListener(employees);
     }
@@ -443,10 +440,6 @@ public static final String TABLE_NAMES = "names";
 
     public void updateUserImage(Drawable img) {
         userImage.setValue(img);
-    }
-
-    public MutableLiveData<Integer> getPosition() {
-        return position;
     }
 
     public String getVersion() {

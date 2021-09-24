@@ -34,7 +34,7 @@ public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolde
     private OnItemClickListener onItemClickListener;
 
     public interface OnItemClickListener {
-        void onItemClick(int position);
+        void onItemClick(DUnit unit);
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
@@ -49,9 +49,6 @@ public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolde
         return new DUnitViewHolder(view);
     }
 
-    /**Принимает объект ViewHolder (holder) и порядковый номер элемента массива (position)
-    * т.е. у 1-ого элемента View будет порядковый номер 0, он возмёт элемент с этим индексом (заметку)
-    * и у ViewHolder-а установить все значения (присвоить значения к TextView) */
     @Override
     public void onBindViewHolder(@NonNull DUnitViewHolder holder, int position) {
         DUnit unit = units.get(position);
@@ -108,10 +105,9 @@ public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolde
             tIsComplete = itemView.findViewById(R.id.text_is_complete);
             deviceImage = itemView.findViewById(R.id.deviceImage);
 
-            //для работы OnNoteClickListener
             itemView.setOnClickListener(view -> {
                 if (onItemClickListener != null) {
-                    onItemClickListener.onItemClick(getAdapterPosition());
+                    onItemClickListener.onItemClick(units.get(getAdapterPosition()));
                 }
             });
         }

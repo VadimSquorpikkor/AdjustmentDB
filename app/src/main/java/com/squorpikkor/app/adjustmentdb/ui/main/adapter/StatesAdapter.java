@@ -1,5 +1,6 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.adapter;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,24 +8,33 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.squorpikkor.app.adjustmentdb.DEvent;
+import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import java.util.ArrayList;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightDate;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightTime;
+import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.LESS_THAN_ONE;
 
 /**Адаптер для списка всех статусов для выбранного конкретного устройства. Показывает дату, время и сам статус*/
 public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesViewHolder> {
 
-    private final ArrayList<DEvent> events;
-    MainViewModel mViewModel;
+    private ArrayList<DEvent> list = new ArrayList<>();
+    private final MainViewModel mViewModel;
 
     /**
      * Конструктор, в котором передаем ArrayList для RecyclerView
      */
-    public StatesAdapter(ArrayList<DEvent> events, MainViewModel model) {
-        this.events = events;
+    public StatesAdapter(MainViewModel model) {
         this.mViewModel = model;
+    }
+
+    /**Сеттер. После того, как список передан в адаптер, адаптер автоматом обновляет Recycler, для отображения изменений*/
+    @SuppressLint("NotifyDataSetChanged")
+    public void setList(ArrayList<DEvent> list) {
+        if (list==null) list = new ArrayList<>();//Если list == null, то в ресайклер будет передан пустой лист
+        this.list = list;
+        notifyDataSetChanged();
     }
 
     /**
@@ -39,14 +49,14 @@ public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesView
 
     @Override
     public void onBindViewHolder(@NonNull StatesAdapter.StatesViewHolder holder, int position) {
-        DEvent event = events.get(position);
+        DEvent event = list.get(position);
 
         holder.tState.setText(mViewModel.getStateNameById(event.getState()));
         holder.tLocation.setText(mViewModel.getLocationNameById(event.getLocation()));
         long time = event.getDate().getTime();
         holder.tDate.setText(String.format("%s / %s", getRightDate(time), getRightTime(time)));
         String daysPassed = String.valueOf(event.daysPassed());
-        if (daysPassed.equals("0")) daysPassed = "<1";
+        if (daysPassed.equals("0")) daysPassed = LESS_THAN_ONE;
         holder.tDaysPassed.setText(String.format("Дней в работе: %s", daysPassed));
     }
 
@@ -55,7 +65,7 @@ public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesView
      */
     @Override
     public int getItemCount() {
-        return events.size();
+        return list.size();
     }
 
     static class StatesViewHolder extends RecyclerView.ViewHolder {
