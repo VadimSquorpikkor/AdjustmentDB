@@ -25,51 +25,51 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static com.squorpikkor.app.adjustmentdb.Constant.TABLE_LOCATIONS;
+import static com.squorpikkor.app.adjustmentdb.Constant.TABLE_NAMES;
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DEVICE_DEV_SET_ID;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DEVICE_ID;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DEVICE_IMG_PATH;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DEVICE_NAME_ID;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DEVICE_SET_ID;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.DEVICE_SET_NAME_ID;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPLOYEE_EMAIL;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPLOYEE_ID;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPLOYEE_LOCATION;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPLOYEE_NAME_ID;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_CLOSE_DATE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_DATE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_DESCRIPTION;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_LOCATION;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_STATE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EVENT_UNIT;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.LOCATION_ID;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.LOCATION_NAME_ID;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_ID;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_LOCATION;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_NAME_ID;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.STATE_TYPE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_DEVICES;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_DEVICE_SET;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_EMPLOYEES;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_LOCATIONS;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_NAMES;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_STATES;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_EVENTS;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TABLE_UNITS;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_CLOSE_DATE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_DATE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_DEVICE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_DEVICE_SET;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_EMPLOYEE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_EVENT_ID;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_ID;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_INNER_SERIAL;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_LOCATION;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_SERIAL;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_STATE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_TRACKID;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.UNIT_TYPE;
+import static com.squorpikkor.app.adjustmentdb.Constant.ANY_VALUE;
+import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_DEV_SET_ID;
+import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_ID;
+import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_IMG_PATH;
+import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_NAME_ID;
+import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_SET_ID;
+import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_SET_NAME_ID;
+import static com.squorpikkor.app.adjustmentdb.Constant.EMPLOYEE_EMAIL;
+import static com.squorpikkor.app.adjustmentdb.Constant.EMPLOYEE_ID;
+import static com.squorpikkor.app.adjustmentdb.Constant.EMPLOYEE_LOCATION;
+import static com.squorpikkor.app.adjustmentdb.Constant.EMPLOYEE_NAME_ID;
+import static com.squorpikkor.app.adjustmentdb.Constant.EVENT_CLOSE_DATE;
+import static com.squorpikkor.app.adjustmentdb.Constant.EVENT_DATE;
+import static com.squorpikkor.app.adjustmentdb.Constant.EVENT_DESCRIPTION;
+import static com.squorpikkor.app.adjustmentdb.Constant.EVENT_LOCATION;
+import static com.squorpikkor.app.adjustmentdb.Constant.EVENT_STATE;
+import static com.squorpikkor.app.adjustmentdb.Constant.EVENT_UNIT;
+import static com.squorpikkor.app.adjustmentdb.Constant.LOCATION_ID;
+import static com.squorpikkor.app.adjustmentdb.Constant.LOCATION_NAME_ID;
+import static com.squorpikkor.app.adjustmentdb.Constant.STATE_ID;
+import static com.squorpikkor.app.adjustmentdb.Constant.STATE_LOCATION;
+import static com.squorpikkor.app.adjustmentdb.Constant.STATE_NAME_ID;
+import static com.squorpikkor.app.adjustmentdb.Constant.STATE_TYPE;
+import static com.squorpikkor.app.adjustmentdb.Constant.TABLE_DEVICES;
+import static com.squorpikkor.app.adjustmentdb.Constant.TABLE_DEVICE_SET;
+import static com.squorpikkor.app.adjustmentdb.Constant.TABLE_EMPLOYEES;
+import static com.squorpikkor.app.adjustmentdb.Constant.TABLE_STATES;
+import static com.squorpikkor.app.adjustmentdb.Constant.TABLE_EVENTS;
+import static com.squorpikkor.app.adjustmentdb.Constant.TABLE_UNITS;
+import static com.squorpikkor.app.adjustmentdb.Constant.UNIT_CLOSE_DATE;
+import static com.squorpikkor.app.adjustmentdb.Constant.UNIT_DATE;
+import static com.squorpikkor.app.adjustmentdb.Constant.UNIT_DEVICE;
+import static com.squorpikkor.app.adjustmentdb.Constant.UNIT_DEVICE_SET;
+import static com.squorpikkor.app.adjustmentdb.Constant.UNIT_EMPLOYEE;
+import static com.squorpikkor.app.adjustmentdb.Constant.UNIT_EVENT_ID;
+import static com.squorpikkor.app.adjustmentdb.Constant.UNIT_ID;
+import static com.squorpikkor.app.adjustmentdb.Constant.UNIT_INNER_SERIAL;
+import static com.squorpikkor.app.adjustmentdb.Constant.UNIT_LOCATION;
+import static com.squorpikkor.app.adjustmentdb.Constant.UNIT_SERIAL;
+import static com.squorpikkor.app.adjustmentdb.Constant.UNIT_STATE;
+import static com.squorpikkor.app.adjustmentdb.Constant.UNIT_TRACKID;
+import static com.squorpikkor.app.adjustmentdb.Constant.UNIT_TYPE;
 
 
 /**Новая концепция для работы с БД. Ещё не реализована, буду постепенно делать:
@@ -108,7 +108,7 @@ class FireDBHelper {
 
     private final FirebaseFirestore db;
 
-    void locationListener(MutableLiveData<ArrayList<Location>> data) {
+    void locationListener(MutableLiveData<ArrayList<Location>> data, MutableLiveData<Boolean> canWorks) {
         db.collection(TABLE_LOCATIONS)
                 .get().addOnCompleteListener(task -> {
             ArrayList<Location> newLocations = new ArrayList<>();
@@ -125,12 +125,14 @@ class FireDBHelper {
                         .addOnCompleteListener(task1 -> {
                             location.setName(getStringFromSnapshot(task1, nameId));
                             data.setValue(data.getValue());//update Mutable
+                            Log.e(TAG, "--locationListener: "+location.getName());
                         });
 
                 newLocations.add(location);
 
             }
             data.setValue(newLocations);
+            canWorks.setValue(true);
 
         });
     }
@@ -158,7 +160,7 @@ class FireDBHelper {
                                 if (documentSnapshot != null && documentSnapshot.exists()) {
                                     ru = documentSnapshot.get("ru").toString();
                                     en = documentSnapshot.get("en").toString();
-                                    Log.e(TAG, "deviceListener: "+ru+" "+en);
+                                    //Log.e(TAG, "deviceListener: "+ru+" "+en);
                                 }
                             }
 
@@ -181,8 +183,17 @@ class FireDBHelper {
         });
     }
 
-    /**Поиск эл.почты в employees, если пользователя с такой почтой нет, возвращает false*/
-    void checkUser(String email, MutableLiveData<Boolean> canWorks) {
+    /**Поиск эл.почты в employees, если пользователя с такой почтой нет, возвращает false
+     *
+     * Временно(?) работает так:
+     * 1. Загрузка location в приложении отключена
+     * 2. проверяется email и если такой есть в БД, то
+     * 3. запускается locationListener (это теперь единственное место в приложении, откуда этот листенер вообще запускается)
+     * 4. после того, как загрузится последняя локация, включается canWorks.setValue(true)
+     * 5. который уже всё включает (аккаунт в том числе) и загружает остальные лисенеры
+     * Жуткий костыль, потом сделаю нормально*/
+    //TODO сделать нормально
+    void checkUser(String email, MutableLiveData<Boolean> canWorks, MutableLiveData<ArrayList<Location>> locations) {
         db.collection(TABLE_EMPLOYEES)
                 .whereEqualTo(EMPLOYEE_EMAIL, email)
                 .get().addOnCompleteListener(task -> {
@@ -192,8 +203,9 @@ class FireDBHelper {
                     canWorks.setValue(false);
                     Log.e(TAG, "♦НЕТ ТАКОГО ПОЛЬЗОВАТЕЛЯ!");
                 } else {
-                    canWorks.setValue(true);
+                    //canWorks.setValue(true);
                     Log.e(TAG, "♦Есть такой ПОЛЬЗОВАТЕЛЬ");
+                    locationListener(locations, canWorks);
                 }
             }
         });

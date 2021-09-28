@@ -2,12 +2,10 @@ package com.squorpikkor.app.adjustmentdb;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
@@ -27,20 +25,15 @@ import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.squorpikkor.app.adjustmentdb.ui.main.DrawableTask;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
-import com.squorpikkor.app.adjustmentdb.ui.main.entities.Location;
 import com.squorpikkor.app.adjustmentdb.ui.main.fragment.UnitInfoFragment;
 import com.squorpikkor.app.adjustmentdb.ui.main.fragment_cradle.SectionsPagerAdapter;
 import com.squorpikkor.app.adjustmentdb.ui.main.fragment_cradle.ZoomOutPageTransformer;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static com.squorpikkor.app.adjustmentdb.BuildConfig.VERSION_NAME;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_LOCATION_NAME;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 

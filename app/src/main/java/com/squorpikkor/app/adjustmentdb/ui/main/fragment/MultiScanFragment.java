@@ -2,7 +2,6 @@ package com.squorpikkor.app.adjustmentdb.ui.main.fragment;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
@@ -21,14 +20,13 @@ import com.squorpikkor.app.adjustmentdb.ui.main.adapter.FoundUnitAdapter;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialogMulti;
 import java.util.ArrayList;
 
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_MULTI;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_MULTI_STATES;
+import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_MULTI;
+import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_MULTI_STATES;
 
 public class MultiScanFragment extends Fragment {
 
     private Button nextButton;
     private MainViewModel mViewModel;
-    private RecyclerView recyclerFoundUnits;
     private ArrayList<DUnit> foundUnitsList;
     private SurfaceView surfaceView;
     private TextView foundCount;
@@ -55,7 +53,7 @@ public class MultiScanFragment extends Fragment {
         nextButton.setVisibility(View.GONE);
         foundCount = view.findViewById(R.id.found_count);
 
-        recyclerFoundUnits = view.findViewById(R.id.recyclerViewFound);
+        RecyclerView recyclerFoundUnits = view.findViewById(R.id.recyclerViewFound);
         foundUnitAdapter = new FoundUnitAdapter(mViewModel);
         recyclerFoundUnits.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerFoundUnits.setAdapter(foundUnitAdapter);
@@ -78,8 +76,7 @@ public class MultiScanFragment extends Fragment {
             dialog.show(getParentFragmentManager(), null);
         });
 
-        final MutableLiveData<Boolean> restartMultiScanning = mViewModel.getRestartMultiScanning();
-        restartMultiScanning.observe(getViewLifecycleOwner(), this::restartMultiScanning);
+        mViewModel.getRestartMultiScanning().observe(getViewLifecycleOwner(), this::restartMultiScanning);
 
         mViewModel.startMultiScanner(getActivity(), surfaceView);
 
@@ -101,7 +98,7 @@ public class MultiScanFragment extends Fragment {
 
 //        boolean state = mViewModel.getMultiScanner()!=null&&mViewModel.getCanWork()!=null&&mViewModel.getCanWork().getValue()!=null&&mViewModel.getCanWork().getValue();
 
-        mViewModel.getMultiScanner().initialiseDetectorsAndSources(mViewModel.getCanWork().getValue());
+        mViewModel.getMultiScanner().initialiseDetectorsAndSources();
         if (foundUnitsList!=null && foundUnitsList.size() != 0) {
             nextButton.setVisibility(View.VISIBLE);
             mViewModel.setBackPressCommand(BACK_PRESS_MULTI_STATES);

@@ -20,8 +20,8 @@ import com.squorpikkor.app.adjustmentdb.ui.main.dialog.ExitAskDialog;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SearchUnitParamsDialog;
 import java.util.ArrayList;
 
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_INFO_FRAGMENT;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_SEARCH;
+import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_INFO_FRAGMENT;
+import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_SEARCH;
 
 public class SearchDeviceFragment extends Fragment {
 

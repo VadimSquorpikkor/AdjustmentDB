@@ -19,8 +19,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Date;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_VALUE_TEXT;
+import static com.squorpikkor.app.adjustmentdb.Constant.ANY_VALUE;
+import static com.squorpikkor.app.adjustmentdb.Constant.EMPTY_VALUE_TEXT;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -103,7 +103,7 @@ public class SelectStateDialogMulti extends BaseDialog {
             public void onTabReselected(TabLayout.Tab tab) {}
         });
         //установить вариант диалога при последнем выборе
-        int tabIndex = SaveLoad.loadIntParam(STATE_MULTI_DIALOG_TAB_STATE);
+        int tabIndex = SaveLoad.loadInt(STATE_MULTI_DIALOG_TAB_STATE);
         toggleTab(tabIndex);
         tabs.getTabAt(tabIndex).select();
 
@@ -118,7 +118,7 @@ public class SelectStateDialogMulti extends BaseDialog {
     }
 
     private void toggleTab(int tab) {
-        SaveLoad.saveParam(STATE_MULTI_DIALOG_TAB_STATE, tab);
+        SaveLoad.save(STATE_MULTI_DIALOG_TAB_STATE, tab);
         if (tab == 0) {
             view.findViewById(R.id.layout_detail).setVisibility(View.VISIBLE);
             view.findViewById(R.id.layout_short).setVisibility(View.GONE);

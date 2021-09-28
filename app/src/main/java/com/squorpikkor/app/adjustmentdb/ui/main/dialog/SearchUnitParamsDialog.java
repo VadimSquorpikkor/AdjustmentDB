@@ -11,8 +11,8 @@ import android.widget.Spinner;
 import com.squorpikkor.app.adjustmentdb.R;
 import org.jetbrains.annotations.NotNull;
 
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_TYPE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_TYPE;
+import static com.squorpikkor.app.adjustmentdb.Constant.REPAIR_TYPE;
+import static com.squorpikkor.app.adjustmentdb.Constant.SERIAL_TYPE;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class SearchUnitParamsDialog extends BaseDialog {

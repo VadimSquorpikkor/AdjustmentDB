@@ -12,8 +12,8 @@ import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import java.util.ArrayList;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightValue;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_UNIT;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_UNIT;
+import static com.squorpikkor.app.adjustmentdb.Constant.REPAIR_UNIT;
+import static com.squorpikkor.app.adjustmentdb.Constant.SERIAL_UNIT;
 
 /**Адаптер для списка найденных устройств в режиме мультисканирования*/
 public class FoundUnitAdapter extends RecyclerView.Adapter<FoundUnitAdapter.FoundViewHolder>{

@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.EMPTY_VALUE_TEXT;
+import static com.squorpikkor.app.adjustmentdb.Constant.ANY_VALUE;
+import static com.squorpikkor.app.adjustmentdb.Constant.EMPTY_VALUE_TEXT;
 
 /**Диалог распознает серийные номера и имя устройства ("БДКГ-02"). Имена распознает на совпадение
  * со списком устройств (MutableLiveData<ArrayList<Device>> devices), поэтому при добавлении новых

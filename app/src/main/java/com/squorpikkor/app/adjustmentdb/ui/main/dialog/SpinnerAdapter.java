@@ -11,9 +11,9 @@ import com.squorpikkor.app.adjustmentdb.ui.main.entities.State;
 
 import java.util.ArrayList;
 
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE_TEXT;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.TYPE_ANY;
+import static com.squorpikkor.app.adjustmentdb.Constant.ANY_VALUE;
+import static com.squorpikkor.app.adjustmentdb.Constant.ANY_VALUE_TEXT;
+import static com.squorpikkor.app.adjustmentdb.Constant.TYPE_ANY;
 
 /**Сказочно удобный в использовании, я — молодец
  * Решает проблему хранения/получения имен/идентификаторов объектов при выборе позиции из спиннеров

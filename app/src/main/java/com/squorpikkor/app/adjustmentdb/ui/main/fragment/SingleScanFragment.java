@@ -1,6 +1,7 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
@@ -23,9 +24,9 @@ import com.squorpikkor.app.adjustmentdb.ui.main.dialog.RecognizeDialog;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.SelectStateDialogSingle;
 import com.squorpikkor.app.adjustmentdb.ui.main.dialog.WrongQRDialog;
 import java.util.ArrayList;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_SINGLE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_STATES;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.LESS_THAN_ONE;
+import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_SINGLE;
+import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_STATES;
+import static com.squorpikkor.app.adjustmentdb.Constant.LESS_THAN_ONE;
 
 public class SingleScanFragment extends Fragment {
 
@@ -115,12 +116,13 @@ public class SingleScanFragment extends Fragment {
     }
 
     private void restartScanning(boolean state) {
+        Log.e("TAG", "restartScanning: "+state);
         if (state) {
             if (states!=null) states.clear();
             surfaceView.setVisibility(View.VISIBLE);
             infoLayout.setVisibility(View.GONE);
             mViewModel.startSingleScanner(getActivity(), surfaceView);
-            mViewModel.getSingleScanner().initialiseDetectorsAndSources(mViewModel.getCanWork().getValue());
+            mViewModel.getSingleScanner().initialiseDetectorsAndSources();
             mViewModel.setBackPressCommand(BACK_PRESS_SINGLE);
             mViewModel.getSelectedUnit().setValue(null);
             mViewModel.getShouldOpenDialog().setValue(false);
@@ -169,7 +171,7 @@ public class SingleScanFragment extends Fragment {
     public void onResume() {
         super.onResume();
         surfaceView.setVisibility(View.VISIBLE);
-        mViewModel.getSingleScanner().initialiseDetectorsAndSources(mViewModel.getCanWork().getValue());
+        mViewModel.getSingleScanner().initialiseDetectorsAndSources();
         if (infoLayout.getVisibility()==View.GONE) mViewModel.setBackPressCommand(BACK_PRESS_SINGLE);
         else mViewModel.setBackPressCommand(BACK_PRESS_STATES);
     }

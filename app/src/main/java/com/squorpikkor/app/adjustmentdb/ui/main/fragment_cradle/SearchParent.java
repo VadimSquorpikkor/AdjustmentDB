@@ -26,12 +26,4 @@ public class SearchParent extends Fragment {
         transaction.replace(R.id.child_fragment_container_3, childFragment).commit();
         return view;
     }
-
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        Fragment childFragment = SearchDeviceFragment.newInstance();
-//        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-//        transaction.replace(R.id.child_fragment_container_3, childFragment).commit();
-//    }
 }

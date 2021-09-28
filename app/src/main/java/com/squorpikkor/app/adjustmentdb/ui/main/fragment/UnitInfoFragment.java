@@ -15,8 +15,8 @@ import com.squorpikkor.app.adjustmentdb.R;
 import com.squorpikkor.app.adjustmentdb.Utils;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import com.squorpikkor.app.adjustmentdb.ui.main.adapter.StatesAdapter;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.BACK_PRESS_SEARCH;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.LESS_THAN_ONE;
+import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_SEARCH;
+import static com.squorpikkor.app.adjustmentdb.Constant.LESS_THAN_ONE;
 
 public class UnitInfoFragment extends Fragment {
 

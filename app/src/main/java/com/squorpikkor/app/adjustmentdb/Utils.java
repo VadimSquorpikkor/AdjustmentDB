@@ -104,11 +104,11 @@ public class Utils {
 
     public static String generateTrackId() {
         String id = ""+(System.currentTimeMillis()/1000);
-        SaveLoad.saveParam(SAVED_TRACKID, id);
+        SaveLoad.save(SAVED_TRACKID, id);
         return id;
     }
 
     public static String getPreviouslyGeneratedTrackId() {
-        return SaveLoad.loadStringParam(SAVED_TRACKID);
+        return SaveLoad.loadString(SAVED_TRACKID);
     }
 }

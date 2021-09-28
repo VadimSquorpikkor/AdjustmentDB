@@ -14,7 +14,7 @@ import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import java.util.ArrayList;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightDate;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightTime;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.LESS_THAN_ONE;
+import static com.squorpikkor.app.adjustmentdb.Constant.LESS_THAN_ONE;
 
 /**Адаптер для списка всех статусов для выбранного конкретного устройства. Показывает дату, время и сам статус*/
 public class StatesAdapter extends RecyclerView.Adapter<StatesAdapter.StatesViewHolder> {

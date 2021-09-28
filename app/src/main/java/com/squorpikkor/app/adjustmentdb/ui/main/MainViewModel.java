@@ -26,6 +26,21 @@ import com.squorpikkor.app.adjustmentdb.ui.main.scanner.ScannerDataShow;
 import com.squorpikkor.app.adjustmentdb.ui.main.scanner.Scanner;
 import java.util.ArrayList;
 import io.grpc.android.BuildConfig;
+
+import static com.squorpikkor.app.adjustmentdb.Constant.ANY_VALUE;
+import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_INFO_FRAGMENT;
+import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_MULTI;
+import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_MULTI_STATES;
+import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_SEARCH;
+import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_SINGLE;
+import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_STATES;
+import static com.squorpikkor.app.adjustmentdb.Constant.EMPTY_LOCATION_ID;
+import static com.squorpikkor.app.adjustmentdb.Constant.EMPTY_LOCATION_NAME;
+import static com.squorpikkor.app.adjustmentdb.Constant.EMPTY_LOCATION_NAME_2;
+import static com.squorpikkor.app.adjustmentdb.Constant.REPAIR_TYPE;
+import static com.squorpikkor.app.adjustmentdb.Constant.REPAIR_UNIT;
+import static com.squorpikkor.app.adjustmentdb.Constant.SERIAL_TYPE;
+import static com.squorpikkor.app.adjustmentdb.Constant.SPLIT_SYMBOL;
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.ui.main.scanner.Encrypter.decodeMe;
 
@@ -66,106 +81,148 @@ import static com.squorpikkor.app.adjustmentdb.ui.main.scanner.Encrypter.decodeM
  */
 public class MainViewModel extends ViewModel implements ScannerDataShow {
 //--------------------------------------------------------------------------------------------------
-public static final String TABLE_NAMES = "names";
-
-    //Новые стринги для новой БД:
-    public static final String TABLE_UNITS = "units";
-    public static final String UNIT_DATE = "date";
-    public static final String UNIT_CLOSE_DATE = "close_date";
-    public static final String UNIT_DEVICE = "device_id"; //todo возможно в имени стринга и не нужен "_ID", только в значении
-    public static final String UNIT_DEVICE_SET = "devset_id";
-    public static final String UNIT_EMPLOYEE = "employee_id";
-    public static final String UNIT_ID = "id";
-    public static final String UNIT_EVENT_ID = "event_id";
-    public static final String UNIT_INNER_SERIAL = "inner_serial";
-    public static final String UNIT_LOCATION = "location_id";
-    public static final String UNIT_SERIAL = "serial";
-    public static final String UNIT_STATE = "state_id";
-    public static final String UNIT_TYPE = "type_id";//todo по-хорошему нужна коллекция тайпов. Пока обойдусь
-    public static final String UNIT_TRACKID = "trackid";
-
-    public static final String TABLE_STATES = "states"; //в прошлом profile
-    public static final String STATE_ID = "id";
-    public static final String STATE_NAME_ID = "name_id";
-    public static final String STATE_LOCATION = "location_id";
-    public static final String STATE_NAME = "name";
-    public static final String STATE_TYPE = "type_id";
-
-    public static final String TABLE_EVENTS = "events"; //в прошлом states
-    public static final String EVENT_DATE = "date";
-    public static final String EVENT_CLOSE_DATE = "close_date";
-    public static final String EVENT_DESCRIPTION = "description";
-    public static final String EVENT_LOCATION = "location_id";
-    public static final String EVENT_STATE = "state_id";
-    public static final String EVENT_UNIT = "unit_id";
-
-    public static final String TABLE_EMPLOYEES = "employees"; //в прошлом users
-    public static final String EMPLOYEE_EMAIL = "email"; //email нельзя использовать в качестве id, так как у пользователя может поменяться email, и тогда при необходимости выбрать устройства пользователя нужно будет искать и по старому email и по новому
-    public static final String EMPLOYEE_ID = "id";
-    public static final String EMPLOYEE_NAME_ID = "name_id";
-    public static final String EMPLOYEE_LOCATION = "location_id";
-
-    public static final String TABLE_LOCATIONS = "locations";
-    public static final String LOCATION_ID = "id";
-    public static final String LOCATION_NAME_ID = "name_id";
-
-    public static final String TABLE_DEVICES = "devices";
-    public static final String DEVICE_ID = "id";
-    public static final String DEVICE_NAME_ID = "name_id";
-    public static final String DEVICE_DEV_SET_ID = "devset_id";
-    public static final String DEVICE_IMG_PATH = "img_path";
-
-    public static final String TABLE_DEVICE_SET = "device_set";
-    public static final String DEVICE_SET_ID = "id";
-    public static final String DEVICE_SET_NAME_ID = "name_id";
-
-    public static final String EMPTY_LOCATION_ID = "empty_location_id";
-//    public static final String EMPTY_LOCATION_NAME = "Локация не найдена";
-    public static final String EMPTY_LOCATION_NAME = "Пользователь не зарегистрирован";
-//--------------------------------------------------------------------------------------------------
-    public static final String TYPE_ANY = "any_type";
-    public static final String SERIAL_TYPE = "serial_type";
-    public static final String REPAIR_TYPE = "repair_type";
-
-    private static final String SPLIT_SYMBOL = " ";
-    public static final String REPAIR_UNIT = "Ремонт";
-    public static final String SERIAL_UNIT = "Серия";
-    public static final String ANY_VALUE = "any_value";
-    public static final String ANY_VALUE_TEXT = "- любой -";//"- любой -"
-    public static final String EMPTY_VALUE_TEXT = "- не выбран -";//"- не выбран -"
-    public static final String IS_COMPLETE = "ЗАВЕРШЕНО";
-    public static final String LESS_THAN_ONE = " <1";
-//--------------------------------------------------------------------------------------------------
-
-    public static final String BACK_PRESS_SEARCH = "back_press_search";
-    public static final String BACK_PRESS_SINGLE = "back_press_single";
-    public static final String BACK_PRESS_STATES = "back_press_states";
-    public static final String BACK_PRESS_MULTI_STATES = "back_press_multi_states";
-    public static final String BACK_PRESS_MULTI = "back_press_multi";
-    public static final String BACK_PRESS_INFO_FRAGMENT = "back_press_info";
 
     private final FireDBHelper dbh;
 
-    private final MutableLiveData<DUnit> selectedUnit;//todo из трёх должен остаться только scannerFoundUnitsList
-    private final MutableLiveData<ArrayList<DEvent>> unitStatesList;
-    private final MutableLiveData<ArrayList<DUnit>> scannerFoundUnitsList;
+    private final MutableLiveData<DUnit>                selectedUnit;//todo из трёх должен остаться только scannerFoundUnitsList
+    private final MutableLiveData<ArrayList<DEvent>>    unitStatesList;
+    private final MutableLiveData<ArrayList<DUnit>>     scannerFoundUnitsList;
 
-    private final MutableLiveData<String> location_id;
-    private final MutableLiveData<String> locationName;
+    private final MutableLiveData<String>   location_id;
+    private final MutableLiveData<String>   locationName;
     private final MutableLiveData<Drawable> userImage;
-    private final MutableLiveData<Boolean> startExit;
-    private final MutableLiveData<Boolean> goToSearchTab;
-    private final MutableLiveData<Boolean> restartScanning;
-    private final MutableLiveData<Boolean> restartMultiScanning;
-    private final MutableLiveData<Boolean> backToRecycler;
-    private final MutableLiveData<Boolean> isWrongQR;
-    private final MutableLiveData<Boolean> shouldOpenDialog;
-    private final MutableLiveData<String> email;
+    private final MutableLiveData<Boolean>  startExit;
+    private final MutableLiveData<Boolean>  goToSearchTab;
+    private final MutableLiveData<Boolean>  restartScanning;
+    private final MutableLiveData<Boolean>  restartMultiScanning;
+    private final MutableLiveData<Boolean>  backToRecycler;
+    private final MutableLiveData<Boolean>  isWrongQR;
+    private final MutableLiveData<Boolean>  shouldOpenDialog;
+    private final MutableLiveData<String>   email;
+    private Scanner singleScanner;
+    private Scanner multiScanner;
+    private MutableLiveData<ArrayList<Location>>  locations;
+    private MutableLiveData<ArrayList<Device>>    devices;
+    private MutableLiveData<ArrayList<Employee>>  employees;
+    private MutableLiveData<ArrayList<State>>     states;
+    private MutableLiveData<ArrayList<DeviceSet>> deviceSets;
+    /**Юниты, которые были найдены поиском по БД по параметрам*/
+    private MutableLiveData<ArrayList<DUnit>> foundUnitsList;
+    private MutableLiveData<Boolean> canWork;
 
-    private FirebaseUser user;
+//--------------------------------------------------------------------------------------------------
+    public MutableLiveData<ArrayList<Location>>     getLocations() {
+        return locations;
+    }
+    public MutableLiveData<ArrayList<Device>>       getDevices() {
+        return devices;
+    }
+    public MutableLiveData<ArrayList<Employee>>     getEmployees() {
+        return employees;
+    }
+    public MutableLiveData<ArrayList<State>>        getStates() {
+        return states;
+    }
+    public MutableLiveData<ArrayList<DeviceSet>>    getDeviceSets() {
+        return deviceSets;
+    }
+    public MutableLiveData<ArrayList<DEvent>>       getUnitStatesList() {
+        return unitStatesList;
+    }
+    public MutableLiveData<DUnit>                   getSelectedUnit() {
+        return selectedUnit;
+    }
+    public MutableLiveData<ArrayList<DUnit>>        getScannerFoundUnitsList() {
+        return scannerFoundUnitsList;
+    }
+    public MutableLiveData<Drawable>                getUserImage() {
+        return userImage;
+    }
+    public MutableLiveData<String>                  getLocation_id() {
+        return location_id;
+    }
+    public MutableLiveData<String>                  getLocationName() {
+        return locationName;
+    }
+    public MutableLiveData<Boolean>                 getIsWrongQR() {
+        return isWrongQR;
+    }
+    public MutableLiveData<Boolean>                 getShouldOpenDialog() {
+        return shouldOpenDialog;
+    }
+    public MutableLiveData<String>                  getEmail() {
+        return email;
+    }
+    public MutableLiveData<ArrayList<DUnit>>        getFoundUnitsList() {
+        return foundUnitsList;
+    }
+    public MutableLiveData<Boolean>                 getCanWork() {
+        return canWork;
+    }
 
-    Scanner singleScanner;
-    Scanner multiScanner;
+//--------------------------------------------------------------------------------------------------
+    public MainViewModel() {
+        dbh = new FireDBHelper();
+        locations = new MutableLiveData<>();
+        devices = new MutableLiveData<>();
+        employees = new MutableLiveData<>();
+        states = new MutableLiveData<>();
+        deviceSets = new MutableLiveData<>();
+        foundUnitsList = new MutableLiveData<>();
+        foundUnitsList = new MutableLiveData<>();
+        selectedUnit = new MutableLiveData<>();
+        unitStatesList = new MutableLiveData<>();
+        scannerFoundUnitsList = new MutableLiveData<>();
+        location_id = new MutableLiveData<>();
+        locationName = new MutableLiveData<>();
+        userImage = new MutableLiveData<>();
+        startExit = new MutableLiveData<>();
+        goToSearchTab = new MutableLiveData<>();
+        restartScanning = new MutableLiveData<>();
+        restartMultiScanning = new MutableLiveData<>();
+        backToRecycler = new MutableLiveData<>();
+        backToRecycler.setValue(false);
+        isWrongQR = new MutableLiveData<>();
+        shouldOpenDialog = new MutableLiveData<>();
+        canWork = new MutableLiveData<>();
+        canWork.setValue(false);
+        email = new MutableLiveData<>();
+        canWork.observeForever(this::doListen);
+        dbh.employeeListener(employees);
+    }
+//--------------------------------------------------------------------------------------------------
+    public void removeListeners() {
+
+        locations.setValue(null);
+        devices.setValue(null);
+        states.setValue(null);
+        deviceSets.setValue(null);
+    }
+
+    public void addListeners() {
+//        dbh.locationListener(locations);
+        dbh.deviceListener(devices);
+        dbh.stateListener(states);
+        dbh.deviceSetListener(deviceSets);
+    }
+//--------------------------------------------------------------------------------------------------
+
+    public void updateUserImage(Drawable img) {
+        userImage.setValue(img);
+    }
+    public String getVersion() {
+        return BuildConfig.VERSION_NAME;
+    }
+
+
+    public void startSingleScanner(Activity activity, SurfaceView surfaceView) {
+        singleScanner = new Scanner(activity, false, this, surfaceView);
+    }
+
+    public void startMultiScanner(Activity activity, SurfaceView surfaceView) {
+        multiScanner = new Scanner(activity, true, this, surfaceView);
+    }
+
 
 //----------------------------------------------------
     //Для новой архитектуры
@@ -204,31 +261,6 @@ public static final String TABLE_NAMES = "names";
         return newList;
     }
 
-    MutableLiveData<ArrayList<Location>> locations;
-    MutableLiveData<ArrayList<Device>> devices;
-    MutableLiveData<ArrayList<Employee>> employees;
-    MutableLiveData<ArrayList<State>> states;
-    MutableLiveData<ArrayList<DeviceSet>> deviceSets;
-
-    /**Юниты, которые были найдены поиском по БД по параметрам*/
-    MutableLiveData<ArrayList<DUnit>> foundUnitsList;
-
-    public MutableLiveData<ArrayList<Location>> getLocations() {
-        return locations;
-    }
-    public MutableLiveData<ArrayList<Device>> getDevices() {
-        return devices;
-    }
-    public MutableLiveData<ArrayList<Employee>> getEmployees() {
-        return employees;
-    }
-    public MutableLiveData<ArrayList<State>> getStates() {
-        return states;
-    }
-
-    public MutableLiveData<ArrayList<DeviceSet>> getDeviceSets() {
-        return deviceSets;
-    }
 
     /**Из списка локаций выбирает список их имен*/
     public ArrayList<String> getLocationNames() {
@@ -255,6 +287,7 @@ public static final String TABLE_NAMES = "names";
 
     //todo вообще можно сделать частью DEvent (event.getName(mViewModel)) надо подумать
     public String getLocationNameById(String id) {
+        if (id.equals(EMPTY_LOCATION_ID)) return EMPTY_LOCATION_NAME_2;
         return getNameByIdPrivate(locations.getValue(), id);
     }
     public String getDeviceNameById(String id) {
@@ -289,6 +322,7 @@ public static final String TABLE_NAMES = "names";
     }
 
     public void setLocationByEmail(String email) {
+        Log.e(TAG, "setLocationByEmail: "+email);
         ArrayList<Employee> list = employees.getValue();
         if (!(list == null || list.size() == 0 || email == null || email.equals(""))) {
             for (int i = 0; i < list.size(); i++) {
@@ -300,77 +334,24 @@ public static final String TABLE_NAMES = "names";
                 }
             }
         }
+        Log.e(TAG, "setLocationByEmail: НЕ НАЙДЕНО!");
         location_id.setValue(EMPTY_LOCATION_ID);
         locationName.setValue(getLocationNameById(EMPTY_LOCATION_NAME));
     }
 
-    public MutableLiveData<ArrayList<DUnit>> getFoundUnitsList() {
-        return foundUnitsList;
-    }
 
-    MutableLiveData<Boolean> canWork;
-
-    public MutableLiveData<Boolean> getCanWork() {
-        return canWork;
-    }
 
     public void checkUserEmail(String email) {
-        dbh.checkUser(email, canWork);
+        dbh.checkUser(email, canWork, locations);
     }
 
-    public void removeListeners() {
-        locations.setValue(null);
-        devices.setValue(null);
-        states.setValue(null);
-        deviceSets.setValue(null);
-    }
 
-    public void addListeners() {
-        dbh.locationListener(locations);
-        dbh.deviceListener(devices);
-        dbh.stateListener(states);
-        dbh.deviceSetListener(deviceSets);
-    }
 //----------------------------------------------------
 
-    public MainViewModel() {
-        dbh = new FireDBHelper();
 
-        locations = new MutableLiveData<>();
-        devices = new MutableLiveData<>();
-        employees = new MutableLiveData<>();
-        states = new MutableLiveData<>();
-        deviceSets = new MutableLiveData<>();
-
-        foundUnitsList = new MutableLiveData<>();
-        foundUnitsList = new MutableLiveData<>();
-//        addListeners();
-        selectedUnit = new MutableLiveData<>();
-        unitStatesList = new MutableLiveData<>();
-        scannerFoundUnitsList = new MutableLiveData<>();
-        location_id = new MutableLiveData<>();
-        locationName = new MutableLiveData<>();
-        userImage = new MutableLiveData<>();
-
-        startExit = new MutableLiveData<>();
-        goToSearchTab = new MutableLiveData<>();
-        restartScanning = new MutableLiveData<>();
-        restartMultiScanning = new MutableLiveData<>();
-        backToRecycler = new MutableLiveData<>();
-        backToRecycler.setValue(false);
-
-        isWrongQR = new MutableLiveData<>();
-        shouldOpenDialog = new MutableLiveData<>();
-
-        canWork = new MutableLiveData<>();
-        canWork.setValue(false);
-        email = new MutableLiveData<>();
-        canWork.observeForever(this::doListen);
-
-        dbh.employeeListener(employees);
-    }
 
     private void doListen(Boolean aBoolean) {
+        Log.e(TAG, "---------doListen: "+aBoolean);
         if (aBoolean) {
             addListeners();
 
@@ -420,67 +401,7 @@ public static final String TABLE_NAMES = "names";
         dbh.listenerForMultiScanUnitWithLastEvent(scannerFoundUnitsList);
     }
 
-//--------------------------------------------------------------------------------------------------
 
-    public MutableLiveData<ArrayList<DEvent>> getUnitStatesList() {
-        return unitStatesList;
-    }
-
-    public MutableLiveData<DUnit> getSelectedUnit() {
-        return selectedUnit;
-    }
-
-    public MutableLiveData<ArrayList<DUnit>> getScannerFoundUnitsList() {
-        return scannerFoundUnitsList;
-    }
-
-    public MutableLiveData<Drawable> getUserImage() {
-        return userImage;
-    }
-
-    public void updateUserImage(Drawable img) {
-        userImage.setValue(img);
-    }
-
-    public String getVersion() {
-        return BuildConfig.VERSION_NAME;
-    }
-
-    public MutableLiveData<String> getLocation_id() {
-        return location_id;
-    }
-
-    public MutableLiveData<String> getLocationName() {
-        return locationName;
-    }
-
-    public FirebaseUser getFirebaseUser() {
-        return user;
-    }
-
-    public void setFirebaseUser(FirebaseUser user) {
-        this.user = user;
-    }
-
-    public void startSingleScanner(Activity activity, SurfaceView surfaceView) {
-        singleScanner = new Scanner(activity, false, this, surfaceView);
-    }
-
-    public void startMultiScanner(Activity activity, SurfaceView surfaceView) {
-        multiScanner = new Scanner(activity, true, this, surfaceView);
-    }
-
-    public MutableLiveData<Boolean> getIsWrongQR() {
-        return isWrongQR;
-    }
-
-    public MutableLiveData<Boolean> getShouldOpenDialog() {
-        return shouldOpenDialog;
-    }
-
-    public MutableLiveData<String> getEmail() {
-        return email;
-    }
 
     //--------------- BACK PRESS -----------------------------------------------------------------------
 

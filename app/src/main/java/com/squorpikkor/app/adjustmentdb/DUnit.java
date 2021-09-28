@@ -1,11 +1,12 @@
 package com.squorpikkor.app.adjustmentdb;
 
+import static com.squorpikkor.app.adjustmentdb.Constant.ANY_VALUE;
+import static com.squorpikkor.app.adjustmentdb.Constant.REPAIR_TYPE;
+import static com.squorpikkor.app.adjustmentdb.Constant.SERIAL_TYPE;
+
 import android.util.Log;
 import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import java.util.Date;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.ANY_VALUE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.REPAIR_TYPE;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.SERIAL_TYPE;
 
 public class DUnit {
 

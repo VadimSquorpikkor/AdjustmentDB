@@ -16,7 +16,7 @@ import com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel;
 import java.util.ArrayList;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightDateAndTime;
 import static com.squorpikkor.app.adjustmentdb.Utils.getRightValue;
-import static com.squorpikkor.app.adjustmentdb.ui.main.MainViewModel.IS_COMPLETE;
+import static com.squorpikkor.app.adjustmentdb.Constant.IS_COMPLETE;
 
 /**Адаптер для элемента списка устройств, найденных поиском по БД по параметрам*/
 public class UnitAdapter extends RecyclerView.Adapter<UnitAdapter.DUnitViewHolder>{
