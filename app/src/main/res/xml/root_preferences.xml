@@ -7,7 +7,7 @@
             app:defaultValue="2"
             app:entries="@array/select_fragment_entries"
             app:entryValues="@array/select_values"
-            app:key="preferredTab"
+            app:key="@string/preferred_tab"
             app:title="Вкладка по умолчанию"
             app:useSimpleSummaryProvider="true" />
 

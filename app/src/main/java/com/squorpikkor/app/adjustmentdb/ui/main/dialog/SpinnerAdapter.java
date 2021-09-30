@@ -1,7 +1,6 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.dialog;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 

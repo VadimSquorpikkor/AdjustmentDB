@@ -7,7 +7,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
@@ -55,8 +54,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //Выбор вкладки, которая будет открываться при старте приложения.
         //Выбирается пользователем в настройках, по умолчанию — 1 ("Поиск"). Нумерация идет с 0)
-        String saved = PreferenceManager.getDefaultSharedPreferences(this).getString("preferredTab", "1");
-        int preferredTab = Integer.parseInt(saved);
+//        String saved = PreferenceManager.getDefaultSharedPreferences(this).getString("preferredTab", "1");
+//        int preferredTab = Integer.parseInt(saved);
+        int preferredTab = SaveLoad.getPrefInt(R.string.preferred_tab, 1);
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         viewPager = findViewById(R.id.view_pager);

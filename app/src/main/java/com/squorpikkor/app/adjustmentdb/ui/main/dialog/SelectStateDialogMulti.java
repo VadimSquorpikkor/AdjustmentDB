@@ -19,6 +19,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
+
 import static com.squorpikkor.app.adjustmentdb.Constant.ANY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.Constant.EMPTY_VALUE_TEXT;
 

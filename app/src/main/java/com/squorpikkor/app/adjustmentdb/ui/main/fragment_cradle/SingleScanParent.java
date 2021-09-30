@@ -1,14 +1,13 @@
 package com.squorpikkor.app.adjustmentdb.ui.main.fragment_cradle;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.squorpikkor.app.adjustmentdb.R;
@@ -26,14 +25,20 @@ public class SingleScanParent extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_parent, container, false);
+        ImageView img = view.findViewById(R.id.image_for_empty);
         mViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
-
         mViewModel.getCanWork().observe(getViewLifecycleOwner(), aBoolean -> {
-            if (aBoolean) startFragment();
-            else stopFragment();
+            if (aBoolean) {
+                img.setVisibility(View.GONE);
+                startFragment();
+            } else {
+                img.setVisibility(View.VISIBLE);
+                stopFragment();
+            }
         });
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_parent, container, false);
+        return view;
     }
 
     private void stopFragment() {

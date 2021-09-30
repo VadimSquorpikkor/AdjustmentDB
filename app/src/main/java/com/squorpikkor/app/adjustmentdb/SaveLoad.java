@@ -58,9 +58,17 @@ public class SaveLoad {
         if (mPrefManager.contains(key)) return Integer.parseInt(mPrefManager.getString(key, "0"));
         return 0;
     }
+    public static int getPrefInt(String key) {//не нужно, всё равно в prefFragment можно только через @string/key_name имя задать, т.е. через int
+        if (mPrefManager.contains(key)) return Integer.parseInt(mPrefManager.getString(key, "0"));
+        return 0;
+    }
     /**Загрузка настройки boolean, заданной через preferenceActivity, по ключу из resId*/
     public static int getPrefInt(int resId, int defValue) {
         String key = App.getContext().getString(resId);
+        if (mPrefManager.contains(key)) return Integer.parseInt(mPrefManager.getString(key, String.valueOf(defValue)));
+        return defValue;
+    }
+    public static int getPrefInt(String key, int defValue) {//не нужно, всё равно в prefFragment можно только через @string/key_name имя задать, т.е. через int
         if (mPrefManager.contains(key)) return Integer.parseInt(mPrefManager.getString(key, String.valueOf(defValue)));
         return defValue;
     }
