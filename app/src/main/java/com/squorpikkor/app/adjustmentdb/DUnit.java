@@ -71,17 +71,15 @@ public class DUnit {
     }
 
     public void addNewEvent(MainViewModel model, String state, String description, String location) {
-        Log.e("TAG", "addNewEvent: lastEvent = "+lastEvent);
-
         DEvent newEvent = getNewEvent(state, description, location);
         if (newEvent==null||newEvent.getId()==null||newEvent.getId().equals("")) return;
 
-        if (lastEvent!=null) lastEvent.closeEvent(model);//если это первое событие, то lastEvent будет равен null
+        if (lastEvent!=null) lastEvent.updateEvent(model);//если это первое событие, то lastEvent будет равен null
         eventId = newEvent.getId();
         lastEvent = newEvent;
         if (lastEvent.getState().equals("rep_r_otpravleno") || lastEvent.getState().equals("rep_r_vydano")) {//TODO сделать через константы
             closeUnit();
-//            lastEvent.closeEvent(model);//впринципе, если не закрывать, то ивент будет показывать, сколько времени прошло со дня закрытия ремонта/серии
+            lastEvent.closeEvent();
         }
 
         //todo убрать if (eventId!=null&&!eventId.equals("")) unit.setEventId(eventId); из selectState

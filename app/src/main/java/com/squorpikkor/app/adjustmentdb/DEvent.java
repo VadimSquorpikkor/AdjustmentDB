@@ -53,8 +53,12 @@ public class DEvent {
     }
 
     /**Закрывает себя в БД*/
-    public void closeEvent(MainViewModel model) {
-        model.closeEvent(id);
+    public void updateEvent(MainViewModel model) {
+        model.updateEvent(id);
+    }
+
+    public void closeEvent() {
+        closeDate = new Date();
     }
 
     public Date getDate() {

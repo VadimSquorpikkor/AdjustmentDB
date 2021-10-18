@@ -370,8 +370,8 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         }
     }
 
-    public void closeEvent(String event_id) {
-        dbh.closeEvent(event_id); // если создан новый ивент, то старый закрываем
+    public void updateEvent(String event_id) {
+        dbh.updateEvent(event_id); // если создан новый ивент, то старый закрываем
     }
 
     /**Сохраняет выбранный юнит и его последнее событие*/

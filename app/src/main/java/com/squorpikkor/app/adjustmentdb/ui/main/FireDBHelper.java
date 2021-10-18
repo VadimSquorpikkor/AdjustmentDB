@@ -376,6 +376,7 @@ class FireDBHelper {
         if (event == null) return;//если нового статуса не было и новый ивент == null, то dbh.addEventToDB его проигнорирует и этот ивент добавляться в БД не будет
         Map<String, Object> data = new HashMap<>();
         data.put(EVENT_DATE, new Date());
+        if (event.getCloseDate()!=null) data.put(EVENT_CLOSE_DATE, event.getCloseDate());
         data.put(EVENT_STATE, event.getState());
         data.put(EVENT_DESCRIPTION, event.getDescription());
         data.put(EVENT_UNIT, event.getUnit_id());
@@ -388,7 +389,7 @@ class FireDBHelper {
     }
 
     /**Добавляет к ивенту дату закрытия события. Дата закрытия — это сегодняшняя дата*/
-    void closeEvent(String event_id) {
+    void updateEvent(String event_id) {
         if (event_id==null) return;
         db.collection(TABLE_EVENTS).document(event_id).update(EVENT_CLOSE_DATE, new Date());
     }
