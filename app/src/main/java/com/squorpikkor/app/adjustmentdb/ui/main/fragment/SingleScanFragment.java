@@ -158,8 +158,7 @@ public class SingleScanFragment extends Fragment {
     }
 
     private void openStatesDialog() {
-        SelectStateDialogSingle dialog = new SelectStateDialogSingle();
-        dialog.show(getParentFragmentManager(), null);
+        new SelectStateDialogSingle().show(getParentFragmentManager(), null);
     }
 
     private void openRecognizeDialog() {

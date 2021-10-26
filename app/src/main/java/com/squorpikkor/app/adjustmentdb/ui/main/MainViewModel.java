@@ -15,6 +15,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
 import com.squorpikkor.app.adjustmentdb.R;
+import com.squorpikkor.app.adjustmentdb.SaveLoad;
 import com.squorpikkor.app.adjustmentdb.app.App;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.Device;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.DeviceSet;
@@ -446,8 +447,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     }
 //--------------------------------------------------------------------------------------------------
 
-    //todo переименовать на startSearch
-    public void getUnitListFromBD(String deviceNameId, String locationId, String employeeId, String typeId, String stateId, String devSet, String serial) {
+    public void startSearch(String deviceNameId, String locationId, String employeeId, String typeId, String stateId, String devSet, String serial) {
         Log.e(TAG, "♦ deviceName - "+deviceNameId+" location - "+locationId+" employee - "+employeeId+" type - "+typeId);
         //Если поле серийного номера пустое, то ищем по параметрам; если поле содержит значение, то ищем по этому значению, игнорируя
         // все остальные параметры. Т.е. ищем или по параметрам, или по серийному номеру
@@ -505,10 +505,8 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     /**Открытие диалога статусов сразу после успешного распознания QR-кода (и вставки данных в диалог)
      * Если пользователь установил такое правило в настройках*/
     private void showStateDialog() {
-        boolean savedValue = PreferenceManager.getDefaultSharedPreferences(App.getContext()).getBoolean("auto_start_dialog", false);
-        if (savedValue) {
-            if (shouldOpenDialog.getValue()==null || !shouldOpenDialog.getValue()) shouldOpenDialog.setValue(true);
-        }
+        boolean savedValue = SaveLoad.getPrefBoolean(R.string.auto_start_dialog);
+        if (savedValue) shouldOpenDialog.setValue(true);
     }
 
     private void sayWrongQr() {

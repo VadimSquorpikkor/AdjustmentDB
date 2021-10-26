@@ -5,12 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -33,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.squorpikkor.app.adjustmentdb.BuildConfig.VERSION_NAME;
+import static com.squorpikkor.app.adjustmentdb.Constant.EMPTY_LOCATION_ID;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -89,20 +88,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         TextView emailText = headerView.findViewById(R.id.email_text);
         accountImage = headerView.findViewById(R.id.account_image);
 
-        final MutableLiveData<Drawable> getImage = mViewModel.getUserImage();
-        getImage.observe(this, drawable -> accountImage.setImageDrawable(drawable));
+        mViewModel.getUserImage().observe(this, drawable -> accountImage.setImageDrawable(drawable));
 
-        final MutableLiveData<String> locationName = mViewModel.getLocationName();
-        locationName.observe(this, s -> {
-            if (locationName.getValue() != null) {
-                location.setText(locationName.getValue());
-                locationText.setText(locationName.getValue());
+        mViewModel.getLocationName().observe(this, name -> {
+            if (name != null) {
+                location.setText(name);
+                locationText.setText(name);
             }
         });
 
-        final MutableLiveData<Boolean> goToSearch = mViewModel.getGoToSearchTab();
-        goToSearch.observe(this, this::goToSearchTab);
-
+        mViewModel.getGoToSearchTab().observe(this, this::goToSearchTab);
 
         if (FirebaseAuth.getInstance().getCurrentUser() != null && FirebaseAuth.getInstance().getCurrentUser().getEmail() != null) {
             Log.e(TAG, "*********************************************onCreate: "+FirebaseAuth.getInstance().getCurrentUser().getEmail());
@@ -112,8 +107,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             signIn();
         }
 
-        mViewModel.getLocations().observe(this, locations ->
-                locationName.setValue(mViewModel.getLocationNameById(mViewModel.getLocation_id().getValue())));
+        mViewModel.getLocations().observe(this, locations -> {
+//            locationName.setValue(mViewModel.getLocationNameById(mViewModel.getLocation_id().getValue()));
+            String name = mViewModel.getLocationNameById(mViewModel.getLocation_id().getValue()==null?EMPTY_LOCATION_ID:mViewModel.getLocation_id().getValue());
+            location.setText(name);
+            locationText.setText(name);
+        });
 
         mViewModel.getEmail().observe(this, emailText::setText);
     }

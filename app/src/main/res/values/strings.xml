@@ -63,5 +63,6 @@
     <string name="trackid">TrackId</string>
 <!--    <string name="title_activity_settings" />--> <!--о как-->
     <string name="title_activity_settings">Настройки</string>
+    <string name="auto_start_dialog">auto_start_dialog</string>
 
 </resources>

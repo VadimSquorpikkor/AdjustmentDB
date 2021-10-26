@@ -49,7 +49,7 @@ public class SaveLoad {
     /**Загрузка настройки boolean, заданной через preferenceActivity, по ключу из resId*/
     public static boolean getPrefBoolean(int resId) {
         String key = App.getContext().getString(resId);
-        if (mPrefManager.contains(key)) return Boolean.getBoolean(mPrefManager.getString(key, "false"));
+        if (mPrefManager.contains(key)) return mPrefManager.getBoolean(key, false);
         return false;
     }
     /**Загрузка настройки boolean, заданной через preferenceActivity, по ключу из resId*/

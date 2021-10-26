@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -58,10 +57,9 @@ public class MultiScanFragment extends Fragment {
         recyclerFoundUnits.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerFoundUnits.setAdapter(foundUnitAdapter);
 
-        final MutableLiveData<ArrayList<DUnit>> foundUnits = mViewModel.getScannerFoundUnitsList();
-        foundUnits.observe(getViewLifecycleOwner(), s -> {
-            foundUnitsList = foundUnits.getValue();
-            foundCount.setText(String.format(getString(R.string.found_count), foundUnitsList.size()));
+        mViewModel.getScannerFoundUnitsList().observe(getViewLifecycleOwner(), s -> {
+            foundUnitsList = s;
+            foundCount.setText(String.format(MultiScanFragment.this.getString(R.string.found_count), foundUnitsList.size()));
             if (foundUnitsList.size() != 0) {
                 nextButton.setVisibility(View.VISIBLE);
                 mViewModel.setBackPressCommand(BACK_PRESS_MULTI_STATES);

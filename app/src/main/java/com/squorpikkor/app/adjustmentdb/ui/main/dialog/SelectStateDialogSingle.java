@@ -60,7 +60,9 @@ public class SelectStateDialogSingle extends BaseDialog {
 
         initializeWithVM(R.layout.dialog_select_states_single);
 
-        unit = mViewModel.getSelectedUnit().getValue();
+        mViewModel.getSelectedUnit().observe(this, dUnit -> this.unit = dUnit);
+
+//        unit = mViewModel.getSelectedUnit().getValue();
         location = mViewModel.getLocation_id().getValue();
 
         Spinner deviceSetSpinner = view.findViewById(R.id.spinnerDevSetName);
