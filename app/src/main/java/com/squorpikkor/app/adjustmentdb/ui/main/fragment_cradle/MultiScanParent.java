@@ -56,6 +56,7 @@ public class MultiScanParent extends Fragment {
     }
 
     private void startFragment() {
+
         Fragment childFragment = MultiScanFragment.newInstance();
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         transaction.replace(R.id.child_fragment_container, childFragment).commit();

@@ -111,6 +111,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     private MutableLiveData<ArrayList<DUnit>> foundUnitsList;
     private MutableLiveData<Boolean> canWork;
 
+    private MutableLiveData<Boolean> showSurface;
 //--------------------------------------------------------------------------------------------------
     public MutableLiveData<ArrayList<Location>>     getLocations() {
         return locations;
@@ -161,7 +162,11 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         return canWork;
     }
 
-//--------------------------------------------------------------------------------------------------
+    public MutableLiveData<Boolean> getShowSurface() {
+        return showSurface;
+    }
+
+    //--------------------------------------------------------------------------------------------------
     public MainViewModel() {
         dbh = new FireDBHelper();
         locations = new MutableLiveData<>();
@@ -190,6 +195,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         email = new MutableLiveData<>();
         canWork.observeForever(this::doListen);
         dbh.employeeListener(employees);
+        showSurface = new MutableLiveData<>(true);
     }
 //--------------------------------------------------------------------------------------------------
     public void removeListeners() {

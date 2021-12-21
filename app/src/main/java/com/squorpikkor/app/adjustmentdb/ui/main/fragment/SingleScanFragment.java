@@ -59,7 +59,7 @@ public class SingleScanFragment extends Fragment {
 
         addNewStateButton = view.findViewById(R.id.addNewState);
         addNewStateButton.setVisibility(View.GONE);
-        addNewStateButton.setOnClickListener(view1 -> openStatesDialog());
+        addNewStateButton.setOnClickListener(view1 -> openStatesDialog(true));
 
         recognizeButton = view.findViewById(R.id.recognize_button);
         recognizeButton.setVisibility(View.GONE);
@@ -94,7 +94,8 @@ public class SingleScanFragment extends Fragment {
         mViewModel.getSelectedUnit().observe(getViewLifecycleOwner(), this::insertDataToFields);
         mViewModel.getUnitStatesList().observe(getViewLifecycleOwner(), this::updateEvents);
         mViewModel.getRestartScanning().observe(getViewLifecycleOwner(), this::restartScanning);
-        mViewModel.getShouldOpenDialog().observe(getViewLifecycleOwner(), b -> {if (b) openStatesDialog();});
+        mViewModel.getShouldOpenDialog().observe(getViewLifecycleOwner(), this::openStatesDialog);
+        mViewModel.getShowSurface().observe(getViewLifecycleOwner(), show -> surfaceView.setVisibility(show?View.VISIBLE:View.GONE));
 
         mViewModel.startSingleScanner(getActivity(), surfaceView);
 
@@ -109,6 +110,7 @@ public class SingleScanFragment extends Fragment {
 
     private void showWrongDialog(boolean isWrong) {
         if (isWrong) {
+            mViewModel.getShowSurface().setValue(false);
             WrongQRDialog dialog = new WrongQRDialog(requireActivity());
             dialog.show();
             mViewModel.getIsWrongQR().setValue(false);
@@ -119,7 +121,8 @@ public class SingleScanFragment extends Fragment {
         Log.e("TAG", "restartScanning: "+state);
         if (state) {
             if (states!=null) states.clear();
-            surfaceView.setVisibility(View.VISIBLE);
+            //surfaceView.setVisibility(View.VISIBLE);
+            mViewModel.getShowSurface().setValue(true);
             infoLayout.setVisibility(View.GONE);
             mViewModel.startSingleScanner(getActivity(), surfaceView);
             mViewModel.getSingleScanner().initialiseDetectorsAndSources();
@@ -157,8 +160,10 @@ public class SingleScanFragment extends Fragment {
         mViewModel.addSelectedUnitStatesListListener(unit.getId());
     }
 
-    private void openStatesDialog() {
+    private void openStatesDialog(boolean b) {
+        if (!b) return;
         new SelectStateDialogSingle().show(getParentFragmentManager(), null);
+        mViewModel.getShouldOpenDialog().setValue(false);
     }
 
     private void openRecognizeDialog() {

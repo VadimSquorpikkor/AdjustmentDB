@@ -70,12 +70,13 @@ public class MultiScanFragment extends Fragment {
         });
 
         nextButton.setOnClickListener(v -> {
+            mViewModel.getShowSurface().setValue(false);
             SelectStateDialogMulti dialog = new SelectStateDialogMulti();
             dialog.show(getParentFragmentManager(), null);
         });
 
         mViewModel.getRestartMultiScanning().observe(getViewLifecycleOwner(), this::restartMultiScanning);
-
+        mViewModel.getShowSurface().observe(getViewLifecycleOwner(), show -> surfaceView.setVisibility(show?View.VISIBLE:View.GONE));
         mViewModel.startMultiScanner(getActivity(), surfaceView);
 
         return view;
@@ -83,9 +84,10 @@ public class MultiScanFragment extends Fragment {
 
     private void restartMultiScanning(Boolean state) {
         if (state) {
+            mViewModel.getShowSurface().setValue(true);
             nextButton.setVisibility(View.GONE);
             foundUnitsList = new ArrayList<>();
-            surfaceView.setVisibility(View.VISIBLE);
+//            surfaceView.setVisibility(View.VISIBLE);
         }
     }
 
