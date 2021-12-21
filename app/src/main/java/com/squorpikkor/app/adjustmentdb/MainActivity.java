@@ -6,6 +6,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
@@ -47,6 +48,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //при первом запуске установить значения настроек по умолчанию, без этого обращение к
+        // настройкам будет возвращать null до тех пор, пока пользователь не зайдет в настройки (SettingsActivity)
+        PreferenceManager.setDefaultValues(this, R.xml.root_preferences, false);
         setContentView(R.layout.activity_main);
 
         mViewModel = new ViewModelProvider(this).get(MainViewModel.class);

@@ -31,10 +31,18 @@ public class SaveLoad {
         if (mPrefPrivate.contains(key)) return mPrefPrivate.getString(key, "");
         return "";
     }
+    public static String loadString(String key, String def) {
+        if (mPrefPrivate.contains(key)) return mPrefPrivate.getString(key, def);
+        return "";
+    }
     /**Загрузка int по ключу*/
     public static int loadInt(String key) {
         if (mPrefPrivate.contains(key)) return mPrefPrivate.getInt(key, 0);
         return 0;
+    }
+    public static int loadInt(String key, int def) {
+        if (mPrefPrivate.contains(key)) return mPrefPrivate.getInt(key, def);
+        return def;
     }
     /**Загрузка float по ключу*/
     public static float loadFloat(String key) {

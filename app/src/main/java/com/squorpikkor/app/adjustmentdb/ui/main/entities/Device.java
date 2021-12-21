@@ -12,6 +12,13 @@ public class Device extends Entity{
         this.imgPath = imgPath;
     }
 
+    public Device(String id, String nameId, String name, String engName, String devSetId, String imgPath) {
+        super(id, nameId, name);
+        this.devSetId = devSetId;
+        this.imgPath = imgPath;
+        this.engName = engName;
+    }
+
     public String getEngName() {
         return engName;
     }

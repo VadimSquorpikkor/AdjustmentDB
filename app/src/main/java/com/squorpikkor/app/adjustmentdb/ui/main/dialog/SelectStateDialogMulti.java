@@ -105,7 +105,7 @@ public class SelectStateDialogMulti extends BaseDialog {
             public void onTabReselected(TabLayout.Tab tab) {}
         });
         //установить вариант диалога при последнем выборе
-        int tabIndex = SaveLoad.loadInt(STATE_MULTI_DIALOG_TAB_STATE);
+        int tabIndex = SaveLoad.loadInt(STATE_MULTI_DIALOG_TAB_STATE, 1);//по умолчанию "Кратко"
         toggleTab(tabIndex);
         tabs.getTabAt(tabIndex).select();
 

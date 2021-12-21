@@ -12,6 +12,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squorpikkor.app.adjustmentdb.DEvent;
 import com.squorpikkor.app.adjustmentdb.DUnit;
+import com.squorpikkor.app.adjustmentdb.SaveLoad;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.Device;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.DeviceSet;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.Employee;
@@ -95,7 +96,9 @@ import static com.squorpikkor.app.adjustmentdb.Constant.UNIT_TYPE;
 
 class FireDBHelper {
 
-//--------------------------------------------------------------------------------------------------
+    Casher casher;
+
+    //--------------------------------------------------------------------------------------------------
 //todo ВСЕ ЛИСЕНЕРЫ НУЖНО ОБЪЕДИНИТЬ В ОДИН (У ВСЕХ СУЩНОСТЕЙ ВЕДЬ ОДИН РОДИТЕЛЬ)
     void joinName(String id, Entity e, MutableLiveData<ArrayList<? extends Entity>> data) {
         db.collection(TABLE_NAMES).document(id).get()
@@ -137,10 +140,40 @@ class FireDBHelper {
         });
     }
 
+    public static final String DB_VERSION = "db_version";
+    public static final String APP_DB_VERSION = "app_db_version";
+
+
+    void getDataVersion() {
+        db.collection("_settings").document("version").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot doc = task.getResult();
+                if (doc != null) {
+                    Log.e(TAG, "getDataVersion: "+doc.get("value").toString());
+                    SaveLoad.save(DB_VERSION, Integer.parseInt(doc.get("value").toString()));
+                }
+            }
+        });
+    }
+
     void deviceListener(MutableLiveData<ArrayList<Device>> data) {
-        db.collection(TABLE_DEVICES)
-                .get().addOnCompleteListener(task -> {
-            ArrayList<Device> newDevices = new ArrayList<>();
+        int dbVersion = SaveLoad.loadInt(DB_VERSION);
+        int appDbVersion = SaveLoad.loadInt(APP_DB_VERSION);
+        if (appDbVersion < dbVersion) {
+            Log.e(TAG, "...версия меньше чем в БД");
+            deviceListener_(data);
+        } else {
+            Log.e(TAG, "...пробуем из кэша");
+            ArrayList<Device> newDevices = casher.getDeviceCash();
+            if (newDevices.size()!=0) data.setValue(newDevices);//Если из кэша что-то загрузилось, возвращаем такую коллекцию,
+            else deviceListener_(data); //иначе — грузим из БД
+        }
+    }
+
+    private void deviceListener_(MutableLiveData<ArrayList<Device>> data) {
+        Log.e(TAG, "...из БД");
+        ArrayList<Device> newDevices = new ArrayList<>();
+        db.collection(TABLE_DEVICES).get().addOnCompleteListener(task -> {
             for (DocumentSnapshot document : task.getResult()) {
                 String id = document.get(DEVICE_ID).toString();
                 String nameId = document.get(DEVICE_NAME_ID).toString();
@@ -179,6 +212,8 @@ class FireDBHelper {
 
                 newDevices.add(device);
             }
+            casher.saveDeviceCash(newDevices);//сохраняем в кэш
+            SaveLoad.save(APP_DB_VERSION, SaveLoad.loadInt(DB_VERSION));//обновляем номер версии БД
             data.setValue(newDevices);
         });
     }
@@ -339,6 +374,8 @@ class FireDBHelper {
 
     public FireDBHelper() {
         db = FirebaseFirestore.getInstance();
+        casher = new Casher();
+        getDataVersion();
     }
 
     /**Добавляет документ в БД. Если документ не существует, он будет создан. Если документ существует,

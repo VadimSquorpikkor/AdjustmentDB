@@ -60,9 +60,7 @@ public class SelectStateDialogSingle extends BaseDialog {
 
         initializeWithVM(R.layout.dialog_select_states_single);
 
-        mViewModel.getSelectedUnit().observe(this, dUnit -> this.unit = dUnit);
-
-//        unit = mViewModel.getSelectedUnit().getValue();
+        unit = mViewModel.getSelectedUnit().getValue();
         location = mViewModel.getLocation_id().getValue();
 
         Spinner deviceSetSpinner = view.findViewById(R.id.spinnerDevSetName);
@@ -177,7 +175,7 @@ public class SelectStateDialogSingle extends BaseDialog {
             public void onTabReselected(TabLayout.Tab tab) {}
         });
         //установить вариант диалога при последнем выборе
-        int tabIndex = SaveLoad.loadInt(STATE_SINGLE_DIALOG_TAB_STATE);
+        int tabIndex = SaveLoad.loadInt(STATE_SINGLE_DIALOG_TAB_STATE, 1);//по умолчанию "Кратко"
         toggleTab(tabIndex);
         tabs.getTabAt(tabIndex).select();
 
