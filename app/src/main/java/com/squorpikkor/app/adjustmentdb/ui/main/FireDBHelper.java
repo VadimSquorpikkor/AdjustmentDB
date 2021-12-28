@@ -96,7 +96,15 @@ import static com.squorpikkor.app.adjustmentdb.Constant.UNIT_TYPE;
 
 class FireDBHelper {
 
-    Casher casher;
+    public FireDBHelper() {
+        db = FirebaseFirestore.getInstance();
+        casher = new Casher();
+        getDataVersion();
+    }
+
+    private final Casher casher;
+    public static final String DB_VERSION = "db_version";
+    public static final String APP_DB_VERSION = "app_db_version";
 
     //--------------------------------------------------------------------------------------------------
 //todo ВСЕ ЛИСЕНЕРЫ НУЖНО ОБЪЕДИНИТЬ В ОДИН (У ВСЕХ СУЩНОСТЕЙ ВЕДЬ ОДИН РОДИТЕЛЬ)
@@ -139,10 +147,6 @@ class FireDBHelper {
 
         });
     }
-
-    public static final String DB_VERSION = "db_version";
-    public static final String APP_DB_VERSION = "app_db_version";
-
 
     void getDataVersion() {
         db.collection("_settings").document("version").get().addOnCompleteListener(task -> {
@@ -371,12 +375,6 @@ class FireDBHelper {
     }
 
 //--------------------------------------------------------------------------------------------------
-
-    public FireDBHelper() {
-        db = FirebaseFirestore.getInstance();
-        casher = new Casher();
-        getDataVersion();
-    }
 
     /**Добавляет документ в БД. Если документ не существует, он будет создан. Если документ существует,
      * его содержимое будет перезаписано вновь предоставленными данными

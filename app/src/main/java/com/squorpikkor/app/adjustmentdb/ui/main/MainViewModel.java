@@ -161,12 +161,10 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     public MutableLiveData<Boolean>                 getCanWork() {
         return canWork;
     }
-
-    public MutableLiveData<Boolean> getShowSurface() {
+    public MutableLiveData<Boolean>                 getShowSurface() {
         return showSurface;
     }
-
-    //--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
     public MainViewModel() {
         dbh = new FireDBHelper();
         locations = new MutableLiveData<>();
@@ -199,7 +197,6 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     }
 //--------------------------------------------------------------------------------------------------
     public void removeListeners() {
-
         locations.setValue(null);
         devices.setValue(null);
         states.setValue(null);
@@ -213,14 +210,12 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         dbh.deviceSetListener(deviceSets);
     }
 //--------------------------------------------------------------------------------------------------
-
     public void updateUserImage(Drawable img) {
         userImage.setValue(img);
     }
     public String getVersion() {
         return BuildConfig.VERSION_NAME;
     }
-
 
     public void startSingleScanner(Activity activity, SurfaceView surfaceView) {
         singleScanner = new Scanner(activity, false, this, surfaceView);
@@ -229,8 +224,6 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     public void startMultiScanner(Activity activity, SurfaceView surfaceView) {
         multiScanner = new Scanner(activity, true, this, surfaceView);
     }
-
-
 //----------------------------------------------------
     //Для новой архитектуры
 
