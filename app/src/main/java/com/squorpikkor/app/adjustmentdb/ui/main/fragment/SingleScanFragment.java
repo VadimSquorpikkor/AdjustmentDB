@@ -95,11 +95,15 @@ public class SingleScanFragment extends Fragment {
         mViewModel.getUnitStatesList().observe(getViewLifecycleOwner(), this::updateEvents);
         mViewModel.getRestartScanning().observe(getViewLifecycleOwner(), this::restartScanning);
         mViewModel.getShouldOpenDialog().observe(getViewLifecycleOwner(), this::openStatesDialog);
-        mViewModel.getShowSurface().observe(getViewLifecycleOwner(), show -> surfaceView.setVisibility(show?View.VISIBLE:View.GONE));
+        mViewModel.getShowSurface().observe(getViewLifecycleOwner(), this::showSurface);
 
         mViewModel.startSingleScanner(getActivity(), surfaceView);
 
         return view;
+    }
+
+    private void showSurface(boolean show) {
+        surfaceView.setVisibility(show?View.VISIBLE:View.GONE);
     }
 
     private void updateEvents(ArrayList<DEvent> events) {

@@ -99,10 +99,17 @@ public class Scanner {
     }
 
     void worksWithSingleBarcodeAnswer(SparseArray<Barcode> barcodes) {
+        Log.e(TAG, "worksWithSingleBarcodeAnswer: '"+cameraSource);
         intentData = barcodes.valueAt(0).displayValue;
-        scannerDataShow.saveUnit(intentData);
-        cameraSource.stop();
-        MediaPlayer.create(context, R.raw.fast_beep).start();
+        if (!dataSet.contains(intentData)){
+            dataSet.add(intentData);
+            scannerDataShow.saveUnit(intentData);
+            cameraSource.stop();
+            MediaPlayer.create(context, R.raw.fast_beep).start();
+        }
+//        scannerDataShow.saveUnit(intentData);
+//        cameraSource.stop();
+//        MediaPlayer.create(context, R.raw.fast_beep).start();
     }
 
     void worksWithMultiBarcodeAnswer(SparseArray<Barcode> barcodes) {

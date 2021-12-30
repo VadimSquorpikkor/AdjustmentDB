@@ -81,8 +81,8 @@ public class SelectStateDialogSingle extends BaseDialog {
 
         mViewModel.getDeviceSets().observe(this, list2 -> deviceSetSpinnerAdapter.setData(list2, EMPTY_VALUE_TEXT));
         mViewModel.getDevices().observe(this, list1 -> deviceSpinnerAdapter.setDataByDevSet(list1, deviceSetSpinnerAdapter.getSelectedNameId(), EMPTY_VALUE_TEXT));
-        mViewModel.getStates().observe(this, list -> stateSpinnerAdapter.setDataByTypeAndLocation(list, unit.getType(), location, EMPTY_VALUE_TEXT));
-        mViewModel.getStates().observe(this, this::updateShortStateRecycler);
+        /*if (unit!=null) */mViewModel.getStates().observe(this, list -> stateSpinnerAdapter.setDataByTypeAndLocation(list, unit.getType(), location, EMPTY_VALUE_TEXT));
+        /*if (unit!=null) */mViewModel.getStates().observe(this, this::updateShortStateRecycler);
         mViewModel.getEmployees().observe(this, list -> employeeSpinnerAdapter.setData(list, EMPTY_VALUE_TEXT));
 
         deviceSetSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

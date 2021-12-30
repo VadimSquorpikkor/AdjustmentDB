@@ -1,12 +1,16 @@
 package com.squorpikkor.app.adjustmentdb.ui.main;
 
 import android.util.Log;
+
+import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -118,6 +122,39 @@ class FireDBHelper {
     }
 
     private final FirebaseFirestore db;
+
+    //todo переименовать в getLocations
+    void locationListener_3(MutableLiveData<ArrayList<Location>> data, MutableLiveData<Boolean> canWorks) {
+        db.collection(TABLE_LOCATIONS).get().addOnCompleteListener(task -> {
+            ArrayList<Location> newLocations = new ArrayList<>();
+            for (DocumentSnapshot document : task.getResult()) {
+                String id = document.get(LOCATION_ID).toString();
+                String name = document.get(LOCATION_NAME_ID).toString();
+                Location location = new Location(id, name);
+                newLocations.add(location);
+            }
+            data.setValue(newLocations);
+            canWorks.setValue(true);
+        });
+    }
+
+    void locationListener_2(MutableLiveData<ArrayList<Location>> data, MutableLiveData<Boolean> canWorks) {
+        db.collection(TABLE_EVENTS).addSnapshotListener((value, error) -> {
+            if (error != null) {
+                Log.e(TAG, "Listen failed.", error);
+                return;
+            }
+            ArrayList<Location> newLocations = new ArrayList<>();
+            for (QueryDocumentSnapshot doc : value) {
+                String id = doc.get(LOCATION_ID).toString();
+                String name = doc.get(LOCATION_NAME_ID).toString();
+                Location location = new Location(id, name);
+                newLocations.add(location);
+            }
+            data.setValue(newLocations);
+            canWorks.setValue(true);
+        });
+    }
 
     void locationListener(MutableLiveData<ArrayList<Location>> data, MutableLiveData<Boolean> canWorks) {
         db.collection(TABLE_LOCATIONS)
@@ -245,6 +282,9 @@ class FireDBHelper {
                     //canWorks.setValue(true);
                     Log.e(TAG, "♦Есть такой ПОЛЬЗОВАТЕЛЬ");
                     locationListener(locations, canWorks);
+
+                    //todo эксперимент
+                    //locationListener_3(locations, canWorks);
                 }
             }
         });

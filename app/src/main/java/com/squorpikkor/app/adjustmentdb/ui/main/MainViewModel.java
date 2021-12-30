@@ -187,7 +187,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         backToRecycler = new MutableLiveData<>();
         backToRecycler.setValue(false);
         isWrongQR = new MutableLiveData<>();
-        shouldOpenDialog = new MutableLiveData<>();
+        shouldOpenDialog = new MutableLiveData<>(false);
         canWork = new MutableLiveData<>();
         canWork.setValue(false);
         email = new MutableLiveData<>();
@@ -342,7 +342,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
 
     public void checkUserEmail(String email) {
-        dbh.checkUser(email, canWork, locations);
+        dbh.checkUser(email, canWork, locations);//todo здесь будет переводчик (Bridge)
     }
 
 
