@@ -84,6 +84,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 //--------------------------------------------------------------------------------------------------
 
     private final FireDBHelper dbh;
+    ///private Bridge bridge;
 
     private final MutableLiveData<DUnit>                selectedUnit;//todo из трёх должен остаться только scannerFoundUnitsList
     private final MutableLiveData<ArrayList<DEvent>>    unitStatesList;
@@ -194,6 +195,8 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         canWork.observeForever(this::doListen);
         dbh.employeeListener(employees);
         showSurface = new MutableLiveData<>(true);
+
+        ///bridge = new Bridge();
     }
 //--------------------------------------------------------------------------------------------------
     public void removeListeners() {
@@ -458,6 +461,15 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         scannerFoundUnitsList.setValue(new ArrayList<>());
         restartMultiScanning.postValue(true);
         multiScanner.clearFoundedBarcodes();
+    }
+
+    public void restartSingleScanning() {
+        showSurface.setValue(true);
+        singleScanner.initialiseDetectorsAndSources();
+        singleScanner.clearFoundedBarcodes();
+        setBackPressCommand(BACK_PRESS_SINGLE);
+        selectedUnit.setValue(null);
+        shouldOpenDialog.setValue(false);
     }
 
     /**Получить список всех событий для выбранного юнита*/

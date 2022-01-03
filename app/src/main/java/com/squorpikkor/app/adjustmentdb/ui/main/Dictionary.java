@@ -21,6 +21,10 @@ public class Dictionary {
         this.devSets = new HashMap<>();
     }
 
+    public Map<String, String> getLocations() {
+        return locations;
+    }
+
     void addDevice(String name, String id) {
         devices.put(name, id);
     }

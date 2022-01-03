@@ -87,7 +87,6 @@ public class MultiScanFragment extends Fragment {
             mViewModel.getShowSurface().setValue(true);
             nextButton.setVisibility(View.GONE);
             foundUnitsList = new ArrayList<>();
-//            surfaceView.setVisibility(View.VISIBLE);
         }
     }
 

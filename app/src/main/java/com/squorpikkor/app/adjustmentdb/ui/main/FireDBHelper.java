@@ -2,15 +2,12 @@ package com.squorpikkor.app.adjustmentdb.ui.main;
 
 import android.util.Log;
 
-import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -100,6 +97,8 @@ import static com.squorpikkor.app.adjustmentdb.Constant.UNIT_TYPE;
 
 class FireDBHelper {
 
+    private final FirebaseFirestore db;
+
     public FireDBHelper() {
         db = FirebaseFirestore.getInstance();
         casher = new Casher();
@@ -107,12 +106,63 @@ class FireDBHelper {
     }
 
     private final Casher casher;
-    public static final String DB_VERSION = "db_version";
     public static final String APP_DB_VERSION = "app_db_version";
+    private int dbVersion;
+
+    private void getDataVersion() {
+        db.collection("_settings").document("version").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot doc = task.getResult();
+                if (doc != null) {
+                    Log.e(TAG, "getDataVersion: "+doc.get("value").toString());
+                    dbVersion = Integer.parseInt(doc.get("value").toString());
+
+//                    int dictionaryVersion = SaveLoad.loadInt(DICTIONARY_VERSION);
+//                    if (dictionaryVersion < dbVersion) {
+//                        Log.e(TAG, "...версия меньше чем в БД");
+//                        updateDictionary();
+//                    }
+                }
+            }
+        });
+    }
+
+    private void updateDictionary() {
+        Log.e(TAG, "...обновление библиотеки");
+        //SaveLoad.save(DICTIONARY_VERSION, dbVersion);//обновляем номер версии библиотеки
+    }
+
+    /**Поиск эл.почты в employees, если пользователя с такой почтой нет, возвращает false
+     *
+     * Временно(?) работает так:
+     * 1. Загрузка location в приложении отключена
+     * 2. проверяется email и если такой есть в БД, то
+     * 3. запускается locationListener (это теперь единственное место в приложении, откуда этот листенер вообще запускается)
+     * 4. после того, как загрузится последняя локация, включается canWorks.setValue(true)
+     * 5. который уже всё включает (аккаунт в том числе) и загружает остальные лисенеры
+     * Жуткий костыль, потом сделаю нормально*/
+    //TODO сделать нормально
+    void checkUser(String email, MutableLiveData<Boolean> canWorks, MutableLiveData<ArrayList<Location>> locations) {
+        db.collection(TABLE_EMPLOYEES)
+                .whereEqualTo(EMPLOYEE_EMAIL, email)
+                .get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot querySnapshot = task.getResult();
+                if (querySnapshot == null || querySnapshot.isEmpty()) {
+                    canWorks.setValue(false);
+                    Log.e(TAG, "♦НЕТ ТАКОГО ПОЛЬЗОВАТЕЛЯ!");
+                } else {
+                    Log.e(TAG, "♦Есть такой ПОЛЬЗОВАТЕЛЬ");
+                    locationListener(locations, canWorks);
+                }
+            }
+        });
+    }
 
     //--------------------------------------------------------------------------------------------------
-//todo ВСЕ ЛИСЕНЕРЫ НУЖНО ОБЪЕДИНИТЬ В ОДИН (У ВСЕХ СУЩНОСТЕЙ ВЕДЬ ОДИН РОДИТЕЛЬ)
-    void joinName(String id, Entity e, MutableLiveData<ArrayList<? extends Entity>> data) {
+    //todo ВСЕ ЛИСЕНЕРЫ НУЖНО ОБЪЕДИНИТЬ В ОДИН (У ВСЕХ СУЩНОСТЕЙ ВЕДЬ ОДИН РОДИТЕЛЬ)
+    private void joinName(String id, Entity e, MutableLiveData<ArrayList<? extends Entity>> data) {
+        if (data.getValue().get(0).getClass()==Location.class)
         db.collection(TABLE_NAMES).document(id).get()
                 .addOnCompleteListener(task1 -> {
                     e.setName(getStringFromSnapshot(task1, id));
@@ -121,33 +171,12 @@ class FireDBHelper {
                 });
     }
 
-    private final FirebaseFirestore db;
-
-    //todo переименовать в getLocations
-    void locationListener_3(MutableLiveData<ArrayList<Location>> data, MutableLiveData<Boolean> canWorks) {
+    void getLocations(MutableLiveData<ArrayList<Location>> data, MutableLiveData<Boolean> canWorks) {
         db.collection(TABLE_LOCATIONS).get().addOnCompleteListener(task -> {
             ArrayList<Location> newLocations = new ArrayList<>();
             for (DocumentSnapshot document : task.getResult()) {
                 String id = document.get(LOCATION_ID).toString();
                 String name = document.get(LOCATION_NAME_ID).toString();
-                Location location = new Location(id, name);
-                newLocations.add(location);
-            }
-            data.setValue(newLocations);
-            canWorks.setValue(true);
-        });
-    }
-
-    void locationListener_2(MutableLiveData<ArrayList<Location>> data, MutableLiveData<Boolean> canWorks) {
-        db.collection(TABLE_EVENTS).addSnapshotListener((value, error) -> {
-            if (error != null) {
-                Log.e(TAG, "Listen failed.", error);
-                return;
-            }
-            ArrayList<Location> newLocations = new ArrayList<>();
-            for (QueryDocumentSnapshot doc : value) {
-                String id = doc.get(LOCATION_ID).toString();
-                String name = doc.get(LOCATION_NAME_ID).toString();
                 Location location = new Location(id, name);
                 newLocations.add(location);
             }
@@ -166,8 +195,7 @@ class FireDBHelper {
                 String name = document.get(LOCATION_NAME_ID).toString();
                 Location location = new Location(id, nameId, name);
 
-//                joinName(id, location, data);
-
+                //joinName(id, location, data);
                 //JOIN------------------------------------------------------------------
                 db.collection(TABLE_NAMES).document(nameId).get()
                         .addOnCompleteListener(task1 -> {
@@ -177,7 +205,6 @@ class FireDBHelper {
                         });
 
                 newLocations.add(location);
-
             }
             data.setValue(newLocations);
             canWorks.setValue(true);
@@ -185,20 +212,8 @@ class FireDBHelper {
         });
     }
 
-    void getDataVersion() {
-        db.collection("_settings").document("version").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot doc = task.getResult();
-                if (doc != null) {
-                    Log.e(TAG, "getDataVersion: "+doc.get("value").toString());
-                    SaveLoad.save(DB_VERSION, Integer.parseInt(doc.get("value").toString()));
-                }
-            }
-        });
-    }
-
     void deviceListener(MutableLiveData<ArrayList<Device>> data) {
-        int dbVersion = SaveLoad.loadInt(DB_VERSION);
+        //int dbVersion = SaveLoad.loadInt(DB_VERSION);
         int appDbVersion = SaveLoad.loadInt(APP_DB_VERSION);
         if (appDbVersion < dbVersion) {
             Log.e(TAG, "...версия меньше чем в БД");
@@ -254,41 +269,13 @@ class FireDBHelper {
                 newDevices.add(device);
             }
             casher.saveDeviceCash(newDevices);//сохраняем в кэш
-            SaveLoad.save(APP_DB_VERSION, SaveLoad.loadInt(DB_VERSION));//обновляем номер версии БД
+//            SaveLoad.save(APP_DB_VERSION, SaveLoad.loadInt(DB_VERSION));//обновляем номер версии БД
+            SaveLoad.save(APP_DB_VERSION, dbVersion);//обновляем номер версии БД
             data.setValue(newDevices);
         });
     }
 
-    /**Поиск эл.почты в employees, если пользователя с такой почтой нет, возвращает false
-     *
-     * Временно(?) работает так:
-     * 1. Загрузка location в приложении отключена
-     * 2. проверяется email и если такой есть в БД, то
-     * 3. запускается locationListener (это теперь единственное место в приложении, откуда этот листенер вообще запускается)
-     * 4. после того, как загрузится последняя локация, включается canWorks.setValue(true)
-     * 5. который уже всё включает (аккаунт в том числе) и загружает остальные лисенеры
-     * Жуткий костыль, потом сделаю нормально*/
-    //TODO сделать нормально
-    void checkUser(String email, MutableLiveData<Boolean> canWorks, MutableLiveData<ArrayList<Location>> locations) {
-        db.collection(TABLE_EMPLOYEES)
-                .whereEqualTo(EMPLOYEE_EMAIL, email)
-                .get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                QuerySnapshot querySnapshot = task.getResult();
-                if (querySnapshot == null || querySnapshot.isEmpty()) {
-                    canWorks.setValue(false);
-                    Log.e(TAG, "♦НЕТ ТАКОГО ПОЛЬЗОВАТЕЛЯ!");
-                } else {
-                    //canWorks.setValue(true);
-                    Log.e(TAG, "♦Есть такой ПОЛЬЗОВАТЕЛЬ");
-                    locationListener(locations, canWorks);
 
-                    //todo эксперимент
-                    //locationListener_3(locations, canWorks);
-                }
-            }
-        });
-    }
 
     void employeeListener(MutableLiveData<ArrayList<Employee>> data) {
         db.collection(TABLE_EMPLOYEES)

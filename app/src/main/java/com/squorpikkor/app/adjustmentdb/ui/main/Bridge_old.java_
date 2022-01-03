@@ -1,0 +1,103 @@
+package com.squorpikkor.app.adjustmentdb.ui.main;
+
+
+import static com.squorpikkor.app.adjustmentdb.Constant.ANY_VALUE;
+
+import androidx.lifecycle.MutableLiveData;
+
+import com.squorpikkor.app.adjustmentdb.DUnit;
+import com.squorpikkor.app.adjustmentdb.ui.main.entities.Device;
+import com.squorpikkor.app.adjustmentdb.ui.main.entities.Location;
+import com.squorpikkor.app.adjustmentdb.ui.main.entities.State;
+
+import java.util.ArrayList;
+
+/** Перевод nameId -> name при получении данных из БД и перевод name -> nameId при отправке данных
+ * в БД. После получении данных приложение работает только со значениями name.
+ * Другими словами: приложение ничего не знает о nameId, класс FireBaseHelper ничего не знает о name,
+ * общаются друг с другом через Bridge, это что-то типа переводчика*/
+public class Bridge_old {
+
+    private final FireDBHelper dbh;
+    private MutableLiveData<ArrayList<DUnit>> foundUnitsList;
+
+    MutableLiveData<ArrayList<Location>> encodedLocations;
+
+    Dictionary dictionary;
+    Translater translater;
+
+    public Bridge_old() {
+        this.dbh = new FireDBHelper();
+        dictionary = new Dictionary();
+        translater = new Translater();
+
+
+    }
+
+    public void deviceListener(MutableLiveData<ArrayList<Device>> devices) {
+        dbh.deviceListener();
+    }
+
+    public void getStateListener(MutableLiveData<ArrayList<State>> states) {
+        dbh.stateListener();
+    }
+
+
+    public void getLocations(MutableLiveData<ArrayList<Location>> decodedData, MutableLiveData<Boolean> canWorks) {
+        encodedLocations = new MutableLiveData<>();
+        encodedLocations.observeForever(list -> decode(encodedLocations, decodedData));
+
+        dbh.getLocations(encodedLocations, canWorks);
+    }
+
+    /**id -> name*/
+    private void decode(MutableLiveData<ArrayList<Location>> encodedLocations, MutableLiveData<ArrayList<Location>> decodedData) {
+        ArrayList<Location> decodedList = new ArrayList<>();
+        if (encodedLocations.getValue()==null) decodedData.setValue(decodedList);
+        for (Location location:encodedLocations.getValue()) decodedList.add(new Location(location.getId(), getNameById(location.getName())));
+        decodedData.setValue(decodedList);
+    }
+
+    private String getNameById(String name) {
+        return name;
+    }
+
+
+    Location decode(Location location) {
+        return new Location(location.getId(), dictionary.getLocation(location.getName()));
+    }
+
+    void getUnitList (MutableLiveData<ArrayList<DUnit>> unitList, String deviceName, String location, String employee, String type, String state, String devSet, String serial) {
+        foundUnitsList = new MutableLiveData<>();
+        foundUnitsList.observeForever(list -> decodeUnitList(list, unitList));
+
+        if (serial.equals("")) dbh.getUnitList(foundUnitsList,
+                dictionary.getDeviceId(deviceName),
+                dictionary.getLocationId(location),
+                dictionary.getEmployeeId(employee),
+                dictionary.getTypeId(type),
+                dictionary.getStateId(state),
+                dictionary.getDevSetId(devSet), ANY_VALUE);
+        else dbh.getUnitList(foundUnitsList, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, serial);
+    }
+
+    private void decodeUnitList(ArrayList<DUnit> list, MutableLiveData<ArrayList<DUnit>> unitList) {
+        ArrayList<DUnit> decodedList = new ArrayList<>();
+        for (DUnit unit:list) decodedList.add(decodedDUnit(unit));
+        unitList.setValue(decodedList);
+    }
+
+    /**id -> name*/
+    private DUnit decodedDUnit(DUnit unit) {
+
+        return unit;
+    }
+
+    /**name -> id*/
+    private DUnit encodeDUnit(DUnit unit) {
+        return unit;
+    }
+
+
+
+}

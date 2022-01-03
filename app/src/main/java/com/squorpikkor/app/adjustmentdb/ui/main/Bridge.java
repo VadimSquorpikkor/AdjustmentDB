@@ -1,11 +1,8 @@
 package com.squorpikkor.app.adjustmentdb.ui.main;
 
 
-import static com.squorpikkor.app.adjustmentdb.Constant.ANY_VALUE;
-
 import androidx.lifecycle.MutableLiveData;
-
-import com.squorpikkor.app.adjustmentdb.DUnit;
+import com.squorpikkor.app.adjustmentdb.ui.main.entities.Location;
 
 import java.util.ArrayList;
 
@@ -16,43 +13,25 @@ import java.util.ArrayList;
 public class Bridge {
 
     private final FireDBHelper dbh;
-    private MutableLiveData<ArrayList<DUnit>> foundUnitsList;
-
-    Dictionary dictionary;
+    private MutableLiveData<ArrayList<Location>> encodedLocations;
+    private final Dictionary dictionary;
+    private Translater translater;
 
     public Bridge() {
         this.dbh = new FireDBHelper();
         dictionary = new Dictionary();
+        translater = new Translater();
     }
 
-    void getUnitList (MutableLiveData<ArrayList<DUnit>> unitList, String deviceName, String location, String employee, String type, String state, String devSet, String serial) {
-        foundUnitsList = new MutableLiveData<>();
-        foundUnitsList.observeForever(list -> decodeUnitList(list, unitList));
+    public void getLocations(MutableLiveData<ArrayList<Location>> decodedData, MutableLiveData<Boolean> canWorks) {
+        encodedLocations = new MutableLiveData<>();
+        encodedLocations.observeForever(list -> translater.decode(encodedLocations, decodedData));
 
-        if (serial.equals("")) dbh.getUnitList(foundUnitsList,
-                dictionary.getDeviceId(deviceName),
-                dictionary.getLocationId(location),
-                dictionary.getEmployeeId(employee),
-                dictionary.getTypeId(type),
-                dictionary.getStateId(state),
-                dictionary.getDevSetId(devSet), ANY_VALUE);
-        else dbh.getUnitList(foundUnitsList, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, ANY_VALUE, serial);
+        dbh.getLocations(encodedLocations, canWorks);
     }
 
-    private void decodeUnitList(ArrayList<DUnit> list, MutableLiveData<ArrayList<DUnit>> unitList) {
-        ArrayList<DUnit> decodedList = new ArrayList<>();
-        for (DUnit unit:list) decodedList.add(decodedDUnit(unit));
-        unitList.setValue(decodedList);
-    }
+    /*Location decode(Location location) {
+        return new Location(location.getId(), dictionary.getLocation(location.getName()));
+    }*/
 
-    /**id -> name*/
-    private DUnit decodedDUnit(DUnit unit) {
-
-        return unit;
-    }
-
-    /**name -> id*/
-    private DUnit encodeDUnit(DUnit unit) {
-        return unit;
-    }
 }

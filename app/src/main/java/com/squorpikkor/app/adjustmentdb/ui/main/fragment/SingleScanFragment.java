@@ -122,17 +122,10 @@ public class SingleScanFragment extends Fragment {
     }
 
     private void restartScanning(boolean state) {
-        Log.e("TAG", "restartScanning: "+state);
         if (state) {
             if (states!=null) states.clear();
-            //surfaceView.setVisibility(View.VISIBLE);
-            mViewModel.getShowSurface().setValue(true);
             infoLayout.setVisibility(View.GONE);
-            mViewModel.startSingleScanner(getActivity(), surfaceView);
-            mViewModel.getSingleScanner().initialiseDetectorsAndSources();
-            mViewModel.setBackPressCommand(BACK_PRESS_SINGLE);
-            mViewModel.getSelectedUnit().setValue(null);
-            mViewModel.getShouldOpenDialog().setValue(false);
+            mViewModel.restartSingleScanning();
         }
     }
 
@@ -178,6 +171,7 @@ public class SingleScanFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.e("TAG", "onResume: ");
         surfaceView.setVisibility(View.VISIBLE);
         mViewModel.getSingleScanner().initialiseDetectorsAndSources();
         if (infoLayout.getVisibility()==View.GONE) mViewModel.setBackPressCommand(BACK_PRESS_SINGLE);
