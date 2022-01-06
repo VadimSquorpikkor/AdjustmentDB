@@ -134,6 +134,7 @@ public class SelectStateDialogMulti extends BaseDialog {
     private void saveUnitNewStateOnly(String name) {
         if (mUnitList==null||mUnitList.size()==0) return;
             for (DUnit unit:mUnitList) {
+                if (unit.getDate()==null) unit.setDate(new Date());
                 unit.addNewEvent(mViewModel, name, "", location);
                 mViewModel.saveUnitAndEvent(unit);
             }

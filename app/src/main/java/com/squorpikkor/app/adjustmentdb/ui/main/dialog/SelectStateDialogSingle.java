@@ -201,6 +201,7 @@ public class SelectStateDialogSingle extends BaseDialog {
 
     /**Вариант сохранения юнита, когда обновляется единственный параметр — статус устройства*/
     private void saveUnitNewStateOnly(String name) {
+        if (unit.getDate()==null) unit.setDate(new Date());
         unit.addNewEvent(mViewModel, name, "", location);
         mViewModel.saveUnitAndEvent(unit);
         dismiss();
