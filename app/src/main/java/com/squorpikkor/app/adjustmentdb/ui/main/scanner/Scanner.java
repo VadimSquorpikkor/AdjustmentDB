@@ -34,7 +34,7 @@ public class Scanner {
     private HashSet<String> dataSet;
 
     public Scanner(Activity context, boolean isMultiScan, ScannerDataShow scannerDataShow, SurfaceView surfaceView) {
-        Log.e(TAG, "...Scanner: ");
+//        Log.e(TAG, "...Scanner: ");
         this.context = context;
         this.isMultiScan = isMultiScan;
         this.scannerDataShow = scannerDataShow;
@@ -43,7 +43,7 @@ public class Scanner {
     }
 
     public void initialiseDetectorsAndSources() {
-        Log.e(TAG, "...initialiseDetectorsAndSources: ");
+//        Log.e(TAG, "...initialiseDetectorsAndSources: ");
         BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(context)
                 .setBarcodeFormats(Barcode.ALL_FORMATS)
                 .build();
@@ -58,7 +58,7 @@ public class Scanner {
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                Log.e(TAG, "...surfaceCreated: ");
+//                Log.e(TAG, "...surfaceCreated: ");
                 try {
                     if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                         cameraSource.start(surfaceView.getHolder());
@@ -73,11 +73,11 @@ public class Scanner {
 
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-                Log.e(TAG, "...surfaceChanged: ");
+//                Log.e(TAG, "...surfaceChanged: ");
             }
 
             public void surfaceDestroyed(SurfaceHolder holder) {
-                Log.e(TAG, "...surfaceDestroyed: ");
+//                Log.e(TAG, "...surfaceDestroyed: ");
                 cameraSource.stop();
             }
         });
@@ -105,7 +105,7 @@ public class Scanner {
 
     void worksWithSingleBarcodeAnswer(SparseArray<Barcode> barcodes) {
         intentData = barcodes.valueAt(0).displayValue;
-        Log.e(TAG, "worksWithSingleBarcodeAnswer: '"+intentData);
+//        Log.e(TAG, "worksWithSingleBarcodeAnswer: '"+intentData);
         if (!dataSet.contains(intentData)){
             dataSet.add(intentData);
             scannerDataShow.saveUnit(intentData);

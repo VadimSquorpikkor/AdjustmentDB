@@ -159,7 +159,7 @@ class FireDBHelper {
         });
     }
 
-    //--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
     //todo ВСЕ ЛИСЕНЕРЫ НУЖНО ОБЪЕДИНИТЬ В ОДИН (У ВСЕХ СУЩНОСТЕЙ ВЕДЬ ОДИН РОДИТЕЛЬ)
     private void joinName(String id, Entity e, MutableLiveData<ArrayList<? extends Entity>> data) {
         if (data.getValue().get(0).getClass()==Location.class)
@@ -226,6 +226,7 @@ class FireDBHelper {
         }
     }
 
+    private int i = 0;
     private void deviceListener_(MutableLiveData<ArrayList<Device>> data) {
         Log.e(TAG, "...из БД");
         ArrayList<Device> newDevices = new ArrayList<>();
@@ -250,12 +251,20 @@ class FireDBHelper {
                                     ru = documentSnapshot.get("ru").toString();
                                     en = documentSnapshot.get("en").toString();
                                     //Log.e(TAG, "deviceListener: "+ru+" "+en);
-                                }
-                            }
 
                             if (!ru.equals("")) device.setName(ru);
                             if (!en.equals("")) device.setEngName(en);
                             data.setValue(data.getValue());
+                                }
+
+                                i++;
+                                //Смысл: если это самый последний цикл (т.е. если загружены имена
+                                // для ПОСЛЕДНЕГО device), то пришло время чтобы сохранять в кэш
+                                // (сохранение нельзя поставить в конце функции, так как это всё
+                                // происходит в разных потоках и функция завершается раньше, чез
+                                // завершается этот цикл for)
+                                if (task.getResult().size() == i) saveDevicesToCash(newDevices);
+                            }
                         });
 
                 //JOIN------------------------------------------------------------------
@@ -268,13 +277,14 @@ class FireDBHelper {
 
                 newDevices.add(device);
             }
-            casher.saveDeviceCash(newDevices);//сохраняем в кэш
-//            SaveLoad.save(APP_DB_VERSION, SaveLoad.loadInt(DB_VERSION));//обновляем номер версии БД
-            SaveLoad.save(APP_DB_VERSION, dbVersion);//обновляем номер версии БД
             data.setValue(newDevices);
         });
     }
 
+    public void saveDevicesToCash(ArrayList<Device> data) {
+        casher.saveDeviceCash(data);//сохраняем в кэш
+        SaveLoad.save(APP_DB_VERSION, dbVersion);//обновляем номер версии БД
+    }
 
 
     void employeeListener(MutableLiveData<ArrayList<Employee>> data) {

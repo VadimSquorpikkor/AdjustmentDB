@@ -6,6 +6,7 @@
         <entry key="..\:/GitHub/AdjustmentDB/app/src/main/res/drawable/button_shape_selector.xml" value="0.37083333333333335" />
         <entry key="..\:/GitHub/AdjustmentDB/app/src/main/res/drawable/button_shape_selector_green.xml" value="0.37083333333333335" />
         <entry key="..\:/GitHub/AdjustmentDB/app/src/main/res/drawable/edit_text_field.xml" value="0.33240740740740743" />
+        <entry key="..\:/GitHub/AdjustmentDB/app/src/main/res/drawable/main_gradient.xml" value="0.37083333333333335" />
         <entry key="..\:/GitHub/AdjustmentDB/app/src/main/res/drawable/my_button_shape.xml" value="0.37083333333333335" />
         <entry key="..\:/GitHub/AdjustmentDB/app/src/main/res/drawable/my_button_shape_green.xml" value="0.37083333333333335" />
         <entry key="..\:/GitHub/AdjustmentDB/app/src/main/res/drawable/my_button_shape_pressed.xml" value="0.37083333333333335" />
@@ -22,6 +23,7 @@
         <entry key="..\:/GitHub/AdjustmentDB/app/src/main/res/layout/dialog_state_multi_detail.xml" value="0.21203703703703702" />
         <entry key="..\:/GitHub/AdjustmentDB/app/src/main/res/layout/dialog_state_single_detail.xml" value="0.3351851851851852" />
         <entry key="..\:/GitHub/AdjustmentDB/app/src/main/res/layout/dialog_state_single_short.xml" value="0.3351851851851852" />
+        <entry key="..\:/GitHub/AdjustmentDB/app/src/main/res/layout/dialog_wrong_qr.xml" value="0.3546875" />
         <entry key="..\:/GitHub/AdjustmentDB/app/src/main/res/layout/fragment_multi_scan.xml" value="0.2851851851851852" />
         <entry key="..\:/GitHub/AdjustmentDB/app/src/main/res/layout/fragment_parent.xml" value="0.23425925925925925" />
         <entry key="..\:/GitHub/AdjustmentDB/app/src/main/res/layout/fragment_parent_2.xml" value="0.23425925925925925" />
