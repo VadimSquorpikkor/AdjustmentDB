@@ -58,6 +58,8 @@ public class Constant {
     public static final String EMPTY_LOCATION_ID = "empty_location_id";
     public static final String EMPTY_LOCATION_NAME_2 = "Локация не найдена";
     public static final String EMPTY_LOCATION_NAME = "Пользователь не зарегистрирован";
+    public static final String LOCATION_ADJUSTMENT = "adjustment";
+    public static final String LOCATION_GR_SERVISA = "repair_area";
     //--------------------------------------------------------------------------------------------------
     public static final String TYPE_ANY = "any_type";
     public static final String SERIAL_TYPE = "serial_type";

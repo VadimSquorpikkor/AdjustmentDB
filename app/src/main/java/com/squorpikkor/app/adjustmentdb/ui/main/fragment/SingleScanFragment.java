@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_SINGLE;
 import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_STATES;
 import static com.squorpikkor.app.adjustmentdb.Constant.LESS_THAN_ONE;
+import static com.squorpikkor.app.adjustmentdb.Constant.LOCATION_ADJUSTMENT;
+import static com.squorpikkor.app.adjustmentdb.Constant.LOCATION_GR_SERVISA;
 
 public class SingleScanFragment extends Fragment {
 
@@ -46,6 +48,7 @@ public class SingleScanFragment extends Fragment {
     private ConstraintLayout infoLayout;
     private ImageView isCompleteImage;
     private StatesAdapter statesAdapter;
+    private boolean showDetailedDialog;
 
     public static SingleScanFragment newInstance() {
         return new SingleScanFragment();
@@ -99,6 +102,8 @@ public class SingleScanFragment extends Fragment {
 
         mViewModel.startSingleScanner(getActivity(), surfaceView);
 
+        showDetailedDialog = mViewModel.getLocation_id().getValue().equals(LOCATION_ADJUSTMENT) || mViewModel.getLocation_id().getValue().equals(LOCATION_GR_SERVISA);
+
         return view;
     }
 
@@ -143,7 +148,7 @@ public class SingleScanFragment extends Fragment {
         tName.setText(Utils.getRightValue(mViewModel.getDeviceNameById(unit.getName())));
         tInnerSerial.setText(Utils.getRightValue(unit.getInnerSerial()));
         tSerial.setText(Utils.getRightValue(unit.getSerial()));
-        if (unit.isRepairUnit()) recognizeButton.setVisibility(View.VISIBLE);
+        if (unit.isRepairUnit() && showDetailedDialog) recognizeButton.setVisibility(View.VISIBLE);
         tEmployee.setText(Utils.getRightValue(mViewModel.getEmployeeNameById(unit.getEmployee())));
         String passed = String.valueOf(unit.daysPassed());
         if (passed.equals("0")) passed = LESS_THAN_ONE;

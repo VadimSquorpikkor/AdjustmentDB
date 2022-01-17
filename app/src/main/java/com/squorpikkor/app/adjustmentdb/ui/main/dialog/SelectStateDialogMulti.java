@@ -23,6 +23,8 @@ import java.util.Objects;
 
 import static com.squorpikkor.app.adjustmentdb.Constant.ANY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.Constant.EMPTY_VALUE_TEXT;
+import static com.squorpikkor.app.adjustmentdb.Constant.LOCATION_ADJUSTMENT;
+import static com.squorpikkor.app.adjustmentdb.Constant.LOCATION_GR_SERVISA;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -94,20 +96,33 @@ public class SelectStateDialogMulti extends BaseDialog {
         okButton.setOnClickListener(view -> saveUnits(mUnitList));
 
         TabLayout tabs = view.findViewById(R.id.tab_layout);
-        tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                toggleTab(tab.getPosition());
-            }
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
-        });
-        //установить вариант диалога при последнем выборе
-        int tabIndex = SaveLoad.loadInt(STATE_MULTI_DIALOG_TAB_STATE, 1);//по умолчанию "Кратко"
-        toggleTab(tabIndex);
-        tabs.getTabAt(tabIndex).select();
+        //Если локация — это регулировка или группа сервиса, то показываются вкладки выбора типа
+        // диалога: кратко или подробно, иначе — доступен только краткий режим. Другими словами для
+        // пользователей не с участка регулировки или сервиса не будет доступен расширенный режим
+        // диалога (эти пользователи могут выбирать только статус для устройства)
+        if (mViewModel.getLocation_id().getValue().equals(LOCATION_ADJUSTMENT) || mViewModel.getLocation_id().getValue().equals(LOCATION_GR_SERVISA)) {
+            tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    toggleTab(tab.getPosition());
+                }
+
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {
+                }
+
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {
+                }
+            });
+            //установить вариант диалога при последнем выборе
+            int tabIndex = SaveLoad.loadInt(STATE_MULTI_DIALOG_TAB_STATE, 1);//по умолчанию "Кратко"
+            toggleTab(tabIndex);
+            tabs.getTabAt(tabIndex).select();
+        } else {
+            tabs.setVisibility(View.GONE);
+            toggleTab(1);
+        }
 
         return dialog;
     }
