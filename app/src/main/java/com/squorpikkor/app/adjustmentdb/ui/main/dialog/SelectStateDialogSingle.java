@@ -77,8 +77,8 @@ public class SelectStateDialogSingle extends BaseDialog {
 
         RecyclerView stateNamesRecycler = view.findViewById(R.id.recycler_state_name);
         adapter = new ShortStateAdapter();
-//        adapter.setOnItemClickListener(this::saveUnitNewStateOnly);
-        adapter.setOnItemClickListener(name -> saveUnit(unit));
+        adapter.setOnItemClickListener(this::saveUnitByState);
+//        adapter.setOnItemClickListener(name -> saveUnit(unit));
         stateNamesRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         stateNamesRecycler.setAdapter(adapter);
 
@@ -172,7 +172,8 @@ public class SelectStateDialogSingle extends BaseDialog {
         // диалога: кратко или подробно, иначе — доступен только краткий режим. Другими словами для
         // пользователей не с участка регулировки или сервиса не будет доступен расширенный режим
         // диалога (эти пользователи могут выбирать только статус для устройства)
-        if (mViewModel.getLocation_id().getValue().equals(LOCATION_ADJUSTMENT) || mViewModel.getLocation_id().getValue().equals(LOCATION_GR_SERVISA)) {
+        if (mViewModel.getLocation_id().getValue()!=null &&
+                (mViewModel.getLocation_id().getValue().equals(LOCATION_ADJUSTMENT) || mViewModel.getLocation_id().getValue().equals(LOCATION_GR_SERVISA))) {
             tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) { toggleTab(tab.getPosition()); }
@@ -209,9 +210,10 @@ public class SelectStateDialogSingle extends BaseDialog {
         }
     }
 
-    /**Вариант сохранения юнита, когда обновляется единственный параметр — статус устройства*/
-    private void saveUnitNewStateOnly(String name) {
+    /**Вариант сохранения юнита, когда сохраняется через диалог "Кратко"*/
+    private void saveUnitByState(String name) {
         if (unit.getDate()==null) unit.setDate(new Date());
+        updateUnitData(unit);
         unit.addNewEvent(mViewModel, name, "", location);
         mViewModel.saveUnitAndEvent(unit);
         dismiss();

@@ -17,7 +17,8 @@
         tools:ignore="AllowBackup">
         <activity
             android:name=".MainActivity"
-            android:icon="@mipmap/logo">
+            android:icon="@mipmap/logo"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

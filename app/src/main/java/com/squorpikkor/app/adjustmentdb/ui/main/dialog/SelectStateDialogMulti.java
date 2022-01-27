@@ -70,8 +70,8 @@ public class SelectStateDialogMulti extends BaseDialog {
 
         RecyclerView stateNamesRecycler = view.findViewById(R.id.recycler_state_name);
         shortStateAdapter = new ShortStateAdapter();
-//        shortStateAdapter.setOnItemClickListener(this::saveUnitNewStateOnly);
-        shortStateAdapter.setOnItemClickListener(name -> saveUnits(mUnitList));
+        shortStateAdapter.setOnItemClickListener(this::saveUnitByState);
+//        shortStateAdapter.setOnItemClickListener(name -> saveUnits(mUnitList));
         stateNamesRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         stateNamesRecycler.setAdapter(shortStateAdapter);
 
@@ -100,7 +100,8 @@ public class SelectStateDialogMulti extends BaseDialog {
         // диалога: кратко или подробно, иначе — доступен только краткий режим. Другими словами для
         // пользователей не с участка регулировки или сервиса не будет доступен расширенный режим
         // диалога (эти пользователи могут выбирать только статус для устройства)
-        if (mViewModel.getLocation_id().getValue().equals(LOCATION_ADJUSTMENT) || mViewModel.getLocation_id().getValue().equals(LOCATION_GR_SERVISA)) {
+        if (mViewModel.getLocation_id().getValue()!=null &&
+                (mViewModel.getLocation_id().getValue().equals(LOCATION_ADJUSTMENT) || mViewModel.getLocation_id().getValue().equals(LOCATION_GR_SERVISA))) {
             tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
@@ -145,11 +146,12 @@ public class SelectStateDialogMulti extends BaseDialog {
         }
     }
 
-    /**Вариант сохранения юнита, когда обновляется единственный параметр — статус устройства*/
-    private void saveUnitNewStateOnly(String name) {
+    /**Вариант сохранения юнита, когда сохраняется через диалог "Кратко"*/
+    private void saveUnitByState(String name) {
         if (mUnitList==null||mUnitList.size()==0) return;
             for (DUnit unit:mUnitList) {
                 if (unit.getDate()==null) unit.setDate(new Date());
+                updateUnitData(unit);
                 unit.addNewEvent(mViewModel, name, "", location);
                 mViewModel.saveUnitAndEvent(unit);
             }
