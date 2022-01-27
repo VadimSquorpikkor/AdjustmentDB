@@ -77,7 +77,8 @@ public class SelectStateDialogSingle extends BaseDialog {
 
         RecyclerView stateNamesRecycler = view.findViewById(R.id.recycler_state_name);
         adapter = new ShortStateAdapter();
-        adapter.setOnItemClickListener(this::saveUnitNewStateOnly);
+//        adapter.setOnItemClickListener(this::saveUnitNewStateOnly);
+        adapter.setOnItemClickListener(name -> saveUnit(unit));
         stateNamesRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         stateNamesRecycler.setAdapter(adapter);
 

@@ -19,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Objects;
 
 import static com.squorpikkor.app.adjustmentdb.Constant.ANY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.Constant.EMPTY_VALUE_TEXT;
@@ -71,7 +70,8 @@ public class SelectStateDialogMulti extends BaseDialog {
 
         RecyclerView stateNamesRecycler = view.findViewById(R.id.recycler_state_name);
         shortStateAdapter = new ShortStateAdapter();
-        shortStateAdapter.setOnItemClickListener(this::saveUnitNewStateOnly);
+//        shortStateAdapter.setOnItemClickListener(this::saveUnitNewStateOnly);
+        shortStateAdapter.setOnItemClickListener(name -> saveUnits(mUnitList));
         stateNamesRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         stateNamesRecycler.setAdapter(shortStateAdapter);
 
