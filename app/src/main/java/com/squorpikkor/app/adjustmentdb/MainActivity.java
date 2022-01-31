@@ -1,5 +1,7 @@
 package com.squorpikkor.app.adjustmentdb;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
@@ -9,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -41,9 +44,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView location;
     private TextView locationText;
     private ImageView accountImage;
-    private static final int RC_SIGN_IN = 101;
     private DrawerLayout drawer_layout;
     private ViewPager viewPager;
+    ActivityResultLauncher<Intent> activityResultLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +95,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         TextView emailText = headerView.findViewById(R.id.email_text);
         accountImage = headerView.findViewById(R.id.account_image);
 
+        activityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        IdpResponse response = IdpResponse.fromResultIntent(data);
+                        mViewModel.checkUserEmail(response.getEmail());
+                    }
+                });
+
         mViewModel.getUserImage().observe(this, drawable -> accountImage.setImageDrawable(drawable));
 
         mViewModel.getLocationName().observe(this, name -> {
@@ -122,28 +135,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void signIn() {
-        List<AuthUI.IdpConfig> providers = Collections.singletonList(
-                new AuthUI.IdpConfig.GoogleBuilder().build());
+        List<AuthUI.IdpConfig> providers = Collections.singletonList( new AuthUI.IdpConfig.GoogleBuilder().build());
         AuthUI.getInstance().signOut(this);
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .build(),
-                RC_SIGN_IN);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_SIGN_IN) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
-            if (resultCode == RESULT_OK) {
-                mViewModel.checkUserEmail(response.getEmail());
-            } else {
-                Log.e(TAG, "******************************onActivityResult: NOT OK");
-            }
-        }
+        Intent intent = AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(providers).build();
+        activityResultLauncher.launch(intent);
     }
 
     @Override
