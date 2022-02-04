@@ -5,8 +5,8 @@ public class Employee extends Entity{
     String eMail;
     String location;
 
-    public Employee(String id, String nameId, String name, String eMail, String location) {
-        super(id, nameId, name);
+    public Employee(String id, String name, String eMail, String location) {
+        super(id, id, name);
         this.eMail = eMail;
         this.location = location;
     }

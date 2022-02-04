@@ -12,7 +12,7 @@
             app:useSimpleSummaryProvider="true" />
 
         <SwitchPreferenceCompat
-            app:defaultValue="true"
+            app:defaultValue="false"
             app:key="@string/auto_start_dialog"
             app:title="Автостарт ввода параметров"
             android:summary="После успешного распознавания QR-кода будет автоматически запускаться диалог ввода параметров"/>

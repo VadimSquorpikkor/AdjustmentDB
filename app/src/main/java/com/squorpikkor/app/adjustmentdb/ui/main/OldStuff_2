@@ -1,0 +1,25 @@
+    //todo ВСЕ ЛИСЕНЕРЫ НУЖНО ОБЪЕДИНИТЬ В ОДИН (У ВСЕХ СУЩНОСТЕЙ ВЕДЬ ОДИН РОДИТЕЛЬ)
+    private void joinName(String id, Entity e, MutableLiveData<ArrayList<? extends Entity>> data) {
+        if (data.getValue().get(0).getClass()==Location.class)
+        db.collection(TABLE_NAMES).document(id).get()
+                .addOnCompleteListener(task1 -> {
+                    e.setName(getStringFromSnapshot(task1, id));
+//                    updateLiveData(data);
+                    data.setValue(data.getValue());
+                });
+    }
+
+        /**Для варианта работы с Bridge. Это эксперимент, сам Bridge не подключен и воможно не будет, вариант с Casher ничего так получился*/
+        void getLocations(MutableLiveData<ArrayList<Location>> data, MutableLiveData<Boolean> canWorks) {
+            db.collection(TABLE_LOCATIONS).get().addOnCompleteListener(task -> {
+                ArrayList<Location> newLocations = new ArrayList<>();
+                for (DocumentSnapshot document : task.getResult()) {
+                    String id = document.getId();
+                    String name = document.get(LOCATION_NAME_ID).toString();
+                    Location location = new Location(id, name);
+                    newLocations.add(location);
+                }
+                data.setValue(newLocations);
+                canWorks.setValue(true);
+            });
+        }

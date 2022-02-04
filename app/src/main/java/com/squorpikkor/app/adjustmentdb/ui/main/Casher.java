@@ -53,17 +53,17 @@ class Casher {
         Log.e("TAG", "parseDeviceFromString: "+s);
         String[] ar = s.split(CUT);
         String id = ar[0];
-        String nameId = ar[1];
-        String name = ar[2];
-        String engName = ar[3];
-        String devSetId = ar[4];
-        String imgPath = ar[5];
-        return new Device(id, nameId, name, engName, devSetId, imgPath);
+//        String nameId = ar[1];
+        String name = ar[1];
+        String engName = ar[2];
+        String devSetId = ar[3];
+        String imgPath = ar[4];
+        return new Device(id, name, engName, devSetId, imgPath);
     }
 
     private String parseStringFromDevice(Device d) {
         return d.getId()+CUT+
-               d.getNameId()+CUT+
+//               d.getNameId()+CUT+
                d.getName()+CUT+
                d.getEngName()+CUT+
                d.getDevSetId()+CUT+
@@ -89,14 +89,14 @@ class Casher {
         Log.e("TAG", "parseLocationFromString: "+s);
         String[] ar = s.split(CUT);
         String id = ar[0];
-        String nameId = ar[1];
-        String name = ar[2];
-        return new Location(id, nameId, name);
+//        String nameId = ar[1];
+        String name = ar[1];
+        return new Location(id, name);
     }
 
     private String parseStringFromLocation(Location d) {
         return d.getId()+CUT+
-                d.getNameId()+CUT+
+//                d.getNameId()+CUT+
                 d.getName();
     }
 //--------------------------------------------------------------------------------------------------
@@ -119,14 +119,14 @@ class Casher {
         Log.e("TAG", "parseDevSetsFromString: "+s);
         String[] ar = s.split(CUT);
         String id = ar[0];
-        String nameId = ar[1];
-        String name = ar[2];
-        return new DeviceSet(id, nameId, name);
+//        String nameId = ar[1];
+        String name = ar[1];
+        return new DeviceSet(id, name);
     }
 
     private String parseStringFromDevSet(DeviceSet d) {
         return d.getId()+CUT+
-                d.getNameId()+CUT+
+//                d.getNameId()+CUT+
                 d.getName();
     }
 

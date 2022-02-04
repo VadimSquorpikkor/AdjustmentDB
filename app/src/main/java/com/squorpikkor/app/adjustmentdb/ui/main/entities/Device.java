@@ -6,14 +6,14 @@ public class Device extends Entity{
     String devSetId;
     String imgPath;
 
-    public Device(String id, String nameId, String name, String devSetId, String imgPath) {
-        super(id, nameId, name);
+    /*public Device(String id, String name, String devSetId, String imgPath) {
+        super(id, id, name);
         this.devSetId = devSetId;
         this.imgPath = imgPath;
-    }
+    }*/
 
-    public Device(String id, String nameId, String name, String engName, String devSetId, String imgPath) {
-        super(id, nameId, name);
+    public Device(String id, String name, String engName, String devSetId, String imgPath) {
+        super(id, id, name);
         this.devSetId = devSetId;
         this.imgPath = imgPath;
         this.engName = engName;

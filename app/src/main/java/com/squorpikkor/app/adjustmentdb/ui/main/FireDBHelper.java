@@ -27,28 +27,33 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_NAME_EN;
+import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_NAME_RU;
+import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_SET_NAME_RU;
+import static com.squorpikkor.app.adjustmentdb.Constant.EMPLOYEE_NAME_RU;
+import static com.squorpikkor.app.adjustmentdb.Constant.LOCATION_NAME_RU;
 import static com.squorpikkor.app.adjustmentdb.Constant.TABLE_LOCATIONS;
 import static com.squorpikkor.app.adjustmentdb.Constant.TABLE_NAMES;
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.Constant.ANY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_DEV_SET_ID;
-import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_ID;
+//import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_ID;
 import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_IMG_PATH;
 import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_NAME_ID;
-import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_SET_ID;
-import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_SET_NAME_ID;
+//import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_SET_ID;
+//import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_SET_NAME_ID;
 import static com.squorpikkor.app.adjustmentdb.Constant.EMPLOYEE_EMAIL;
-import static com.squorpikkor.app.adjustmentdb.Constant.EMPLOYEE_ID;
+//import static com.squorpikkor.app.adjustmentdb.Constant.EMPLOYEE_ID;
 import static com.squorpikkor.app.adjustmentdb.Constant.EMPLOYEE_LOCATION;
-import static com.squorpikkor.app.adjustmentdb.Constant.EMPLOYEE_NAME_ID;
+//import static com.squorpikkor.app.adjustmentdb.Constant.EMPLOYEE_NAME_ID;
 import static com.squorpikkor.app.adjustmentdb.Constant.EVENT_CLOSE_DATE;
 import static com.squorpikkor.app.adjustmentdb.Constant.EVENT_DATE;
 import static com.squorpikkor.app.adjustmentdb.Constant.EVENT_DESCRIPTION;
 import static com.squorpikkor.app.adjustmentdb.Constant.EVENT_LOCATION;
 import static com.squorpikkor.app.adjustmentdb.Constant.EVENT_STATE;
 import static com.squorpikkor.app.adjustmentdb.Constant.EVENT_UNIT;
-import static com.squorpikkor.app.adjustmentdb.Constant.LOCATION_ID;
-import static com.squorpikkor.app.adjustmentdb.Constant.LOCATION_NAME_ID;
+//import static com.squorpikkor.app.adjustmentdb.Constant.LOCATION_ID;
+//import static com.squorpikkor.app.adjustmentdb.Constant.LOCATION_NAME_ID;
 import static com.squorpikkor.app.adjustmentdb.Constant.STATE_ID;
 import static com.squorpikkor.app.adjustmentdb.Constant.STATE_LOCATION;
 import static com.squorpikkor.app.adjustmentdb.Constant.STATE_NAME_ID;
@@ -116,20 +121,9 @@ class FireDBHelper {
                 if (doc != null) {
                     Log.e(TAG, "getDataVersion: "+doc.get("value").toString());
                     dbVersion = Integer.parseInt(doc.get("value").toString());
-
-//                    int dictionaryVersion = SaveLoad.loadInt(DICTIONARY_VERSION);
-//                    if (dictionaryVersion < dbVersion) {
-//                        Log.e(TAG, "...версия меньше чем в БД");
-//                        updateDictionary();
-//                    }
                 }
             }
         });
-    }
-
-    private void updateDictionary() {
-        Log.e(TAG, "...обновление библиотеки");
-        //SaveLoad.save(DICTIONARY_VERSION, dbVersion);//обновляем номер версии библиотеки
     }
 
     /**Поиск эл.почты в employees, если пользователя с такой почтой нет, возвращает false
@@ -160,31 +154,6 @@ class FireDBHelper {
     }
 
 //--------------------------------------------------------------------------------------------------
-    //todo ВСЕ ЛИСЕНЕРЫ НУЖНО ОБЪЕДИНИТЬ В ОДИН (У ВСЕХ СУЩНОСТЕЙ ВЕДЬ ОДИН РОДИТЕЛЬ)
-    private void joinName(String id, Entity e, MutableLiveData<ArrayList<? extends Entity>> data) {
-        if (data.getValue().get(0).getClass()==Location.class)
-        db.collection(TABLE_NAMES).document(id).get()
-                .addOnCompleteListener(task1 -> {
-                    e.setName(getStringFromSnapshot(task1, id));
-//                    updateLiveData(data);
-                    data.setValue(data.getValue());
-                });
-    }
-
-    /**Для варианта работы с Bridge. Это эксперимент, сам Bridge не подключен и воможно не будет, вариант с Casher ничего так получился*/
-    void getLocations(MutableLiveData<ArrayList<Location>> data, MutableLiveData<Boolean> canWorks) {
-        db.collection(TABLE_LOCATIONS).get().addOnCompleteListener(task -> {
-            ArrayList<Location> newLocations = new ArrayList<>();
-            for (DocumentSnapshot document : task.getResult()) {
-                String id = document.get(LOCATION_ID).toString();
-                String name = document.get(LOCATION_NAME_ID).toString();
-                Location location = new Location(id, name);
-                newLocations.add(location);
-            }
-            data.setValue(newLocations);
-            canWorks.setValue(true);
-        });
-    }
 
     void locationListener(MutableLiveData<ArrayList<Location>> data, MutableLiveData<Boolean> canWorks) {
         int appDbVersion = SaveLoad.loadInt(APP_DB_VERSION);
@@ -207,18 +176,18 @@ class FireDBHelper {
         db.collection(TABLE_LOCATIONS).get().addOnCompleteListener(task -> {
             ArrayList<Location> newLocations = new ArrayList<>();
             for (DocumentSnapshot document : task.getResult()) {
-                String id = document.get(LOCATION_ID).toString();
-                String nameId = document.get(LOCATION_NAME_ID).toString();
-                String name = document.get(LOCATION_NAME_ID).toString();
-                Location location = new Location(id, nameId, name);
+                String id = document.getId();
+//                String nameId = document.get(LOCATION_NAME_ID).toString();
+                String name = document.get(LOCATION_NAME_RU).toString();
+                Location location = new Location(id, name);
 
                 //joinName(id, location, data);
                 //JOIN------------------------------------------------------------------
-                db.collection(TABLE_NAMES).document(nameId).get()
-                        .addOnCompleteListener(task1 -> {
-                            location.setName(getStringFromSnapshot(task1, nameId));
-                            data.setValue(data.getValue());//update Mutable
-                            Log.e(TAG, "--locationListener: "+location.getName());
+//                db.collection(TABLE_NAMES).document(nameId).get()
+//                        .addOnCompleteListener(task1 -> {
+//                            location.setName(getStringFromSnapshot(task1, nameId));
+//                            data.setValue(data.getValue());//update Mutable
+//                            Log.e(TAG, "--locationListener: "+location.getName());
 
                             i_loc++;
                             //Смысл: если это самый последний цикл (т.е. если загружены имена
@@ -231,7 +200,7 @@ class FireDBHelper {
                                 i_loc=0;
                             }
 
-                        });
+//                        });
 
                 newLocations.add(location);
             }
@@ -269,30 +238,32 @@ class FireDBHelper {
         ArrayList<Device> newDevices = new ArrayList<>();
         db.collection(TABLE_DEVICES).get().addOnCompleteListener(task -> {
             for (DocumentSnapshot document : task.getResult()) {
-                String id = document.get(DEVICE_ID).toString();
-                String nameId = document.get(DEVICE_NAME_ID).toString();
-                String name = document.get(DEVICE_NAME_ID).toString();
+                String id = document.getId();
+//                String nameId = document.get(DEVICE_NAME_ID).toString();
+                //И русские и английские имена нужны для распознавания наклеек, которые могут быть и русские и английские
+                String name = document.get(DEVICE_NAME_RU).toString();
+                String nameEn = document.get(DEVICE_NAME_EN).toString();
                 String devSetId = document.get(DEVICE_DEV_SET_ID).toString();
                 String imgPath = document.get(DEVICE_IMG_PATH).toString();
-                Device device = new Device(id, nameId, name, devSetId, imgPath);
+                Device device = new Device(id, name, nameEn, devSetId, imgPath);
 
                 //JOIN------------------------------------------------------------------
-                db.collection(TABLE_NAMES).document(nameId).get()
-                        .addOnCompleteListener(task1 -> {
+//                db.collection(TABLE_NAMES).document(nameId).get()
+//                        .addOnCompleteListener(task1 -> {
                             //И русские и английские имена нужны для распознавания наклеек, которые могут быть и русские и английские
-                            String ru = "";
-                            String en = "";
-                            if (task1.isSuccessful()) {
-                                DocumentSnapshot documentSnapshot = task1.getResult();
-                                if (documentSnapshot != null && documentSnapshot.exists()) {
-                                    ru = documentSnapshot.get("ru").toString();
-                                    en = documentSnapshot.get("en").toString();
+//                            String ru = "";
+//                            String en = "";
+//                            if (task1.isSuccessful()) {
+//                                DocumentSnapshot documentSnapshot = task1.getResult();
+//                                if (documentSnapshot != null && documentSnapshot.exists()) {
+//                                    ru = documentSnapshot.get("ru").toString();
+//                                    en = documentSnapshot.get("en").toString();
                                     //Log.e(TAG, "deviceListener: "+ru+" "+en);
 
-                            if (!ru.equals("")) device.setName(ru);
-                            if (!en.equals("")) device.setEngName(en);
-                            data.setValue(data.getValue());
-                                }
+//                            if (!ru.equals("")) device.setName(ru);
+//                            if (!en.equals("")) device.setEngName(en);
+//                            data.setValue(data.getValue());
+//                                }
 
                                 i++;
                                 //Смысл: если это самый последний цикл (т.е. если загружены имена
@@ -305,8 +276,8 @@ class FireDBHelper {
                                     i=0;
                                 }
 
-                            }
-                        });
+//                            }
+//                        });
 
                 //JOIN------------------------------------------------------------------
                 //  \\\\\\ //  пока не буду делать отдельную таблицу и отдельно русские имена.
@@ -335,27 +306,12 @@ class FireDBHelper {
                 .get().addOnCompleteListener(task -> {
             ArrayList<Employee> newEmployees = new ArrayList<>();
             for (DocumentSnapshot document : task.getResult()) {
-                //Внимание! Для employee name_id — это id, а name — это name_id
-                //Так сделано, потому что для сохранения сотрудника в юните нужен id сотрудника
-                // (поэтому name_id — это id), а для отображения имени в спиннере достаточно
-                // name_id без подгрузки имени из таблицы имен (name — это name_id)
-                String id = document.get(EMPLOYEE_ID).toString();
-                String nameId = document.get(EMPLOYEE_ID).toString();
-                String name = document.get(EMPLOYEE_NAME_ID).toString();
+                String id = document.getId();
+//                String nameId = document.getId();
+                String name = document.get(EMPLOYEE_NAME_RU).toString();
                 String eMail = document.get(EMPLOYEE_EMAIL).toString();
                 String location = document.get(EMPLOYEE_LOCATION).toString();
-                Employee employee = new Employee(id, nameId, name, eMail, location);
-
-                //JOIN------------------------------------------------------------------
-                // Закоментировано, так как всё равно для русского варианта имен (а employees
-                // используется только в AdjustmentDB, а значит ТОЛЬКО в русском варианте слов)
-                // name_id ВСЕГДА == name, поэтому JOIN делает только лишнюю работу
-//                db.collection(TABLE_NAMES).document(nameId).get()
-//                        .addOnCompleteListener(task1 -> {
-//                            employee.setName(getStringFromSnapshot(task1, nameId));
-//                            data.setValue(data.getValue());
-//                        });
-
+                Employee employee = new Employee(id, name, eMail, location);
                 newEmployees.add(employee);
             }
             data.setValue(newEmployees);
@@ -406,16 +362,16 @@ class FireDBHelper {
                 .get().addOnCompleteListener(task -> {
             ArrayList<DeviceSet> newDevSets = new ArrayList<>();
             for (DocumentSnapshot document : task.getResult()) {
-                String id = document.get(DEVICE_SET_ID).toString();
-                String nameId = document.get(DEVICE_SET_NAME_ID).toString();
-                String name = document.get(DEVICE_SET_NAME_ID).toString();
-                DeviceSet devSet = new DeviceSet(id, nameId, name);
+                String id = document.getId();
+//                String nameId = document.get(DEVICE_SET_NAME_ID).toString();
+                String name = document.get(DEVICE_SET_NAME_RU).toString();
+                DeviceSet devSet = new DeviceSet(id, name);
 
                 //JOIN------------------------------------------------------------------
-                db.collection(TABLE_NAMES).document(nameId).get()
-                        .addOnCompleteListener(task1 -> {
-                            devSet.setName(getStringFromSnapshot(task1, nameId));
-                            data.setValue(data.getValue());
+//                db.collection(TABLE_NAMES).document(nameId).get()
+//                        .addOnCompleteListener(task1 -> {
+//                            devSet.setName(getStringFromSnapshot(task1, nameId));
+//                            data.setValue(data.getValue());
 
                             i_set++;
                             //Смысл: если это самый последний цикл (т.е. если загружены имена
@@ -427,7 +383,7 @@ class FireDBHelper {
                                 saveDeviceSetsToCash(newDevSets);
                                 i_set=0;
                             }
-                        });
+//                        });
                 newDevSets.add(devSet);
             }
             data.setValue(newDevSets);

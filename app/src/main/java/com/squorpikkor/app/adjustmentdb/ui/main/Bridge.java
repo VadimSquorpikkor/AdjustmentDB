@@ -27,7 +27,7 @@ public class Bridge {
         encodedLocations = new MutableLiveData<>();
         encodedLocations.observeForever(list -> translater.decode(encodedLocations, decodedData));
 
-        dbh.getLocations(encodedLocations, canWorks);
+        /////////////////////////dbh.getLocations(encodedLocations, canWorks);
     }
 
     /*Location decode(Location location) {

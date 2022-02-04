@@ -37,23 +37,29 @@ public class Constant {
 
     public static final String TABLE_EMPLOYEES = "employees"; //в прошлом users
     public static final String EMPLOYEE_EMAIL = "email"; //email нельзя использовать в качестве id, так как у пользователя может поменяться email, и тогда при необходимости выбрать устройства пользователя нужно будет искать и по старому email и по новому
-    public static final String EMPLOYEE_ID = "id";
+//    public static final String EMPLOYEE_ID = "id";
     public static final String EMPLOYEE_NAME_ID = "name_id";
     public static final String EMPLOYEE_LOCATION = "location_id";
+    public static final String EMPLOYEE_NAME_RU = "name_ru";
+
 
     public static final String TABLE_LOCATIONS = "locations";
-    public static final String LOCATION_ID = "id";
+//    public static final String LOCATION_ID = "id";
     public static final String LOCATION_NAME_ID = "name_id";
+    public static final String LOCATION_NAME_RU = "name_ru";
 
     public static final String TABLE_DEVICES = "devices";
     public static final String DEVICE_ID = "id";
     public static final String DEVICE_NAME_ID = "name_id";
     public static final String DEVICE_DEV_SET_ID = "devset_id";
     public static final String DEVICE_IMG_PATH = "img_path";
+    public static final String DEVICE_NAME_RU = "name_ru";
+    public static final String DEVICE_NAME_EN = "name_en";
 
     public static final String TABLE_DEVICE_SET = "device_set";
     public static final String DEVICE_SET_ID = "id";
     public static final String DEVICE_SET_NAME_ID = "name_id";
+    public static final String DEVICE_SET_NAME_RU = "name_ru";
 
     public static final String EMPTY_LOCATION_ID = "empty_location_id";
     public static final String EMPTY_LOCATION_NAME_2 = "Локация не найдена";
