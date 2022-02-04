@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_INFO_FRAGMENT;
 import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_SEARCH;
+import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_SEARCH_WHEN_FOUND;
 
 public class SearchDeviceFragment extends Fragment {
 
@@ -81,11 +82,14 @@ public class SearchDeviceFragment extends Fragment {
     }
 
     private void updateFoundRecycler(ArrayList<DUnit> list) {
+        Log.e("TAG", "updateFoundRecycler: "+list.size());
         if (list.size() == 0) {
             logoImage.setVisibility(View.VISIBLE);
-            Toast.makeText(getActivity(), getString(R.string.nothing_found), Toast.LENGTH_SHORT).show();
+            if (!mViewModel.getBackPressCommand().equals(BACK_PRESS_SEARCH_WHEN_FOUND))Toast.makeText(getActivity(), getString(R.string.nothing_found), Toast.LENGTH_SHORT).show();
+            mViewModel.setBackPressCommand(BACK_PRESS_SEARCH);
         } else {
             logoImage.setVisibility(View.GONE);
+            mViewModel.setBackPressCommand(BACK_PRESS_SEARCH_WHEN_FOUND);
         }
         UnitAdapter unitAdapter = new UnitAdapter(list, mViewModel);
         unitAdapter.setOnItemClickListener(SearchDeviceFragment.this::openInfoFragment);

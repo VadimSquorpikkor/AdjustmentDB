@@ -33,6 +33,7 @@ import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_INFO_FRAGMENT
 import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_MULTI;
 import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_MULTI_STATES;
 import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_SEARCH;
+import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_SEARCH_WHEN_FOUND;
 import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_SINGLE;
 import static com.squorpikkor.app.adjustmentdb.Constant.BACK_PRESS_STATES;
 import static com.squorpikkor.app.adjustmentdb.Constant.EMPTY_LOCATION_ID;
@@ -430,6 +431,10 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         this.backPressCommand = backPressCommand;
     }
 
+    public String getBackPressCommand() {
+        return backPressCommand;
+    }
+
     public void getBack() {
         if (backPressCommand==null) return;
 
@@ -439,8 +444,9 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         backToRecycler.setValue(false);
 
         switch (backPressCommand) {
-            case BACK_PRESS_SEARCH: startExit.setValue(true); break;
-            case BACK_PRESS_MULTI:
+            case BACK_PRESS_SEARCH_WHEN_FOUND: if (getFoundUnitsList().getValue().size()!=0) getFoundUnitsList().setValue(new ArrayList<>()); backPressCommand = BACK_PRESS_SEARCH; break;
+            case BACK_PRESS_SEARCH:
+            case BACK_PRESS_MULTI:  startExit.setValue(true); break;
             case BACK_PRESS_SINGLE: goToSearchTab.setValue(true); break;
             case BACK_PRESS_STATES: restartScanning.setValue(true); break;
             case BACK_PRESS_MULTI_STATES: restartMultiScanning(); break;

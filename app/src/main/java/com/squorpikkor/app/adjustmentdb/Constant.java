@@ -76,6 +76,7 @@ public class Constant {
 //--------------------------------------------------------------------------------------------------
 
     public static final String BACK_PRESS_SEARCH = "back_press_search";
+    public static final String BACK_PRESS_SEARCH_WHEN_FOUND = "back_press_search_when_found";
     public static final String BACK_PRESS_SINGLE = "back_press_single";
     public static final String BACK_PRESS_STATES = "back_press_states";
     public static final String BACK_PRESS_MULTI_STATES = "back_press_multi_states";

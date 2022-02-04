@@ -56,8 +56,6 @@ public class SingleScanParent extends Fragment {
     }
 
     private void startFragment() {
-        Fragment childFragment = SingleScanFragment.newInstance();
-        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.replace(R.id.child_fragment_container, childFragment).commit();
+        getChildFragmentManager().beginTransaction().replace(R.id.child_fragment_container, SingleScanFragment.newInstance()).commit();
     }
 }

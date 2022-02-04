@@ -29,6 +29,7 @@ import static com.squorpikkor.app.adjustmentdb.Utils.isEmptyOrNull;
 import static com.squorpikkor.app.adjustmentdb.Constant.ANY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.Constant.EMPTY_VALUE_TEXT;
 
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -63,6 +64,7 @@ public class SelectStateDialogSingle extends BaseDialog {
         initializeWithVM(R.layout.dialog_select_states_single);
 
         unit = mViewModel.getSelectedUnit().getValue();
+//        mViewModel.getSelectedUnit().observe(getViewLifecycleOwner(), dUnit -> unit= dUnit);//проверить
         location = mViewModel.getLocation_id().getValue();
 
         Spinner deviceSetSpinner = view.findViewById(R.id.spinnerDevSetName);
@@ -191,6 +193,10 @@ public class SelectStateDialogSingle extends BaseDialog {
             toggleTab(1);
         }
         return dialog;
+    }
+
+    private void setFieldsVisibility() {
+
     }
 
     private void updateShortStateRecycler(ArrayList<State> list) {
