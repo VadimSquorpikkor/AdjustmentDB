@@ -4,7 +4,7 @@
     <PreferenceCategory app:title="Облегчить себе жизнь">
 
         <ListPreference
-            app:defaultValue="2"
+            app:defaultValue="1"
             app:entries="@array/select_fragment_entries"
             app:entryValues="@array/select_values"
             app:key="@string/preferred_tab"

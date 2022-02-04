@@ -106,7 +106,7 @@ class FireDBHelper {
     }
 
     private final Casher casher;
-    public static final String APP_DB_VERSION = "app_db_version";
+    public static final String APP_DB_VERSION = "app_db_version";//todo по-хорошему нужно сделать разные версии для разных таблиц, иначе при изменении данных для одной таблицы будут обновляться данные для всех таблиц. Но так сложнее администрировать, при изменении данных нужно обновлять определенную версию, а не одну общую
     private int dbVersion;
 
     private void getDataVersion() {
@@ -171,6 +171,7 @@ class FireDBHelper {
                 });
     }
 
+    /**Для варианта работы с Bridge. Это эксперимент, сам Bridge не подключен и воможно не будет, вариант с Casher ничего так получился*/
     void getLocations(MutableLiveData<ArrayList<Location>> data, MutableLiveData<Boolean> canWorks) {
         db.collection(TABLE_LOCATIONS).get().addOnCompleteListener(task -> {
             ArrayList<Location> newLocations = new ArrayList<>();
@@ -186,8 +187,24 @@ class FireDBHelper {
     }
 
     void locationListener(MutableLiveData<ArrayList<Location>> data, MutableLiveData<Boolean> canWorks) {
-        db.collection(TABLE_LOCATIONS)
-                .get().addOnCompleteListener(task -> {
+        int appDbVersion = SaveLoad.loadInt(APP_DB_VERSION);
+        Log.e(TAG, "locationListener: "+appDbVersion);
+        if (appDbVersion < dbVersion) {
+            Log.e(TAG, "...версия меньше чем в БД location");
+            locationListener_(data, canWorks);
+        } else {
+            Log.e(TAG, "...пробуем из кэша location");
+            ArrayList<Location> newLocations = casher.getLocationCash();
+            if (newLocations.size()!=0) {
+                data.setValue(newLocations);//Если из кэша что-то загрузилось, возвращаем такую коллекцию,
+                canWorks.setValue(true);
+            } else locationListener_(data, canWorks); //иначе — грузим из БД
+        }
+    }
+
+    private int i_loc = 0;
+    void locationListener_(MutableLiveData<ArrayList<Location>> data, MutableLiveData<Boolean> canWorks) {
+        db.collection(TABLE_LOCATIONS).get().addOnCompleteListener(task -> {
             ArrayList<Location> newLocations = new ArrayList<>();
             for (DocumentSnapshot document : task.getResult()) {
                 String id = document.get(LOCATION_ID).toString();
@@ -202,6 +219,18 @@ class FireDBHelper {
                             location.setName(getStringFromSnapshot(task1, nameId));
                             data.setValue(data.getValue());//update Mutable
                             Log.e(TAG, "--locationListener: "+location.getName());
+
+                            i_loc++;
+                            //Смысл: если это самый последний цикл (т.е. если загружены имена
+                            // для ПОСЛЕДНЕГО location), то пришло время чтобы сохранять в кэш
+                            // (сохранение нельзя поставить в конце функции, так как это всё
+                            // происходит в разных потоках и функция завершается раньше, чез
+                            // завершается этот цикл for).
+                            if (task.getResult().size() == i_loc) {
+                                saveLocationsToCash(newLocations);
+                                i_loc=0;
+                            }
+
                         });
 
                 newLocations.add(location);
@@ -212,9 +241,17 @@ class FireDBHelper {
         });
     }
 
+    private void saveLocationsToCash(ArrayList<Location> data) {//todo перенести в кэшер
+        Log.e(TAG, "saveLocationsToCash: "+dbVersion);
+        casher.saveLocationsCash(data);//сохраняем в кэш
+        SaveLoad.save(APP_DB_VERSION, dbVersion);//обновляем номер версии БД
+    }
+
+    /***/
     void deviceListener(MutableLiveData<ArrayList<Device>> data) {
         //int dbVersion = SaveLoad.loadInt(DB_VERSION);
         int appDbVersion = SaveLoad.loadInt(APP_DB_VERSION);
+        Log.e(TAG, "deviceListener: "+appDbVersion);
         if (appDbVersion < dbVersion) {
             Log.e(TAG, "...версия меньше чем в БД");
             deviceListener_(data);
@@ -262,8 +299,12 @@ class FireDBHelper {
                                 // для ПОСЛЕДНЕГО device), то пришло время чтобы сохранять в кэш
                                 // (сохранение нельзя поставить в конце функции, так как это всё
                                 // происходит в разных потоках и функция завершается раньше, чез
-                                // завершается этот цикл for)
-                                if (task.getResult().size() == i) saveDevicesToCash(newDevices);
+                                // завершается этот цикл for).
+                                if (task.getResult().size() == i) {
+                                    saveDevicesToCash(newDevices);
+                                    i=0;
+                                }
+
                             }
                         });
 
@@ -281,12 +322,14 @@ class FireDBHelper {
         });
     }
 
-    public void saveDevicesToCash(ArrayList<Device> data) {
+    public void saveDevicesToCash(ArrayList<Device> data) {//todo перенести в кэшер
+        Log.e(TAG, "saveDevicesToCash: "+dbVersion);
         casher.saveDeviceCash(data);//сохраняем в кэш
         SaveLoad.save(APP_DB_VERSION, dbVersion);//обновляем номер версии БД
     }
 
 
+    //TODO когда более-менее будет понятно с пользователями нужно будет тоже кэшировать
     void employeeListener(MutableLiveData<ArrayList<Employee>> data) {
         db.collection(TABLE_EMPLOYEES)
                 .get().addOnCompleteListener(task -> {
@@ -344,9 +387,24 @@ class FireDBHelper {
     }
 
     void deviceSetListener(MutableLiveData<ArrayList<DeviceSet>> data) {
+        int appDbVersion = SaveLoad.loadInt(APP_DB_VERSION);
+        Log.e(TAG, "deviceListener: "+appDbVersion);
+        if (appDbVersion < dbVersion) {
+            Log.e(TAG, "...версия меньше чем в БД set");
+            deviceSetListener_(data);
+        } else {
+            Log.e(TAG, "...пробуем из кэша");
+            ArrayList<DeviceSet> newDeviceSets = casher.getDevSetCash();
+            if (newDeviceSets.size()!=0) data.setValue(newDeviceSets);//Если из кэша что-то загрузилось, возвращаем такую коллекцию,
+            else deviceSetListener_(data); //иначе — грузим из БД
+        }
+    }
+
+    private int i_set = 0;
+    void deviceSetListener_(MutableLiveData<ArrayList<DeviceSet>> data) {
         db.collection(TABLE_DEVICE_SET)
                 .get().addOnCompleteListener(task -> {
-            ArrayList<DeviceSet> newStates = new ArrayList<>();
+            ArrayList<DeviceSet> newDevSets = new ArrayList<>();
             for (DocumentSnapshot document : task.getResult()) {
                 String id = document.get(DEVICE_SET_ID).toString();
                 String nameId = document.get(DEVICE_SET_NAME_ID).toString();
@@ -358,11 +416,28 @@ class FireDBHelper {
                         .addOnCompleteListener(task1 -> {
                             devSet.setName(getStringFromSnapshot(task1, nameId));
                             data.setValue(data.getValue());
+
+                            i_set++;
+                            //Смысл: если это самый последний цикл (т.е. если загружены имена
+                            // для ПОСЛЕДНЕГО device), то пришло время чтобы сохранять в кэш
+                            // (сохранение нельзя поставить в конце функции, так как это всё
+                            // происходит в разных потоках и функция завершается раньше, чез
+                            // завершается этот цикл for).
+                            if (task.getResult().size() == i_set) {
+                                saveDeviceSetsToCash(newDevSets);
+                                i_set=0;
+                            }
                         });
-                newStates.add(devSet);
+                newDevSets.add(devSet);
             }
-            data.setValue(newStates);
+            data.setValue(newDevSets);
         });
+    }
+
+    private void saveDeviceSetsToCash(ArrayList<DeviceSet> data) {//todo перенести в кэшер
+        Log.e(TAG, "saveDevicesToCash: "+dbVersion);
+        casher.saveDevSetCash(data);//сохраняем в кэш
+        SaveLoad.save(APP_DB_VERSION, dbVersion);//обновляем номер версии БД
     }
 
     /**Упрощенный вариант получения имени на русском языке по snapshot*/
