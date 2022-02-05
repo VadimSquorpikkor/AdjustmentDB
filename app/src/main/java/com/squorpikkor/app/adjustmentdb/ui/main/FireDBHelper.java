@@ -32,6 +32,7 @@ import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_NAME_RU;
 import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_SET_NAME_RU;
 import static com.squorpikkor.app.adjustmentdb.Constant.EMPLOYEE_NAME_RU;
 import static com.squorpikkor.app.adjustmentdb.Constant.LOCATION_NAME_RU;
+import static com.squorpikkor.app.adjustmentdb.Constant.STATE_NAME_RU;
 import static com.squorpikkor.app.adjustmentdb.Constant.TABLE_LOCATIONS;
 import static com.squorpikkor.app.adjustmentdb.Constant.TABLE_NAMES;
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
@@ -54,9 +55,9 @@ import static com.squorpikkor.app.adjustmentdb.Constant.EVENT_STATE;
 import static com.squorpikkor.app.adjustmentdb.Constant.EVENT_UNIT;
 //import static com.squorpikkor.app.adjustmentdb.Constant.LOCATION_ID;
 //import static com.squorpikkor.app.adjustmentdb.Constant.LOCATION_NAME_ID;
-import static com.squorpikkor.app.adjustmentdb.Constant.STATE_ID;
+//import static com.squorpikkor.app.adjustmentdb.Constant.STATE_ID;
 import static com.squorpikkor.app.adjustmentdb.Constant.STATE_LOCATION;
-import static com.squorpikkor.app.adjustmentdb.Constant.STATE_NAME_ID;
+//import static com.squorpikkor.app.adjustmentdb.Constant.STATE_NAME_ID;
 import static com.squorpikkor.app.adjustmentdb.Constant.STATE_TYPE;
 import static com.squorpikkor.app.adjustmentdb.Constant.TABLE_DEVICES;
 import static com.squorpikkor.app.adjustmentdb.Constant.TABLE_DEVICE_SET;
@@ -319,27 +320,58 @@ class FireDBHelper {
     }
 
     void stateListener(MutableLiveData<ArrayList<State>> data) {
+        int appDbVersion = SaveLoad.loadInt(APP_DB_VERSION);
+        if (appDbVersion < dbVersion) {
+            Log.e(TAG, "...версия меньше чем в БД");
+            stateListener_(data);
+        } else {
+            Log.e(TAG, "...пробуем из кэша");
+            ArrayList<State> newStates = casher.getStateCash();
+            if (newStates.size()!=0) data.setValue(newStates);//Если из кэша что-то загрузилось, возвращаем такую коллекцию,
+            else stateListener_(data); //иначе — грузим из БД
+        }
+    }
+
+    private int i_sta = 0;
+    void stateListener_(MutableLiveData<ArrayList<State>> data) {
         db.collection(TABLE_STATES)
                 .get().addOnCompleteListener(task -> {
             ArrayList<State> newStates = new ArrayList<>();
             for (DocumentSnapshot document : task.getResult()) {
-                String id = document.get(STATE_ID).toString();
-                String nameId = document.get(STATE_NAME_ID).toString();
-                String name = document.get(STATE_NAME_ID).toString();
+                String id = document.getId();
+//                String nameId = document.get(STATE_NAME_ID).toString();
+                String name = document.get(STATE_NAME_RU).toString();
                 String type = document.get(STATE_TYPE).toString();
                 String location = document.get(STATE_LOCATION).toString();
-                State state = new State(id, nameId, name, type, location);
+                State state = new State(id, name, type, location);
+
+                i_sta++;
+                //Смысл: если это самый последний цикл (т.е. если загружены имена
+                // для ПОСЛЕДНЕГО device), то пришло время чтобы сохранять в кэш
+                // (сохранение нельзя поставить в конце функции, так как это всё
+                // происходит в разных потоках и функция завершается раньше, чез
+                // завершается этот цикл for).
+                if (task.getResult().size() == i_sta) {
+                    saveStatesToCash(newStates);
+                    i_sta=0;
+                }
 
                 //JOIN------------------------------------------------------------------
-                db.collection(TABLE_NAMES).document(nameId).get()
-                        .addOnCompleteListener(task1 -> {
-                            state.setName(getStringFromSnapshot(task1, nameId));
-                            data.setValue(data.getValue());
-                        });
+//                db.collection(TABLE_NAMES).document(nameId).get()
+//                        .addOnCompleteListener(task1 -> {
+//                            state.setName(getStringFromSnapshot(task1, nameId));
+//                            data.setValue(data.getValue());
+//                        });
                 newStates.add(state);
             }
             data.setValue(newStates);
         });
+    }
+
+    public void saveStatesToCash(ArrayList<State> data) {//todo перенести в кэшер
+        Log.e(TAG, "saveDevicesToCash: "+dbVersion);
+        casher.saveStatesCash(data);//сохраняем в кэш
+        SaveLoad.save(APP_DB_VERSION, dbVersion);//обновляем номер версии БД
     }
 
     void deviceSetListener(MutableLiveData<ArrayList<DeviceSet>> data) {

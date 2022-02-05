@@ -5,8 +5,8 @@ public class State extends Entity {
     String type;
     String location;
 
-    public State(String id, String nameId, String name, String type, String location) {
-        super(id, nameId, name);
+    public State(String id, String name, String type, String location) {
+        super(id, id, name);
         this.type = type;
         this.location = location;
     }

@@ -25,6 +25,7 @@ public class Constant {
     public static final String STATE_NAME_ID = "name_id";
     public static final String STATE_LOCATION = "location_id";
     public static final String STATE_NAME = "name";
+    public static final String STATE_NAME_RU = "name_ru";
     public static final String STATE_TYPE = "type_id";
 
     public static final String TABLE_EVENTS = "events"; //в прошлом states

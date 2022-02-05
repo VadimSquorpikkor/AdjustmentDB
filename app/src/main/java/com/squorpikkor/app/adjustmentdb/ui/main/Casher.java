@@ -6,6 +6,7 @@ import com.squorpikkor.app.adjustmentdb.SaveLoad;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.Device;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.DeviceSet;
 import com.squorpikkor.app.adjustmentdb.ui.main.entities.Location;
+import com.squorpikkor.app.adjustmentdb.ui.main.entities.State;
 
 import java.util.ArrayList;
 
@@ -33,6 +34,7 @@ class Casher {
     private static final String DEVICES = "save_devices";
     private static final String LOCATIONS = "save_locations";
     private static final String DEVICE_SETS = "save_dev_sets";
+    private static final String STATES = "save_states";
 //--------------------------------------------------------------------------------------------------
     ArrayList<Device> getDeviceCash() {
         Log.e("TAG", "...из кэша");
@@ -130,4 +132,36 @@ class Casher {
                 d.getName();
     }
 
+//--------------------------------------------------------------------------------------------------
+    public ArrayList<State> getStateCash() {
+        Log.e("TAG", "...из кэша State");
+        ArrayList<String> list = SaveLoad.loadStringArray(STATES);
+        ArrayList<State> newStates = new ArrayList<>();
+        for (String s:list) newStates.add(parseStateFromString(s));
+        return newStates;
+    }
+
+    public void saveStatesCash(ArrayList<State> data) {
+        Log.e("TAG", "...сохраняем в кэш State");
+        ArrayList<String> list = new ArrayList<>();
+        for (State d:data) list.add(parseStringFromState(d));
+        SaveLoad.saveArray(STATES, list);
+    }
+
+    private State parseStateFromString(String s) {
+        Log.e("TAG", "parseDevSetsFromString: "+s);
+        String[] ar = s.split(CUT);
+        String id = ar[0];
+        String name = ar[1];
+        String type = ar[2];
+        String location = ar[3];
+        return new State(id, name, type, location);
+    }
+
+    private String parseStringFromState(State d) {
+        return d.getId()+CUT+
+                d.getName()+CUT+
+                d.getType()+CUT+
+                d.getLocation();
+    }
 }
