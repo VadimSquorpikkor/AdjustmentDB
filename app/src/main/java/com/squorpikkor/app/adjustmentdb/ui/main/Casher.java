@@ -10,6 +10,8 @@ import com.squorpikkor.app.adjustmentdb.ui.main.entities.State;
 
 import java.util.ArrayList;
 
+import static com.squorpikkor.app.adjustmentdb.ui.main.FireDBHelper.APP_DB_VERSION;
+
 /**Для уменьшения количества запросов в БД применяется кэширование — сохранение полученных данных из БД и
  использование их при необходимости без повторного обращения к БД. В БД хранится номер её версии, приложение
  при первом подключении к БД загружает данные и сохраняет их. Также приложение сохраняет версию БД. При
@@ -36,6 +38,11 @@ class Casher {
     private static final String DEVICE_SETS = "save_dev_sets";
     private static final String STATES = "save_states";
 //--------------------------------------------------------------------------------------------------
+    void saveDevicesToCash(ArrayList<Device> data, int dbVersion) {
+        saveDeviceCash(data);//сохраняем в кэш
+        SaveLoad.save(APP_DB_VERSION, dbVersion);//обновляем номер версии БД
+    }
+
     ArrayList<Device> getDeviceCash() {
         Log.e("TAG", "...из кэша");
         ArrayList<String> list = SaveLoad.loadStringArray(DEVICES);
@@ -44,7 +51,7 @@ class Casher {
         return newDevices;
     }
 
-    void saveDeviceCash(ArrayList<Device> devs) {
+    private void saveDeviceCash(ArrayList<Device> devs) {
         Log.e("TAG", "...сохраняем в кэш");
         ArrayList<String> list = new ArrayList<>();
         for (Device d:devs) list.add(parseStringFromDevice(d));
@@ -55,7 +62,6 @@ class Casher {
         Log.e("TAG", "parseDeviceFromString: "+s);
         String[] ar = s.split(CUT);
         String id = ar[0];
-//        String nameId = ar[1];
         String name = ar[1];
         String engName = ar[2];
         String devSetId = ar[3];
@@ -65,14 +71,18 @@ class Casher {
 
     private String parseStringFromDevice(Device d) {
         return d.getId()+CUT+
-//               d.getNameId()+CUT+
                d.getName()+CUT+
                d.getEngName()+CUT+
                d.getDevSetId()+CUT+
                d.getImgPath();
     }
 //--------------------------------------------------------------------------------------------------
-    public ArrayList<Location> getLocationCash() {
+    void saveLocationsToCash(ArrayList<Location> data, int dbVersion) {
+        saveLocationsCash(data);//сохраняем в кэш
+        SaveLoad.save(APP_DB_VERSION, dbVersion);//обновляем номер версии БД
+    }
+
+    ArrayList<Location> getLocationCash() {
         Log.e("TAG", "...из кэша location");
         ArrayList<String> list = SaveLoad.loadStringArray(LOCATIONS);
         ArrayList<Location> newLocations = new ArrayList<>();
@@ -80,7 +90,7 @@ class Casher {
         return newLocations;
     }
 
-    public void saveLocationsCash(ArrayList<Location> data) {
+    private void saveLocationsCash(ArrayList<Location> data) {
         Log.e("TAG", "...сохраняем в кэш");
         ArrayList<String> list = new ArrayList<>();
         for (Location d:data) list.add(parseStringFromLocation(d));
@@ -91,18 +101,21 @@ class Casher {
         Log.e("TAG", "parseLocationFromString: "+s);
         String[] ar = s.split(CUT);
         String id = ar[0];
-//        String nameId = ar[1];
         String name = ar[1];
         return new Location(id, name);
     }
 
     private String parseStringFromLocation(Location d) {
         return d.getId()+CUT+
-//                d.getNameId()+CUT+
                 d.getName();
     }
 //--------------------------------------------------------------------------------------------------
-    public ArrayList<DeviceSet> getDevSetCash() {
+    void saveDeviceSetsToCash(ArrayList<DeviceSet> data, int dbVersion) {
+        saveDevSetCash(data);//сохраняем в кэш
+        SaveLoad.save(APP_DB_VERSION, dbVersion);//обновляем номер версии БД
+    }
+
+    ArrayList<DeviceSet> getDevSetCash() {
         Log.e("TAG", "...из кэша DevSet");
         ArrayList<String> list = SaveLoad.loadStringArray(DEVICE_SETS);
         ArrayList<DeviceSet> newDeviceSets = new ArrayList<>();
@@ -110,7 +123,7 @@ class Casher {
         return newDeviceSets;
     }
 
-    public void saveDevSetCash(ArrayList<DeviceSet> data) {
+    private void saveDevSetCash(ArrayList<DeviceSet> data) {
         Log.e("TAG", "...сохраняем в кэш DevSet");
         ArrayList<String> list = new ArrayList<>();
         for (DeviceSet d:data) list.add(parseStringFromDevSet(d));
@@ -121,19 +134,21 @@ class Casher {
         Log.e("TAG", "parseDevSetsFromString: "+s);
         String[] ar = s.split(CUT);
         String id = ar[0];
-//        String nameId = ar[1];
         String name = ar[1];
         return new DeviceSet(id, name);
     }
 
     private String parseStringFromDevSet(DeviceSet d) {
         return d.getId()+CUT+
-//                d.getNameId()+CUT+
                 d.getName();
     }
-
 //--------------------------------------------------------------------------------------------------
-    public ArrayList<State> getStateCash() {
+    void saveStatesToCash(ArrayList<State> data, int dbVersion) {
+        saveStatesCash(data);//сохраняем в кэш
+        SaveLoad.save(APP_DB_VERSION, dbVersion);//обновляем номер версии БД
+    }
+
+    ArrayList<State> getStateCash() {
         Log.e("TAG", "...из кэша State");
         ArrayList<String> list = SaveLoad.loadStringArray(STATES);
         ArrayList<State> newStates = new ArrayList<>();
@@ -141,7 +156,7 @@ class Casher {
         return newStates;
     }
 
-    public void saveStatesCash(ArrayList<State> data) {
+    private void saveStatesCash(ArrayList<State> data) {
         Log.e("TAG", "...сохраняем в кэш State");
         ArrayList<String> list = new ArrayList<>();
         for (State d:data) list.add(parseStringFromState(d));
@@ -149,7 +164,7 @@ class Casher {
     }
 
     private State parseStateFromString(String s) {
-        Log.e("TAG", "parseDevSetsFromString: "+s);
+        Log.e("TAG", "parseStateFromString: "+s);
         String[] ar = s.split(CUT);
         String id = ar[0];
         String name = ar[1];
