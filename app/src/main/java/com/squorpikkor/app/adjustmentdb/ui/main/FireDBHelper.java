@@ -120,12 +120,13 @@ class FireDBHelper {
      * Временно(?) работает так:
      * 1. Загрузка location в приложении отключена
      * 2. проверяется email и если такой есть в БД, то
+     * 3. добавляем его в employees
      * 3. запускается locationListener (это теперь единственное место в приложении, откуда этот листенер вообще запускается)
      * 4. после того, как загрузится последняя локация, включается canWorks.setValue(true)
      * 5. который уже всё включает (аккаунт в том числе) и загружает остальные лисенеры
-     * Жуткий костыль, потом сделаю нормально*/
-    //TODO сделать нормально
-    void checkUser(String email, MutableLiveData<Boolean> canWorks, MutableLiveData<ArrayList<Location>> locations) {
+     * Жуткий костыль, потом сделаю нормально
+     * P.S. А может и нормально работает*/
+    void checkUser(String email, MutableLiveData<Boolean> canWorks, MutableLiveData<ArrayList<Location>> locations, MutableLiveData<ArrayList<Employee>> employees) {
         db.collection(TABLE_EMPLOYEES)
                 .whereEqualTo(EMPLOYEE_EMAIL, email)
                 .get().addOnCompleteListener(task -> {
@@ -136,7 +137,16 @@ class FireDBHelper {
                     Log.e(TAG, "♦НЕТ ТАКОГО ПОЛЬЗОВАТЕЛЯ!");
                 } else {
                     Log.e(TAG, "♦Есть такой ПОЛЬЗОВАТЕЛЬ");
+                    DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+                    String id = document.getId();
+                    String name = document.get(EMPLOYEE_NAME_RU).toString();
+                    String eMail = document.get(EMPLOYEE_EMAIL).toString();
+                    String location = document.get(EMPLOYEE_LOCATION).toString();
+                    Employee employee = new Employee(id, name, eMail, location);
+                    Log.e(TAG, "checkUser: EMPLOYEE- " + employee.getEMail()+" " +employee.getLocation());
+                    employees.getValue().add(employee);
                     locationListener(locations, canWorks);
+
                 }
             }
         });

@@ -8,7 +8,6 @@ import android.view.SurfaceView;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import androidx.preference.PreferenceManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -105,16 +104,15 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     private final MutableLiveData<String>   email;
     private Scanner singleScanner;
     private Scanner multiScanner;
-    private MutableLiveData<ArrayList<Location>>  locations;
-    private MutableLiveData<ArrayList<Device>>    devices;
-    private MutableLiveData<ArrayList<Employee>>  employees;
-    private MutableLiveData<ArrayList<State>>     states;
-    private MutableLiveData<ArrayList<DeviceSet>> deviceSets;
+    private final MutableLiveData<ArrayList<Location>>  locations;
+    private final MutableLiveData<ArrayList<Device>>    devices;
+    private final MutableLiveData<ArrayList<Employee>>  employees;
+    private final MutableLiveData<ArrayList<State>>     states;
+    private final MutableLiveData<ArrayList<DeviceSet>> deviceSets;
     /**Юниты, которые были найдены поиском по БД по параметрам*/
     private MutableLiveData<ArrayList<DUnit>> foundUnitsList;
-    private MutableLiveData<Boolean> canWork;
-
-    private MutableLiveData<Boolean> showSurface;
+    private final MutableLiveData<Boolean> canWork;
+    private final MutableLiveData<Boolean> showSurface;
 //--------------------------------------------------------------------------------------------------
     public MutableLiveData<ArrayList<Location>>     getLocations() {
         return locations;
@@ -172,7 +170,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         dbh = new FireDBHelper();
         locations = new MutableLiveData<>();
         devices = new MutableLiveData<>();
-        employees = new MutableLiveData<>();
+        employees = new MutableLiveData<>(new ArrayList<>());
         states = new MutableLiveData<>();
         deviceSets = new MutableLiveData<>();
         foundUnitsList = new MutableLiveData<>();
@@ -195,9 +193,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
         canWork.setValue(false);
         email = new MutableLiveData<>();
         canWork.observeForever(this::doListen);
-        dbh.employeeListener(employees);
         showSurface = new MutableLiveData<>(true);
-
         ///bridge = new Bridge();
     }
 //--------------------------------------------------------------------------------------------------
@@ -210,6 +206,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
     public void addListeners() {
 //        dbh.locationListener(locations);
+        dbh.employeeListener(employees);
         dbh.deviceListener(devices);
         dbh.stateListener(states);
         dbh.deviceSetListener(deviceSets);
@@ -327,7 +324,9 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
     }
 
     public void setLocationByEmail(String email) {
-        Log.e(TAG, "setLocationByEmail: "+email);
+        Log.e(TAG, "try setLocationByEmail: "+email);
+        if (employees.getValue()!=null) for (Employee e:employees.getValue()) Log.e(TAG, "--- Email: "+ e.getEMail());
+
         ArrayList<Employee> list = employees.getValue();
         if (!(list == null || list.size() == 0 || email == null || email.equals(""))) {
             for (int i = 0; i < list.size(); i++) {
@@ -347,7 +346,7 @@ public class MainViewModel extends ViewModel implements ScannerDataShow {
 
 
     public void checkUserEmail(String email) {
-        dbh.checkUser(email, canWork, locations);//todo здесь будет переводчик (Bridge)
+        dbh.checkUser(email, canWork, locations, employees);//todo здесь будет переводчик (Bridge)
     }
 
 
