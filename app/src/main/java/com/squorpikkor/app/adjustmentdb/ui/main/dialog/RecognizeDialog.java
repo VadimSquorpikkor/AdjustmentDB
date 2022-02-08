@@ -249,11 +249,30 @@ public class RecognizeDialog extends BaseDialog{
         if (isWrongName(text)) return "";
         Log.e(TAG, "♦ getDevName: "+text);
 
+
         if (text.contains("5AKT")) nameDef = getRightNameByMask(text, "5AKT", "BDKG");
         else if (text.contains("5AKr")) nameDef = getRightNameByMask(text, "5AKr", "BDKG");
         else if (text.contains("6AKE")) nameDef = getRightNameByMask(text, "6AKE", "BDKG");
         else if (text.contains("5AKE")) nameDef = getRightNameByMask(text, "5AKE", "BDKG");
         else if (text.contains("5AKH")) nameDef = getRightNameByMask(text, "5AKH", "BDKN");
+
+        else if (text.contains("60M")) nameDef = getRightNameByMask(text, "60M", "PU");
+        else if (text.contains("50M")) nameDef = getRightNameByMask(text, "60M", "PU");
+
+        else if (text.contains("5An6")) nameDef = getRightNameByMask(text, "5An6", "BDPB");
+        else if (text.contains("6A16")) nameDef = getRightNameByMask(text, "6A16", "BDPB");
+        else if (text.contains("5AI6")) nameDef = getRightNameByMask(text, "5AI6", "BDPB");
+
+        else if (text.contains("5AnA")) nameDef = getRightNameByMask(text, "5AnA", "BDPA");
+        else if (text.contains("6A1A")) nameDef = getRightNameByMask(text, "6A1A", "BDPA");
+        else if (text.contains("5AIA")) nameDef = getRightNameByMask(text, "5AIA", "BDPA");
+
+        else if (text.contains("5AnC")) nameDef = getRightNameByMask(text, "5AnC", "BDPS");
+        else if (text.contains("6A1C")) nameDef = getRightNameByMask(text, "6A1C", "BDPS");
+        else if (text.contains("5AIC")) nameDef = getRightNameByMask(text, "5AIC", "BDPS");
+
+        else if (text.contains("5APM")) nameDef = getRightNameByMask(text, "5APM", "BDPS");
+        else if (text.contains("6APM")) nameDef = getRightNameByMask(text, "6APM", "BDPS");
         else {
             for (String name : names) {
                 if (text.contains(name)){
