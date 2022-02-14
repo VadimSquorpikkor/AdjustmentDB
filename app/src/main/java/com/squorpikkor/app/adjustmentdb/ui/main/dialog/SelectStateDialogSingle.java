@@ -249,6 +249,7 @@ public class SelectStateDialogSingle extends BaseDialog {
         if (unit.getInnerSerial().equals("") && !newInner.equals("")) unit.setInnerSerial(newInner);
         if (unit.getSerial().equals("") && !newSerial.equals("")) unit.setSerial(newSerial);
         if (unit.getDate()==null) unit.setDate(new Date());
+        unit.setLastDate(new Date());//новенькое
         if (!newStateId.equals(ANY_VALUE)) unit.addNewEvent(mViewModel, newStateId, description, location);
         if (!employee.equals(ANY_VALUE)) unit.setEmployee(employee);
         if (!devSetId.equals(ANY_VALUE)) unit.setDeviceSet(devSetId);

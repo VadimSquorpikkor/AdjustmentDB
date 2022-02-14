@@ -22,6 +22,7 @@ public class DUnit {
     private DEvent lastEvent;
     private String deviceSet;
     private String trackId;
+    private Date lastDate;
 
     public DUnit() {
     }
@@ -198,5 +199,13 @@ public class DUnit {
 
     public void setTrackId(String trackId) {
         this.trackId = trackId;
+    }
+
+    public void setLastDate(Date lastDate) {
+        this.lastDate = lastDate;
+    }
+
+    public Date getLastDate() {
+        return lastDate;
     }
 }

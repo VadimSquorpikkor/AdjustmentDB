@@ -33,6 +33,7 @@ import static com.squorpikkor.app.adjustmentdb.Constant.EMPLOYEE_NAME_RU;
 import static com.squorpikkor.app.adjustmentdb.Constant.LOCATION_NAME_RU;
 import static com.squorpikkor.app.adjustmentdb.Constant.STATE_NAME_RU;
 import static com.squorpikkor.app.adjustmentdb.Constant.TABLE_LOCATIONS;
+import static com.squorpikkor.app.adjustmentdb.Constant.UNIT_LAST_DATE;
 import static com.squorpikkor.app.adjustmentdb.MainActivity.TAG;
 import static com.squorpikkor.app.adjustmentdb.Constant.ANY_VALUE;
 import static com.squorpikkor.app.adjustmentdb.Constant.DEVICE_DEV_SET_ID;
@@ -351,6 +352,7 @@ class FireDBHelper {
         if (unit.getCloseDate()!=null) data.put(UNIT_CLOSE_DATE, unit.getCloseDate());
         if (unit.getLastEvent()!=null) data.put(UNIT_LOCATION, unit.getLastEvent().getLocation());
         if (unit.getLastEvent()!=null) data.put(UNIT_STATE, unit.getLastEvent().getState());
+        data.put(UNIT_LAST_DATE, unit.getLastDate());
         data.put(UNIT_TRACKID, unit.getTrackId());
         db.collection(TABLE_UNITS)
                 .document(unit.getId())

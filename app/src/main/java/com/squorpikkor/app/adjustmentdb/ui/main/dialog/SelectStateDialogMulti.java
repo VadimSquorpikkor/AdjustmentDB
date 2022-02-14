@@ -181,6 +181,7 @@ public class SelectStateDialogMulti extends BaseDialog {
 
         if (unit.getName().equals("") && !newNameId.equals(ANY_VALUE)) unit.setName(newNameId);
         if (unit.getDate()==null) unit.setDate(new Date());
+        unit.setLastDate(new Date());//новенькое
         if (!newStateId.equals(ANY_VALUE)) unit.addNewEvent(mViewModel, newStateId, description, location);
         if (!employee.equals(ANY_VALUE)) unit.setEmployee(employee);
         if (!devSetId.equals(ANY_VALUE)) unit.setDeviceSet(devSetId);
