@@ -63,8 +63,8 @@ public class SelectStateDialogSingle extends BaseDialog {
 
         initializeWithVM(R.layout.dialog_select_states_single);
 
-        unit = mViewModel.getSelectedUnit().getValue();
-//        mViewModel.getSelectedUnit().observe(getViewLifecycleOwner(), dUnit -> unit= dUnit);//проверить
+//        unit = mViewModel.getSelectedUnit().getValue();
+        mViewModel.getSelectedUnit().observe(this, dUnit -> unit = dUnit);//проверить
         location = mViewModel.getLocation_id().getValue();
 
         Spinner deviceSetSpinner = view.findViewById(R.id.spinnerDevSetName);
@@ -83,6 +83,7 @@ public class SelectStateDialogSingle extends BaseDialog {
 //        adapter.setOnItemClickListener(name -> saveUnit(unit));
         stateNamesRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         stateNamesRecycler.setAdapter(adapter);
+
 
         mViewModel.getDeviceSets().observe(this, list2 -> deviceSetSpinnerAdapter.setData(list2, EMPTY_VALUE_TEXT));
         mViewModel.getDevices().observe(this, list1 -> deviceSpinnerAdapter.setDataByDevSet(list1, deviceSetSpinnerAdapter.getSelectedNameId(), EMPTY_VALUE_TEXT));
